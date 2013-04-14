@@ -21,13 +21,13 @@ func main() {
 		log.Printf("Error: %v\n", err)
 		return
 	}
-	for i := 0; i < 100; i++ {
-		df, ok := <-out
+	for i := 0; i < 1000; i++ {
+		_, ok := <-out
 		if !ok {
 			log.Printf("The data channel got closed (exiting)")
 			return
 		}
-		log.Printf("Got df: %v", df.String())
+		//log.Printf("Got df: %v", df.String())
 	}
 	log.Printf("Finished... closing.")
 	device.Disconnect()

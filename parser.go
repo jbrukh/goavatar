@@ -2,6 +2,7 @@ package goavatar
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -22,6 +23,7 @@ const (
 // ----------------------------------------------------------------- //
 
 type DataFrameHeader struct {
+	// a header is 1+2+1+4+1+2+2+4+2 = 19 bytes
 	FieldSampleRateVersion byte
 	FieldFrameSize         uint16
 	FieldFrameType         byte
@@ -104,6 +106,11 @@ func (h *DataFrameHeader) Time() time.Time {
 	return time.Unix(int64(h.FieldTimestamp), int64(time.Duration(h.FieldFracSecs)*time.Second/AvatarFracSecs))
 }
 
+// Payload size
+func (h *DataFrameHeader) PayloadSize() int {
+	return h.Channels() * h.Samples() * AvatarDataPointBytes
+}
+
 // ----------------------------------------------------------------- //
 // AvatarEEG stream parser
 // ----------------------------------------------------------------- //
@@ -145,10 +152,32 @@ func (r *avatarParser) ConsumeSync() (err error) {
 
 func (r *avatarParser) ConsumeHeader() (h *DataFrameHeader, err error) {
 	h = new(DataFrameHeader)
-	// read the data into the header
-	err = binary.Read(r.reader, binary.BigEndian, h)
+
+	// let's peek at the header; there's a chance it is corrupted, and
+	// if so, we will want just skip to the next sync instead of reading
+	// it in (or else we risk losing more data because we're not properly
+	// synced up)
+	buf, err := r.reader.Peek(19)
 	if err != nil {
 		return nil, err
+	}
+	buffer := bytes.NewBuffer(buf)
+
+	// read-ahead the header into the buffer to check it
+	err = binary.Read(buffer, binary.BigEndian, h)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that it is sane
+	pSize := h.PayloadSize()
+	if pSize > AvatarSanePayload || h.FrameSize()-22 != pSize {
+		return nil, fmt.Errorf("Size of payload over threshhold (or doesn't match); wanted %d", pSize)
+	} else {
+		// buf should be 19 bytes long
+		if _, err := r.reader.Read(buf); err != nil {
+			return nil, err
+		}
 	}
 
 	// note the header
@@ -157,9 +186,12 @@ func (r *avatarParser) ConsumeHeader() (h *DataFrameHeader, err error) {
 }
 
 func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (err error) {
-	// read the payload
-	// now read the data
-	pSize := header.Channels() * header.Samples() * AvatarDataPointBytes
+	// ascertain the size of the payload; if the frame is corrupted,
+	// this size will probably be too large, which will result in a
+	// bad reading of the data...
+
+	pSize := header.PayloadSize()
+	// ok, now read it
 	payload := make([]byte, pSize)
 	n := 0
 

@@ -48,7 +48,7 @@ type Device struct {
 func NewDevice(serialPort string) *Device {
 	return &Device{
 		serialPort: serialPort,
-		offSignal:  make(chan bool, 1),
+		offSignal:  make(chan bool),
 		output:     make(chan *DataFrame, DataBufferSize),
 	}
 }
@@ -94,7 +94,6 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 	reader := newAvatarParser(r)
 
 	for {
-		log.Printf("new loop")
 		// break the loop if 
 		// there is an off signal
 		if shouldBreak(offSignal) {
@@ -132,11 +131,11 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 			crc:             crc,
 		}
 		ourCrc := reader.Crc()
-		//log.Printf("Frame: %+v, Crc: %v", *frame, ourCrc)
 		if ourCrc != crc {
 			log.Printf("Bad CRC: %+v (expected: %d)", *frame, ourCrc)
 			continue
 		}
+
 		output <- frame
 	}
 }
@@ -144,7 +143,6 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 func shouldBreak(offSignal <-chan bool) bool {
 	select {
 	case <-offSignal:
-		log.Printf("Received off signal...")
 		return true
 	default:
 	}
