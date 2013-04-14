@@ -16,18 +16,18 @@ func init() {
 
 func main() {
 	device := goavatar.NewDevice(DEFAULT_PORT)
-	err, output := device.Connect()
+	out, err := device.Connect()
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return
 	}
 	for i := 0; i < 100; i++ {
-		df, ok := <-output
+		df, ok := <-out
 		if !ok {
 			log.Printf("The data channel got closed (exiting)")
 			return
 		}
-		log.Printf("Got df: %v\n", df.String())
+		log.Printf("Got df: %v", df.String())
 	}
 	log.Printf("Finished... closing.")
 	device.Disconnect()

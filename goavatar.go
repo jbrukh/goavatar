@@ -1,26 +1,18 @@
 package goavatar
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
-	"time"
 )
 
 // ----------------------------------------------------------------- //
 // Constants
 // ----------------------------------------------------------------- //
 
-// constants used for parsing the
-// AvatarEEG data stream
 const (
-	AvatarSyncByte          = 0xAA
-	AvatarExpectedVersion   = 3 // version
-	AvatarExpectedFrameType = 1 // data frame
-	AvatarFracSecs          = time.Duration(4096)
-	AvatarDataPointBytes    = 3
-	AvatarSanePayload       = 8 * 32 * AvatarDataPointBytes
-	DataBufferSize          = 1000
+	DataBufferSize = 1024
 )
 
 type AvatarChannel int
@@ -42,21 +34,19 @@ const (
 // AvatarEEG Device
 // ----------------------------------------------------------------- //
 
-// Device represents an AvatarEEG device on a particular port that you
-// can connect and disconnect from.
+// Device represents an AvatarEEG device on a particular port.
 type Device struct {
-	connected  bool
-	serialPort string
-	offSignal  chan bool
-	reader     io.ReadCloser
-	output     chan *DataFrame
+	serialPort string          // serial port like /dev/tty.AvatarEEG03009-SPPDev
+	offSignal  chan bool       // send a value to disconnect the device
+	reader     io.ReadCloser   // the reader of the serial port
+	output     chan *DataFrame // channel that delivers raw Avatar output
 }
 
 // NewDevice creates a new Device. The user can then start
-// streaming data by calling Connect().
+// streaming data by calling Connect() and reading the 
+// output channel.
 func NewDevice(serialPort string) *Device {
 	return &Device{
-		connected:  false,
 		serialPort: serialPort,
 		offSignal:  make(chan bool, 1),
 		output:     make(chan *DataFrame, DataBufferSize),
@@ -64,64 +54,36 @@ func NewDevice(serialPort string) *Device {
 }
 
 // Connect to the device.
-func (d *Device) Connect() (err error, output <-chan *DataFrame) {
-	if d.connected {
-		log.Printf("Tried to connect to the device, but it is already connected. (ignoring)")
-		return
-	}
-	reader, err := d.connect()
+func (d *Device) Connect() (output <-chan *DataFrame, err error) {
+	// connect to the reader for the port; this will
+	// fail if we are already reading from this port
+	reader, err := os.Open(d.serialPort)
 	if err != nil {
-		log.Printf("Connection to the device has failed: %s", err)
-		return err, nil
+		return nil, fmt.Errorf("Cannot connect: %v", err)
 	}
+
+	// remember the reader and begin streaming data
+	// on a separate thread
 	d.reader = reader
 	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				log.Printf("Got an error in the parser thread: %v\n", r)
-				d.cleanup() // TODO: this is not threadsafe
-			}
-		}()
 		parseByteStream(d.reader, d.offSignal, d.output)
 	}()
-	return nil, d.output
+	return d.output, nil
 }
 
 // Disconnect from the device.
 func (d *Device) Disconnect() {
-	if d.connected {
-		d.offSignal <- true // send the off signal
-		d.cleanup()
-		d.connected = false
-		log.Printf("Disconnected.")
-	} else {
-		log.Printf("Already disconnected. (ignoring)")
-	}
-}
+	// send the off signal; will block until the
+	// offSignal is processed on the output thread
+	d.offSignal <- true
 
-// connect will connect to the serial port and set internal
-// state of the Device appropriately. This method probably
-// needs to be synchronized externally.
-func (d *Device) connect() (device io.ReadCloser, err error) {
-	device, err = os.Open(d.serialPort)
-	if err != nil {
-		return nil, err
-	}
-	d.connected = true
-	log.Printf("Connected to the device on port %s", d.serialPort)
-	return
-}
-
-func (d *Device) cleanup() {
+	// close the reader
 	if err := d.reader.Close(); err != nil {
 		log.Printf("Error closing the reader: %v", err)
 	}
 
 	// close the output channel
 	close(d.output)
-
-	// now disconnected
-	d.connected = false
 }
 
 // parseByteStream parses the byte stream coming out of the device and writes the output
@@ -132,6 +94,7 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 	reader := newAvatarParser(r)
 
 	for {
+		log.Printf("new loop")
 		// break the loop if 
 		// there is an off signal
 		if shouldBreak(offSignal) {
@@ -169,14 +132,13 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 			crc:             crc,
 		}
 		ourCrc := reader.Crc()
-		log.Printf("Frame: %+v, Crc: %v", *frame, ourCrc)
+		//log.Printf("Frame: %+v, Crc: %v", *frame, ourCrc)
 		if ourCrc != crc {
-			log.Printf("Skipping this frame (bad crc)...")
+			log.Printf("Bad CRC: %+v (expected: %d)", *frame, ourCrc)
 			continue
 		}
-		// output <- frame
+		output <- frame
 	}
-	log.Printf("Closing parser...")
 }
 
 func shouldBreak(offSignal <-chan bool) bool {
