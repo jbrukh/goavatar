@@ -16,6 +16,7 @@ const (
 	AvatarFracSecs          = time.Duration(4096)
 	AvatarDataPointBytes    = 3
 	AvatarSanePayload       = 8 * 32 * AvatarDataPointBytes
+	AvatarAdcRange          = 16777216 // 2^24
 )
 
 // ----------------------------------------------------------------- //
@@ -39,8 +40,8 @@ type DataFrameHeader struct {
 // device. 
 type DataFrame struct {
 	DataFrameHeader
-	channelData [9][]uint32 // raw ADC data for the channels
-	crc         uint16      // CRC-16-CCIT calculated on the entire frame not including CRC
+	data [9][]float64 // raw ADC data for the channels
+	crc  uint16       // CRC-16-CCIT calculated on the entire frame not including CRC
 }
 
 // String
@@ -81,9 +82,15 @@ func (h *DataFrameHeader) FrameCount() int {
 	return int(h.FieldFrameCount)
 }
 
+// HasTriggerChannel
+func (h *DataFrameHeader) HasTriggerChannel() bool {
+	return (h.FieldChannels >> 7) > 0
+}
+
 // Channels
 func (h *DataFrameHeader) Channels() int {
-	return int(h.FieldChannels)
+	// zero the first bit for the trigger channel
+	return int(h.FieldChannels & 0x7F)
 }
 
 // Samples
@@ -185,7 +192,7 @@ func (r *avatarParser) ConsumeHeader() (h *DataFrameHeader, err error) {
 	return
 }
 
-func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (err error) {
+func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (data [9][]float64, err error) {
 	// ascertain the size of the payload; if the frame is corrupted,
 	// this size will probably be too large, which will result in a
 	// bad reading of the data...
@@ -199,14 +206,46 @@ func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (err error) {
 	for n != pSize {
 		nRead, err := r.reader.Read(payload[n:])
 		if err != nil {
-			return err
+			return data, err
 		}
 		n += nRead
 	}
 
 	// note the payload
 	r.crc.Write(payload)
+
+	// allocate the slices for the data
+	samples, channels := header.Samples(), header.Channels()
+	hasTrigger := header.HasTriggerChannel()
+
+	// trigger channel comes first, if applicable
+	if hasTrigger {
+		data[0] = make([]float64, samples)
+	}
+
+	// then allocate the other channels, up to 8
+	for i := 1; i <= channels; i++ {
+		data[i] = make([]float64, samples)
+	}
+
+	// then for each sample, get the data
+	for j := 0; j < samples; j++ {
+		if hasTrigger {
+			data[0][j] = consumeDataPoint(payload, header)
+			// advance the payload
+			payload = payload[3:]
+		}
+		for i := 1; i <= channels; i++ {
+			data[i][j] = consumeDataPoint(payload, header)
+			payload = payload[3:]
+		}
+	}
 	return
+}
+
+func consumeDataPoint(payload []byte, header *DataFrameHeader) float64 {
+	raw := uint32(payload[0])<<16 | uint32(payload[1])<<8 | uint32(payload[2])
+	return ((float64(raw) / float64(1000)) * float64(header.VoltRange())) / float64(AvatarAdcRange)
 }
 
 // read the crc

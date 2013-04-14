@@ -90,7 +90,6 @@ func (d *Device) Disconnect() {
 // to the output channel parameter. It also listens on the offSignal channel for any
 // data, in which case it will stop listening the device and return.
 func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *DataFrame) {
-	defer r.Close()
 	reader := newAvatarParser(r)
 
 	for {
@@ -113,7 +112,7 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 			continue // will break on next loop if reader hosed
 		}
 
-		err = reader.ConsumePayload(header)
+		data, err := reader.ConsumePayload(header)
 		if err != nil {
 			log.Printf("Error: %v", err)
 			continue // will break on next loop if reader hosed
@@ -128,6 +127,7 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 		// collect the frame
 		frame := &DataFrame{
 			DataFrameHeader: *header,
+			data:            data,
 			crc:             crc,
 		}
 		ourCrc := reader.Crc()
