@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+const (
+	AvatarSyncByte          = 0xAA
+	AvatarExpectedVersion   = 3 // version
+	AvatarExpectedFrameType = 1 // data frame
+	AvatarFracSecs          = time.Duration(4096)
+	AvatarDataPointBytes    = 3
+	AvatarSanePayload       = 8 * 32 * AvatarDataPointBytes
+)
+
 // ----------------------------------------------------------------- //
 // AvatarEEG Data Frame and Parsing
 // ----------------------------------------------------------------- //
@@ -30,6 +39,11 @@ type DataFrame struct {
 	DataFrameHeader
 	channelData [9][]uint32 // raw ADC data for the channels
 	crc         uint16      // CRC-16-CCIT calculated on the entire frame not including CRC
+}
+
+// String
+func (df *DataFrame) String() string {
+	return fmt.Sprintf("\n%+v\n", *df)
 }
 
 // SampleRate
@@ -88,11 +102,6 @@ func (h *DataFrameHeader) VoltRange() int {
 // Time converts the timestamp data into Unix nanosecond time.
 func (h *DataFrameHeader) Time() time.Time {
 	return time.Unix(int64(h.FieldTimestamp), int64(time.Duration(h.FieldFracSecs)*time.Second/AvatarFracSecs))
-}
-
-// String
-func (df *DataFrame) String() string {
-	return fmt.Sprintf("\n%+v\n", df)
 }
 
 // ----------------------------------------------------------------- //
