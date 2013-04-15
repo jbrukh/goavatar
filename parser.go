@@ -49,6 +49,10 @@ func (df *DataFrame) String() string {
 	return fmt.Sprintf("\n%+v\n", *df)
 }
 
+func (df *DataFrame) ChannelData(which AvatarChannel) []float64 {
+	return df.data[which]
+}
+
 // SampleRate
 func (h *DataFrameHeader) SampleRate() (sampleRate int, err error) {
 	sr := (h.FieldSampleRateVersion >> 6)
