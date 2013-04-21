@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 )
@@ -181,7 +182,7 @@ func NewMockDevice() *MockDevice {
 
 func (d *MockDevice) Connect() (output <-chan *DataFrame, err error) {
 	// simulate startup time
-	time.Sleep(1500)
+	time.Sleep(time.Second * 1)
 
 	go func() {
 		mockConnection(d.offSignal, d.output)
@@ -212,16 +213,32 @@ func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
 			break
 		}
 		output <- mockFrame()
-		time.Sleep(100)
+		time.Sleep(time.Millisecond * 100)
 	}
 }
 
 func mockFrame() (frame *DataFrame) {
 	var data [9][]float64
+	for i := 1; i <= 2; i++ {
+		data[i] = make([]float64, 16)
+		for j := 0; j < 16; j++ {
+			data[i][j] = rand.Float64()*float64(0.02) + float64(i)
+		}
+	}
 	frame = &DataFrame{
-		DataFrameHeader: DataFrameHeader{},
-		data:            data,
-		crc:             uint16(0),
+		DataFrameHeader: DataFrameHeader{
+			FieldSampleRateVersion: 3,
+			FieldFrameSize:         118,
+			FieldFrameType:         1,
+			FieldFrameCount:        268,
+			FieldChannels:          2,
+			FieldSamples:           16,
+			FieldVoltRange:         750,
+			FieldTimestamp:         1345192284,
+			FieldFracSecs:          2436,
+		},
+		data: data,
+		crc:  uint16(0),
 	}
 	return
 }
