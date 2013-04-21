@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 )
 
 // ----------------------------------------------------------------- //
@@ -35,7 +36,13 @@ const (
 // ----------------------------------------------------------------- //
 
 // Device represents an AvatarEEG device on a particular port.
-type Device struct {
+type Device interface {
+	Connect() (<-chan *DataFrame, error)
+	Disconnect()
+	Out() <-chan *DataFrame
+}
+
+type AvatarDevice struct {
 	serialPort string          // serial port like /dev/tty.AvatarEEG03009-SPPDev
 	offSignal  chan bool       // send a value to disconnect the device
 	reader     io.ReadCloser   // the reader of the serial port
@@ -45,8 +52,8 @@ type Device struct {
 // NewDevice creates a new Device. The user can then start
 // streaming data by calling Connect() and reading the 
 // output channel.
-func NewDevice(serialPort string) *Device {
-	return &Device{
+func NewAvatarDevice(serialPort string) *AvatarDevice {
+	return &AvatarDevice{
 		serialPort: serialPort,
 		offSignal:  make(chan bool),
 		output:     make(chan *DataFrame, DataBufferSize),
@@ -54,7 +61,7 @@ func NewDevice(serialPort string) *Device {
 }
 
 // Connect to the device.
-func (d *Device) Connect() (output <-chan *DataFrame, err error) {
+func (d *AvatarDevice) Connect() (output <-chan *DataFrame, err error) {
 	// connect to the reader for the port; this will
 	// fail if we are already reading from this port
 	reader, err := os.Open(d.serialPort)
@@ -72,7 +79,7 @@ func (d *Device) Connect() (output <-chan *DataFrame, err error) {
 }
 
 // Disconnect from the device.
-func (d *Device) Disconnect() {
+func (d *AvatarDevice) Disconnect() {
 	// send the off signal; will block until the
 	// offSignal is processed on the output thread
 	d.offSignal <- true
@@ -84,6 +91,10 @@ func (d *Device) Disconnect() {
 
 	// close the output channel
 	close(d.output)
+}
+
+func (d *AvatarDevice) Out() <-chan *DataFrame {
+	return d.output
 }
 
 // parseByteStream parses the byte stream coming out of the device and writes the output
@@ -147,4 +158,70 @@ func shouldBreak(offSignal <-chan bool) bool {
 	default:
 	}
 	return false
+}
+
+// ----------------------------------------------------------------- //
+// Mock Avatar Device
+// ----------------------------------------------------------------- //
+
+type MockDevice struct {
+	offSignal chan bool       // send a value to disconnect the device
+	output    chan *DataFrame // output channel
+}
+
+// NewDevice creates a new Device. The user can then start
+// streaming data by calling Connect() and reading the 
+// output channel.
+func NewMockDevice() *MockDevice {
+	return &MockDevice{
+		offSignal: make(chan bool),
+		output:    make(chan *DataFrame, DataBufferSize),
+	}
+}
+
+func (d *MockDevice) Connect() (output <-chan *DataFrame, err error) {
+	// simulate startup time
+	time.Sleep(1500)
+
+	go func() {
+		mockConnection(d.offSignal, d.output)
+	}()
+	return d.output, nil
+
+}
+
+// Disconnect from the device.
+func (d *MockDevice) Disconnect() {
+	// send the off signal; will block until the
+	// offSignal is processed on the output thread
+	d.offSignal <- true
+
+	// close the output channel
+	close(d.output)
+}
+
+func (d *MockDevice) Out() <-chan *DataFrame {
+	return d.output
+}
+
+func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
+	for {
+		// break the loop if 
+		// there is an off signal
+		if shouldBreak(offSignal) {
+			break
+		}
+		output <- mockFrame()
+		time.Sleep(100)
+	}
+}
+
+func mockFrame() (frame *DataFrame) {
+	var data [9][]float64
+	frame = &DataFrame{
+		DataFrameHeader: DataFrameHeader{},
+		data:            data,
+		crc:             uint16(0),
+	}
+	return
 }
