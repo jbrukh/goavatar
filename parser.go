@@ -249,7 +249,7 @@ func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (data [9][]float6
 
 func consumeDataPoint(payload []byte, header *DataFrameHeader) float64 {
 	raw := uint32(payload[0])<<16 | uint32(payload[1])<<8 | uint32(payload[2])
-	return ((float64(raw) / float64(1000)) * float64(header.VoltRange())) / float64(AvatarAdcRange)
+	return ((float64(raw) / float64(1000) / float64(AvatarAdcRange)) * float64(header.VoltRange()))
 }
 
 // read the crc
