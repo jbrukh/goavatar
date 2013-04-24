@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -39,8 +40,8 @@ const (
 // Device represents an AvatarEEG device on a particular port.
 type Device interface {
 	Connect() (<-chan *DataFrame, error)
+	Connected() bool
 	Disconnect()
-	Out() <-chan *DataFrame
 }
 
 type AvatarDevice struct {
@@ -48,6 +49,8 @@ type AvatarDevice struct {
 	offSignal  chan bool       // send a value to disconnect the device
 	reader     io.ReadCloser   // the reader of the serial port
 	output     chan *DataFrame // channel that delivers raw Avatar output
+	lock       *sync.Mutex
+	connected  bool
 }
 
 // NewDevice creates a new Device. The user can then start
@@ -61,13 +64,26 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 	}
 }
 
+func (d *AvatarDevice) Connected() bool {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.connected
+}
+
 // Connect to the device.
 func (d *AvatarDevice) Connect() (output <-chan *DataFrame, err error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	if d.connected {
+		return nil, fmt.Errorf("already connected to the device")
+	}
+
 	// connect to the reader for the port; this will
 	// fail if we are already reading from this port
 	reader, err := os.Open(d.serialPort)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot connect: %v", err)
+		return nil, fmt.Errorf("cannot connect: %v", err)
 	}
 
 	// remember the reader and begin streaming data
@@ -76,11 +92,19 @@ func (d *AvatarDevice) Connect() (output <-chan *DataFrame, err error) {
 	go func() {
 		parseByteStream(d.reader, d.offSignal, d.output)
 	}()
+	d.connected = true
 	return d.output, nil
 }
 
 // Disconnect from the device.
 func (d *AvatarDevice) Disconnect() {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	if !d.connected {
+		return
+	}
+
 	// send the off signal; will block until the
 	// offSignal is processed on the output thread
 	d.offSignal <- true
@@ -92,10 +116,7 @@ func (d *AvatarDevice) Disconnect() {
 
 	// close the output channel
 	close(d.output)
-}
-
-func (d *AvatarDevice) Out() <-chan *DataFrame {
-	return d.output
+	d.connected = false
 }
 
 // parseByteStream parses the byte stream coming out of the device and writes the output
@@ -168,6 +189,8 @@ func shouldBreak(offSignal <-chan bool) bool {
 type MockDevice struct {
 	offSignal chan bool       // send a value to disconnect the device
 	output    chan *DataFrame // output channel
+	connected bool
+	lock      *sync.Mutex
 }
 
 // NewDevice creates a new Device. The user can then start
@@ -177,32 +200,51 @@ func NewMockDevice() *MockDevice {
 	return &MockDevice{
 		offSignal: make(chan bool),
 		output:    make(chan *DataFrame, DataBufferSize),
+		connected: false,
 	}
 }
 
+func (d *MockDevice) Connected() bool {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.connected
+}
+
 func (d *MockDevice) Connect() (output <-chan *DataFrame, err error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	// already connected?
+	if d.connected {
+		return nil, fmt.Errorf("Device is already connected.")
+	}
+
 	// simulate startup time
 	time.Sleep(time.Second * 1)
 
 	go func() {
 		mockConnection(d.offSignal, d.output)
 	}()
+	d.connected = true
 	return d.output, nil
-
 }
 
 // Disconnect from the device.
 func (d *MockDevice) Disconnect() {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	if !d.connected {
+		return
+	}
+
 	// send the off signal; will block until the
 	// offSignal is processed on the output thread
 	d.offSignal <- true
 
 	// close the output channel
 	close(d.output)
-}
-
-func (d *MockDevice) Out() <-chan *DataFrame {
-	return d.output
+	d.connected = false
 }
 
 func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
@@ -218,6 +260,7 @@ func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
 }
 
 func mockFrame() (frame *DataFrame) {
+	// some fake data
 	var data [9][]float64
 	for i := 1; i <= 2; i++ {
 		data[i] = make([]float64, 16)
@@ -225,6 +268,8 @@ func mockFrame() (frame *DataFrame) {
 			data[i][j] = rand.Float64()*float64(0.02) + float64(i)
 		}
 	}
+
+	// TODO: make timestamps realistic
 	frame = &DataFrame{
 		DataFrameHeader: DataFrameHeader{
 			FieldSampleRateVersion: 3,
