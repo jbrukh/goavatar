@@ -18,6 +18,11 @@ Make sure the $GOPATH/bin directory is in your PATH and
 
     $ server
 
+Mock Device
+===========
+
+    $ server --mockDevice
+    
 Options
 =======
 
