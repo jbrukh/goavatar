@@ -8,103 +8,97 @@ import (
 	"net/http"
 )
 
-var engaged = false
+//---------------------------------------------------------//
+// Constants
+//---------------------------------------------------------//
 
-const (
-	MaxFrames      = 10000
-	WindowSize     = 1000
-	WindowMultiple = 10
-)
+const ()
 
-func Handler() http.Handler {
-	return websocket.Handler(jsonServer)
+//---------------------------------------------------------//
+// Handler -- for use with net/http HTTP server
+//---------------------------------------------------------//
+
+// Handler provides a request handler for use with Go's HTTP 
+// server. To set the handler, call:
+//
+//    http.Handle("/uri", socket.Handler(device))
+//
+func Handler(device Device) http.Handler {
+	return websocket.Handler(NewSocketListener(device))
 }
 
-type Control struct {
-	State bool
+//---------------------------------------------------------//
+// Messages
+//---------------------------------------------------------//
+
+// ControlMessage is the structure that WebSocket clients
+// use to engage and disengage the device.
+type ControlMessage struct {
+	Engage    bool `json:"engage"`    // boolean to engage or disengage the device
+	Frequency int  `json:"frequency"` // how many messages to deliver per second
+	Average   bool `json:"average"`   // if false, last data point from each batch will be sent; otherwise average of the batch
 }
 
-type Response struct {
-	Channel1 []float64
-	Channel2 []float64
+// ResponseMessage is sent by the socket in response to
+// a ControlMessage. If an error occurred, then Success
+// will be set to false, and the Err will be set to the
+// error message.
+type ResponseMessage struct {
+	Success bool   `json:"success"` // whether or not the control message was successful
+	Err     string `json:"err"`     // error text, if any
+
+	// may in the future include information about the device
+	// sample rate and frames, etc.
 }
 
-func mockResponse() *Response {
-	r := &Response{
-		Channel1: make([]float64, 10),
-	}
-	for i := 0; i < 10; i++ {
-		r.Channel1[i] = float64(i)
-	}
-	return r
+// DataMessage returns datapoints from the device across 
+// the channels. These data points represent incremental data
+// that has not been seen before. The data messages come at a 
+// frequency specified in the initial control messages.
+type DataMessage struct {
+	Channels  int        `json:"channels"`  // number of channels
+	Data      [8]float64 `json:"data"`      // the data for each channel, only first n relevant, n == # of channels
+	Timestamp uint32     `json:"timestamp"` // timestamp corresponding to this data sample
 }
 
-func jsonServer(ws *websocket.Conn) {
-	var device Device
-	for {
-		var msg Control
+//---------------------------------------------------------//
+// The Socket
+//---------------------------------------------------------//
 
-		err := websocket.JSON.Receive(ws, &msg)
-		if err != nil {
-			log.Println(err)
-			break
-		}
+// NewSocketListener creates a function that can be used
+// as a WebSocket handler. See also Handler(Device).
+func NewSocketListener(device Device) func(ws *websocket.Conn) {
+	return func(ws *websocket.Conn) {
 
-		if msg.State {
-			// connect
-			log.Println("Connecting to the device...")
-
-			// set up the device
-			device := NewMockDevice()
-
-			// connect to it
-			out, err := device.Connect()
-			if err != nil {
-				log.Printf("Error: %v\n", err)
-				continue
-			}
-
-			var (
-				w1 = window.New(WindowSize, WindowMultiple)
-				w2 = window.New(WindowSize, WindowMultiple)
-			)
-
-			go run(out, w1, w2, ws)
-			// do not reference w1,w2 here, not thread-safe
-
-		} else {
-			// disconnect
-			log.Println("Disconnecting from the device...")
-			device.Disconnect()
-
-		}
 	}
 }
 
-func run(out <-chan *DataFrame, w1, w2 *window.MovingWindow, ws *websocket.Conn) {
+func send(ws *websocket.Conn, msg interface{}) {
+	err := websocket.JSON.Send(ws, msg)
+	if err != nil {
+		log.Printf("error sending: %s\n", err)
+	}
+}
+
+func run(device Device) {
 	for i := 0; i < MaxFrames; i++ {
-		df, ok := <-out
+		df, ok := <-device.Out()
 		if !ok {
-			log.Printf("The data channel got closed (exiting)")
+			log.Printf("disconnecting from the device because output channel has closed")
 			return
-		}
-		//log.Printf("Got df: %v", df.String())
-		for _, v := range df.ChannelData(1) {
-			w1.PushBack(v)
-		}
-		for _, v := range df.ChannelData(2) {
-			w2.PushBack(v)
 		}
 
 		r := &Response{
-			Channel1: w1.Slice(),
-			Channel2: w2.Slice(),
+			Channel1: df.ChannelData(1),
+			Channel2: df.ChannelData(2),
 		}
 		err := websocket.JSON.Send(ws, r)
 		if err != nil {
 			log.Printf("error sending: %s\n", err)
-			continue
+			break
 		}
 		log.Printf("send:%#v\n", r)
 	}
+	device.Disconnect()
+
 }

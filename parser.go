@@ -161,6 +161,16 @@ func (r *avatarParser) ConsumeSync() (err error) {
 	return
 }
 
+// TODO: we know the size of the entire frame, so we can peek at it
+// and check the CRC; also, the frame has a maximum size...
+//
+// "With the version of firmware you have there will always be 16 samples in
+// a frame and if trigger channel enabled this would be 9 channels. So max
+// frame size with your firmware is 22 + 3*9*16 = 454 bytes.
+//
+// With future versions we may adjust number of samples to optimize
+// Bluetooth performance and may have hardware that supports up to 24
+// channels."
 func (r *avatarParser) ConsumeHeader() (h *DataFrameHeader, err error) {
 	h = new(DataFrameHeader)
 
