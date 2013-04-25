@@ -1,5 +1,0 @@
-package goavatar
-
-import (
-//"testing"
-)
