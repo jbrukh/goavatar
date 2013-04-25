@@ -6,6 +6,7 @@ import (
 	"github.com/jbrukh/window"
 	"log"
 	"net/http"
+	"os"
 )
 
 //---------------------------------------------------------//
@@ -34,7 +35,7 @@ func Handler(device Device) http.Handler {
 // ControlMessage is the structure that WebSocket clients
 // use to engage and disengage the device.
 type ControlMessage struct {
-	Engage    bool `json:"engage"`    // boolean to engage or disengage the device
+	Connect   bool `json:"connect"`   // boolean to engage or disengage the device
 	Frequency int  `json:"frequency"` // how many messages to deliver per second
 	Average   bool `json:"average"`   // if false, last data point from each batch will be sent; otherwise average of the batch
 }
@@ -44,8 +45,9 @@ type ControlMessage struct {
 // will be set to false, and the Err will be set to the
 // error message.
 type ResponseMessage struct {
-	Success bool   `json:"success"` // whether or not the control message was successful
-	Err     string `json:"err"`     // error text, if any
+	Success  bool   `json:"success"`  // whether or not the control message was successful
+	Err      string `json:"err"`      // error text, if any
+	Channels int    `json:"channels"` // number of channels
 
 	// may in the future include information about the device
 	// sample rate and frames, etc.
@@ -56,7 +58,6 @@ type ResponseMessage struct {
 // that has not been seen before. The data messages come at a 
 // frequency specified in the initial control messages.
 type DataMessage struct {
-	Channels  int        `json:"channels"`  // number of channels
 	Data      [8]float64 `json:"data"`      // the data for each channel, only first n relevant, n == # of channels
 	Timestamp uint32     `json:"timestamp"` // timestamp corresponding to this data sample
 }
@@ -69,10 +70,61 @@ type DataMessage struct {
 // as a WebSocket handler. See also Handler(Device).
 func NewSocketListener(device Device) func(ws *websocket.Conn) {
 	return func(ws *websocket.Conn) {
+		defer ws.Close()
+		for {
+			// check the connection
+			if !ws.IsClientConn() {
+				log.Printf("client has disconnected (closing)")
+				break
+			}
+
+			// listen
+			var msg ControlMessage
+			if err := websocket.JSON.Receive(ws, &msg); err != nil {
+				log.Printf("error receiving: %v (closing)", msg)
+				break
+			}
+
+			// disengage?
+			if !msg.Connect {
+				log.Printf("disengaging the device")
+				device.Disconnect()
+				continue
+			}
+
+			// engage?
+			if msg.Connect {
+				// device already connected?
+				if device.Connected() {
+					send(ws, &ResponseMessage{
+						Success: false,
+						Err:     "device already connected",
+					})
+					continue
+				}
+
+				// connect
+				log.Printf("connecting to the device...")
+				out, err := device.Connect()
+				if err != nil {
+					log.Printf("could not connect: %v", err)
+					send(ws, &ResponseMessage{
+						Success: false,
+						Err:     "could not connect to the device",
+					})
+					continue
+				}
+
+				log.Printf("device is connected")
+				defer device.Disconnect()
+				go stream(device, &msg)
+			}
+		}
 
 	}
 }
 
+// send a message on a the WebSocket
 func send(ws *websocket.Conn, msg interface{}) {
 	err := websocket.JSON.Send(ws, msg)
 	if err != nil {
@@ -80,25 +132,45 @@ func send(ws *websocket.Conn, msg interface{}) {
 	}
 }
 
-func run(device Device) {
-	for i := 0; i < MaxFrames; i++ {
+func stream(device Device, msg *ControlMessage) {
+	defer device.Disconnect() // just in case
+
+	// first, diagnose the device
+	out := device.Out()
+	if df, ok := <-out; !ok {
+		log.Printf("device died prematurely, before it could be diagnosed")
+		return
+	} else {
+		// send the success response
+		send(ws, &ResponseMessage{
+			Success:  true,
+			Channels: df.Channels(),
+		})
+	}
+
+	// now run as long as the device is
+	// connected
+	for device.Connected() {
 		df, ok := <-device.Out()
 		if !ok {
-			log.Printf("disconnecting from the device because output channel has closed")
+			log.Printf("device has closed")
 			return
 		}
 
-		r := &Response{
-			Channel1: df.ChannelData(1),
-			Channel2: df.ChannelData(2),
-		}
-		err := websocket.JSON.Send(ws, r)
-		if err != nil {
+		data := produce(df)
+		if err := websocket.JSON.Send(ws, data); err != nil {
 			log.Printf("error sending: %s\n", err)
 			break
 		}
-		log.Printf("send:%#v\n", r)
 	}
-	device.Disconnect()
+}
 
+func produce(df *DataFrame) *DataMessage {
+	data := new(DataMessage)
+	channels := df.Channels()
+	for i := 1; i < channels; i++ {
+		data.Data[i-1] = df.ChannelData(i)[0] // get the first point
+	}
+	data.Timestamp = df.Time().UnixNano()
+	return data
 }

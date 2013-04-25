@@ -101,3 +101,9 @@ func (d *AvatarDevice) Disconnect() {
 	close(d.output)
 	d.connected = false
 }
+
+func (d *AvatarDevice) Out() {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.output
+}
