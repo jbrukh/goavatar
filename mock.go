@@ -84,7 +84,7 @@ func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
 			break
 		}
 		output <- mockFrame()
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 4) // 250 hz
 	}
 }
 

@@ -4,6 +4,8 @@ import (
 	"code.google.com/p/go.net/websocket"
 	. "github.com/jbrukh/goavatar"
 	//"github.com/jbrukh/window"
+
+	"io"
 	"log"
 	"net/http"
 )
@@ -44,10 +46,10 @@ type ControlMessage struct {
 // will be set to false, and the Err will be set to the
 // error message.
 type ResponseMessage struct {
-	Success  bool   `json:"success"`  // whether or not the control message was successful
-	Err      string `json:"err"`      // error text, if any
-	Channels int    `json:"channels"` // number of channels
-
+	Success   bool   `json:"success"`   // whether or not the control message was successful
+	Err       string `json:"err"`       // error text, if any
+	Channels  int    `json:"channels"`  // number of channels
+	VoltRange int    `json:"voltRange"` // range of mVpp measurement of the device
 	// may in the future include information about the device
 	// sample rate and frames, etc.
 }
@@ -71,10 +73,15 @@ func NewSocketListener(device Device) func(ws *websocket.Conn) {
 	return func(ws *websocket.Conn) {
 		defer ws.Close()
 		for {
+			log.Printf("listening...")
 			// listen
 			var msg ControlMessage
 			if err := websocket.JSON.Receive(ws, &msg); err != nil {
-				log.Printf("error receiving: %v (closing)", err)
+				if err == io.EOF {
+					log.Printf("connection closed")
+				} else {
+					log.Printf("error receiving: %v (closing)", err)
+				}
 				break
 			}
 			log.Printf("received: %+v", msg)
@@ -93,6 +100,15 @@ func NewSocketListener(device Device) func(ws *websocket.Conn) {
 					send(ws, &ResponseMessage{
 						Success: false,
 						Err:     "device already connected",
+					})
+					continue
+				}
+
+				// frequency is weird?
+				if msg.Frequency < 1 || msg.Frequency > 250 {
+					send(ws, &ResponseMessage{
+						Success: false,
+						Err:     "frequency should be 1 to 250",
 					})
 					continue
 				}
@@ -131,40 +147,79 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 	log.Printf("diagnosing the device...")
 	// first, diagnose the device
 	out := device.Out()
+	var (
+		channels   int
+		samples    int
+		sampleRate int
+		batchSize  int
+	)
 	if df, ok := <-out; !ok {
 		log.Printf("device died prematurely, before it could be diagnosed")
 		return
 	} else {
+		// record the diagnostics
+		channels = df.Channels()
+		samples = df.Samples()
+		sampleRate, _ = df.SampleRate()
+
+		// calculate how much we should batch
+		// given the frequency
+		batchSize = sampleRate * samples / msg.Frequency
+
 		// send the success response
-		send(ws, &ResponseMessage{
-			Success:  true,
-			Channels: df.Channels(),
-		})
+		r := &ResponseMessage{
+			Success:   true,
+			Channels:  channels,
+			VoltRange: df.VoltRange(),
+		}
+		log.Printf("sending response: %+v", r)
+		send(ws, r)
 	}
+
+	buffers := make([][]float64, channels)
 
 	// now run as long as the device is
 	// connected
 	for device.Connected() {
 		df, ok := <-device.Out()
 		if !ok {
-			log.Printf("device has closed")
+			log.Printf("device has disconnected")
 			return
 		}
 
-		data := produce(df)
+		for i := 0; i < channels; i++ {
+			buffers[i] = append(buffers[i], df.ChannelData(i+1)...)
+		}
+
+		// do we need to keep filling?
+		if len(buffers[0]) < batchSize {
+			continue
+		}
+
+		// ...no, there is enough for a batch
+		data := new(DataMessage)
+		for i := 0; i < channels; i++ {
+			buf := buffers[i][:batchSize]
+			buffers[i] = buffers[i][batchSize:]
+			if !msg.Average {
+				// sampling the first data point
+				data.Data[i] = buf[0]
+			} else {
+				// find the average
+				sum := float64(0)
+				for j := 0; j < batchSize; j++ {
+					sum += buf[j]
+				}
+				data.Data[i] = sum / float64(batchSize)
+			}
+		}
+
+		// TODO: fix this
+		data.Timestamp = df.Time().UnixNano()
+		log.Printf("sending %+v", data)
 		if err := websocket.JSON.Send(ws, data); err != nil {
 			log.Printf("error sending: %s\n", err)
 			break
 		}
 	}
-}
-
-func produce(df *DataFrame) *DataMessage {
-	data := new(DataMessage)
-	channels := df.Channels()
-	for i := 0; i < channels; i++ {
-		data.Data[i] = df.ChannelData(i + 1)[0] // get the first point
-	}
-	data.Timestamp = df.Time().UnixNano()
-	return data
 }
