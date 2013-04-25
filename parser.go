@@ -57,7 +57,7 @@ func (df *DataFrame) ChannelData(channel int) []float64 {
 	return df.data[channel]
 }
 
-// SampleRate
+// SampleRate: the number of data samples delivered in one second (per channel)
 func (h *DataFrameHeader) SampleRate() (sampleRate int, err error) {
 	sr := (h.FieldSampleRateVersion >> 6)
 	if sr == 0x00 {

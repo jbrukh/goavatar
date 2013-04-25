@@ -1,10 +1,7 @@
-package socket
+package goavatar
 
 import (
 	"code.google.com/p/go.net/websocket"
-	. "github.com/jbrukh/goavatar"
-	//"github.com/jbrukh/window"
-
 	"io"
 	"log"
 	"net/http"
@@ -149,7 +146,6 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 	out := device.Out()
 	var (
 		channels   int
-		samples    int
 		sampleRate int
 		batchSize  int
 	)
@@ -159,12 +155,11 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 	} else {
 		// record the diagnostics
 		channels = df.Channels()
-		samples = df.Samples()
 		sampleRate, _ = df.SampleRate()
 
 		// calculate how much we should batch
 		// given the frequency
-		batchSize = sampleRate * samples / msg.Frequency
+		batchSize = sampleRate / msg.Frequency
 
 		// send the success response
 		r := &ResponseMessage{

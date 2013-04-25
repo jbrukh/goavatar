@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	. "github.com/jbrukh/goavatar"
-	"github.com/jbrukh/goavatar/socket"
 	"log"
 	"net/http"
 )
@@ -37,7 +36,7 @@ func main() {
 	log.Printf("starting server at endpoint http://localhost:%d%s", *listenPort, Endpoint)
 	port := fmt.Sprintf(":%d", *listenPort)
 
-	http.Handle(Endpoint, socket.Handler(device))
+	http.Handle(Endpoint, Handler(device))
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalf("could not start server: %v", err)

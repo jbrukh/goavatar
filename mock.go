@@ -2,6 +2,7 @@ package goavatar
 
 import (
 	"fmt"
+	//"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -88,13 +89,20 @@ func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
 	}
 }
 
+var tick int = 0
+
 func mockFrame() (frame *DataFrame) {
+	tick++
 	// some fake data
 	var data [9][]float64
 	for i := 1; i <= 2; i++ {
 		data[i] = make([]float64, 16)
 		for j := 0; j < 16; j++ {
-			data[i][j] = rand.Float64()*float64(0.02) + float64(i)
+			if tick == 10 {
+				data[i][j] = 10
+			} else {
+				data[i][j] = rand.Float64()*float64(0.02) + float64(i)
+			}
 		}
 	}
 
