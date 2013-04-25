@@ -17,6 +17,7 @@ const (
 	AvatarDataPointBytes    = 3
 	AvatarSanePayload       = 8 * 32 * AvatarDataPointBytes
 	AvatarAdcRange          = 16777216 // 2^24
+	AvatarMaxChannels       = 8
 )
 
 // ----------------------------------------------------------------- //
@@ -49,8 +50,11 @@ func (df *DataFrame) String() string {
 	return fmt.Sprintf("\n%+v\n", *df)
 }
 
-func (df *DataFrame) ChannelData(which AvatarChannel) []float64 {
-	return df.data[which]
+func (df *DataFrame) ChannelData(channel int) []float64 {
+	if channel < 0 || channel > AvatarMaxChannels {
+		panic("you are trying to select a channel that doesn't exist")
+	}
+	return df.data[channel]
 }
 
 // SampleRate

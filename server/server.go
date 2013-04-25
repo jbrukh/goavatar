@@ -12,12 +12,13 @@ import (
 const (
 	DefaultSerialPort = "/dev/tty.AvatarEEG03009-SPPDev"
 	DefaultListenPort = 8000
+	Endpoint          = "/device"
 )
 
 var (
-	serialPort *string = flag.String("serialPort", DefaultPort, "the serial port for the device")
+	serialPort *string = flag.String("serialPort", DefaultSerialPort, "the serial port for the device")
 	mockDevice *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
-	listenPort int     = flag.Bool("listenPort", DefaultListenPort, "the websocket port on which to listen")
+	listenPort *int    = flag.Int("listenPort", DefaultListenPort, "the websocket port on which to listen")
 )
 
 func main() {
@@ -33,10 +34,10 @@ func main() {
 		device = NewAvatarDevice(*serialPort)
 	}
 
-	log.Printf("starting server on port %d", *listenPort)
+	log.Printf("starting server at endpoint http://localhost:%d%s", *listenPort, Endpoint)
 	port := fmt.Sprintf(":%d", *listenPort)
-	h := socket.Handler(device)
 
+	http.Handle(Endpoint, socket.Handler(device))
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalf("could not start server: %v", err)

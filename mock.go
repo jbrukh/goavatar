@@ -1,8 +1,10 @@
 package goavatar
 
 import (
+	"fmt"
 	"math/rand"
 	"sync"
+	"time"
 )
 
 // ----------------------------------------------------------------- //
@@ -13,7 +15,7 @@ type MockDevice struct {
 	offSignal chan bool       // send a value to disconnect the device
 	output    chan *DataFrame // output channel
 	connected bool
-	lock      *sync.Mutex
+	lock      sync.Mutex
 }
 
 // NewDevice creates a new Device. The user can then start
@@ -68,7 +70,7 @@ func (d *MockDevice) Disconnect() {
 	d.connected = false
 }
 
-func (d *MockDevice) Out() {
+func (d *MockDevice) Out() <-chan *DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.output

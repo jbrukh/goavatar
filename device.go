@@ -1,6 +1,9 @@
 package goavatar
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"sync"
 )
 
@@ -41,7 +44,7 @@ type AvatarDevice struct {
 	offSignal  chan bool       // send a value to disconnect the device
 	reader     io.ReadCloser   // the reader of the serial port
 	output     chan *DataFrame // channel that delivers raw Avatar output
-	lock       *sync.Mutex     // for synchronizing calls to control the device
+	lock       sync.Mutex      // for synchronizing calls to control the device
 	connected  bool            // connection status
 }
 
@@ -102,7 +105,7 @@ func (d *AvatarDevice) Disconnect() {
 	d.connected = false
 }
 
-func (d *AvatarDevice) Out() {
+func (d *AvatarDevice) Out() <-chan *DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.output

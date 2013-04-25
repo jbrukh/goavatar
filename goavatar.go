@@ -1,13 +1,8 @@
 package goavatar
 
 import (
-	"fmt"
 	"io"
 	"log"
-	"math/rand"
-	"os"
-	"sync"
-	"time"
 )
 
 // ----------------------------------------------------------------- //

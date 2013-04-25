@@ -3,10 +3,9 @@ package socket
 import (
 	"code.google.com/p/go.net/websocket"
 	. "github.com/jbrukh/goavatar"
-	"github.com/jbrukh/window"
+	//"github.com/jbrukh/window"
 	"log"
 	"net/http"
-	"os"
 )
 
 //---------------------------------------------------------//
@@ -59,7 +58,7 @@ type ResponseMessage struct {
 // frequency specified in the initial control messages.
 type DataMessage struct {
 	Data      [8]float64 `json:"data"`      // the data for each channel, only first n relevant, n == # of channels
-	Timestamp uint32     `json:"timestamp"` // timestamp corresponding to this data sample
+	Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
 }
 
 //---------------------------------------------------------//
@@ -72,18 +71,13 @@ func NewSocketListener(device Device) func(ws *websocket.Conn) {
 	return func(ws *websocket.Conn) {
 		defer ws.Close()
 		for {
-			// check the connection
-			if !ws.IsClientConn() {
-				log.Printf("client has disconnected (closing)")
-				break
-			}
-
 			// listen
 			var msg ControlMessage
 			if err := websocket.JSON.Receive(ws, &msg); err != nil {
-				log.Printf("error receiving: %v (closing)", msg)
+				log.Printf("error receiving: %v (closing)", err)
 				break
 			}
+			log.Printf("received: %+v", msg)
 
 			// disengage?
 			if !msg.Connect {
@@ -105,7 +99,7 @@ func NewSocketListener(device Device) func(ws *websocket.Conn) {
 
 				// connect
 				log.Printf("connecting to the device...")
-				out, err := device.Connect()
+				_, err := device.Connect()
 				if err != nil {
 					log.Printf("could not connect: %v", err)
 					send(ws, &ResponseMessage{
@@ -117,7 +111,7 @@ func NewSocketListener(device Device) func(ws *websocket.Conn) {
 
 				log.Printf("device is connected")
 				defer device.Disconnect()
-				go stream(device, &msg)
+				go stream(device, ws, &msg)
 			}
 		}
 
@@ -132,9 +126,9 @@ func send(ws *websocket.Conn, msg interface{}) {
 	}
 }
 
-func stream(device Device, msg *ControlMessage) {
+func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 	defer device.Disconnect() // just in case
-
+	log.Printf("diagnosing the device...")
 	// first, diagnose the device
 	out := device.Out()
 	if df, ok := <-out; !ok {
@@ -168,8 +162,8 @@ func stream(device Device, msg *ControlMessage) {
 func produce(df *DataFrame) *DataMessage {
 	data := new(DataMessage)
 	channels := df.Channels()
-	for i := 1; i < channels; i++ {
-		data.Data[i-1] = df.ChannelData(i)[0] // get the first point
+	for i := 0; i < channels; i++ {
+		data.Data[i] = df.ChannelData(i + 1)[0] // get the first point
 	}
 	data.Timestamp = df.Time().UnixNano()
 	return data
