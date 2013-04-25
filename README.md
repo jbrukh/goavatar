@@ -10,24 +10,24 @@ To get the repo:
 
     $ go get -u github.com/jbrukh/goavatar
 
-Then, to install the server:
+Then, to install the Octopus server:
 
-    $ go install github.com/jbrukh/goavatar/server
+    $ go install github.com/jbrukh/goavatar/octopus
 
 Make sure the $GOPATH/bin directory is in your PATH and
 
-    $ server
+    $ octopus
 
 Mock Device
 ===========
 
-    $ server --mockDevice
+    $ octopus --mockDevice
     
 Options
 =======
 
-    $ server --help
-    Usage of server:
+    $ octopus --help
+    Usage of octopus:
         -listenPort=8000: the websocket port on which to listen
         -mockDevice=false: whether to use the mock device
         -serialPort="/dev/tty.AvatarEEG03009-SPPDev": the serial port for the device
