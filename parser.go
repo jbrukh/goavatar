@@ -57,6 +57,10 @@ func (df *DataFrame) ChannelData(channel int) []float64 {
 	return df.data[channel]
 }
 
+func (df *DataFrame) ChannelDatas() *MultiBuffer {
+	return NewMultiBufferFromSlice(df.data[1:df.Channels()])
+}
+
 // SampleRate: the number of data samples delivered in one second (per channel)
 func (h *DataFrameHeader) SampleRate() (sampleRate int, err error) {
 	sr := (h.FieldSampleRateVersion >> 6)

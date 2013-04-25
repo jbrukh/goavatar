@@ -1,5 +1,9 @@
 package goavatar
 
+import (
+	"fmt"
+)
+
 type MultiBuffer struct {
 	channels int
 	data     [][]float64
@@ -27,13 +31,18 @@ func NewMultiBufferFromSlice(data [][]float64) *MultiBuffer {
 	w := len(data[0])
 	for c := 0; c < l; c++ {
 		if len(data[c]) != w {
-			panic("inconsistent widths")
+			str := fmt.Sprintf("inconsistent widths: %d and %d", len(data[c]), w)
+			panic(str)
 		}
 	}
 	return &MultiBuffer{
 		channels: l,
 		data:     data,
 	}
+}
+
+func (b *MultiBuffer) Size() int {
+	return len(b.data[0])
 }
 
 func (b *MultiBuffer) AppendSample(data []float64) {
@@ -46,11 +55,11 @@ func (b *MultiBuffer) AppendSample(data []float64) {
 }
 
 func (b *MultiBuffer) Append(data [][]float64) {
-	if len(data) != len(b.channels) {
+	if len(data) != b.channels {
 		panic("buffer sizes not comparable")
 	}
 	for c := 0; c < b.channels; c++ {
-		b.data[c] = append(b.data[c], data[c])
+		b.data[c] = append(b.data[c], data[c]...)
 	}
 }
 
@@ -71,7 +80,7 @@ func (b *MultiBuffer) Next(n int) (*MultiBuffer, bool) {
 	}
 	buf := NewMultiBufferFromSlice(make([][]float64, b.channels))
 	for c := 0; c < b.channels; c++ {
-		buf.data[c] = append(buf.data[c], b.data[c][:n])
+		buf.data[c] = append(buf.data[c], b.data[c][:n]...)
 	}
 	return buf, true
 }

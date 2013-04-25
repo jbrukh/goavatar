@@ -171,7 +171,7 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 		send(ws, r)
 	}
 
-	buffers := make([][]float64, channels)
+	buffers := NewMultiBuffer(channels, 1024)
 
 	// now run as long as the device is
 	// connected
@@ -182,39 +182,44 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 			return
 		}
 
-		for i := 0; i < channels; i++ {
-			buffers[i] = append(buffers[i], df.ChannelData(i+1)...)
-		}
+		chs := df.ChannelDatas()
+		log.Printf("channelDatas: %+v", chs)
+		buffers.AppendBuffer(chs)
 
 		// do we need to keep filling?
-		if len(buffers[0]) < batchSize {
+		if !buffers.HasNext(batchSize) {
 			continue
 		}
 
 		// ...no, there is enough for a batch
 		data := new(DataMessage)
-		for i := 0; i < channels; i++ {
-			buf := buffers[i][:batchSize]
-			buffers[i] = buffers[i][batchSize:]
+
+		for buffers.HasNext(batchSize) {
+			batch, _ := buffers.Next(batchSize)
 			if !msg.Average {
-				// sampling the first data point
-				data.Data[i] = buf[0]
-			} else {
-				// find the average
-				sum := float64(0)
-				for j := 0; j < batchSize; j++ {
-					sum += buf[j]
+				for c := 0; c < channels; c++ {
+					data.Data[c] = batch.data[c][0] // TODO: fix this with getter methods
 				}
-				data.Data[i] = sum / float64(batchSize)
+			} else {
+				for c := 0; c < channels; c++ {
+
+					// find the average
+					sum := float64(0)
+					for j := 0; j < batchSize; j++ {
+						sum += batch.data[c][j] // TODO: fix this
+					}
+					data.Data[c] = sum / float64(batchSize)
+				}
+			}
+
+			// TODO: fix this
+			data.Timestamp = df.Time().UnixNano()
+			log.Printf("sending %+v", data)
+			if err := websocket.JSON.Send(ws, data); err != nil {
+				log.Printf("error sending: %s\n", err)
+				return
 			}
 		}
 
-		// TODO: fix this
-		data.Timestamp = df.Time().UnixNano()
-		log.Printf("sending %+v", data)
-		if err := websocket.JSON.Send(ws, data); err != nil {
-			log.Printf("error sending: %s\n", err)
-			break
-		}
 	}
 }
