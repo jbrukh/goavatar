@@ -21,11 +21,11 @@ Make sure the $GOPATH/bin directory is in your PATH and
 Options
 =======
 
-$ server --help
-Usage of server:
-  -listenPort=8000: the websocket port on which to listen
-  -mockDevice=false: whether to use the mock device
-  -serialPort="/dev/tty.AvatarEEG03009-SPPDev": the serial port for the device
+    $ server --help
+    Usage of server:
+        -listenPort=8000: the websocket port on which to listen
+        -mockDevice=false: whether to use the mock device
+        -serialPort="/dev/tty.AvatarEEG03009-SPPDev": the serial port for the device
 
 Protocol
 ========
@@ -35,7 +35,7 @@ Protocol
         // will send JSON version of these messages.
         
         type ControlMessage struct {
-          Connect   bool `json:"connect"`   // boolean to engage or disengage the device
+            Connect   bool `json:"connect"`   // boolean to engage or disengage the device
         	Frequency int  `json:"frequency"` // how many messages to deliver per second
         	Average   bool `json:"average"`   // if false, last data point from each batch will be sent; otherwise average of the batch
         }
