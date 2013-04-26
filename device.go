@@ -33,6 +33,12 @@ type Device interface {
 	// channel is nil. If the device has been disconnected
 	// the channel will be closed.
 	Out() <-chan *DataFrame
+
+	// Starts recording the streaming data to a file.
+	Record(file string) (err error)
+
+	// Stops recording the streaming data.
+	Stop()
 }
 
 // ----------------------------------------------------------------- //
@@ -109,4 +115,12 @@ func (d *AvatarDevice) Out() <-chan *DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.output
+}
+
+func (d *AvatarDevice) Record(file string) (err error) {
+	return
+}
+
+func (d *AvatarDevice) Stop() {
+
 }

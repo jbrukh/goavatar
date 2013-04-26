@@ -96,3 +96,11 @@ func mockFrame() (frame *DataFrame) {
 	tick++
 	return frames[inx%len(frames)]
 }
+
+func (d *MockDevice) Record(file string) (err error) {
+	return
+}
+
+func (d *MockDevice) Stop() {
+
+}
