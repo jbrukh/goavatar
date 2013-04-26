@@ -3,7 +3,48 @@ package goavatar
 import (
 	"io"
 	"log"
+	"os"
 )
+
+// ----------------------------------------------------------------- //
+// AvatarEEG Device
+// ----------------------------------------------------------------- //
+
+type AvatarDevice struct {
+	baseDevice
+	serialPort string // serial port like /dev/tty.AvatarEEG03009-SPPDev
+}
+
+// NewAvatarDevice creates a new AvatarEEG connection. The user 
+// can then start streaming data by calling Connect() and reading the 
+// output channel.
+func NewAvatarDevice(serialPort string) *AvatarDevice {
+	var (
+		reader io.ReadCloser
+	)
+
+	// connect to the avatar by connecting to the
+	// specified serial port
+	connFunc := func() (err error) {
+		reader, err = os.Open(serialPort)
+		return
+	}
+
+	// disconnect from the device
+	disconnFunc := func() error {
+		return reader.Close()
+	}
+
+	// the streaming function
+	streamFunc := func(offSignal <-chan bool, out chan<- *DataFrame) {
+		parseByteStream(reader, offSignal, out)
+	}
+
+	return &AvatarDevice{
+		baseDevice: *newBaseDevice(connFunc, disconnFunc, streamFunc),
+		serialPort: serialPort,
+	}
+}
 
 // ----------------------------------------------------------------- //
 // Constants
