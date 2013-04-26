@@ -3,7 +3,7 @@ package goavatar
 import (
 	"fmt"
 	//"log"
-	"math/rand"
+	//"math/rand"
 	"sync"
 	"time"
 )
@@ -92,35 +92,7 @@ func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
 var tick int = 0
 
 func mockFrame() (frame *DataFrame) {
+	inx := tick
 	tick++
-	// some fake data
-	var data [9][]float64
-	for i := 1; i <= 2; i++ {
-		data[i] = make([]float64, 16)
-		for j := 0; j < 16; j++ {
-			if tick == 10 {
-				data[i][j] = 10
-			} else {
-				data[i][j] = rand.Float64()*float64(0.02) + float64(i)
-			}
-		}
-	}
-
-	// TODO: make timestamps realistic
-	frame = &DataFrame{
-		DataFrameHeader: DataFrameHeader{
-			FieldSampleRateVersion: 3,
-			FieldFrameSize:         118,
-			FieldFrameType:         1,
-			FieldFrameCount:        268,
-			FieldChannels:          2,
-			FieldSamples:           16,
-			FieldVoltRange:         750,
-			FieldTimestamp:         1345192284,
-			FieldFracSecs:          2436,
-		},
-		data: data,
-		crc:  uint16(0),
-	}
-	return
+	return frames[inx%len(frames)]
 }
