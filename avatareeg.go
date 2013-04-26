@@ -107,12 +107,3 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 		output <- frame
 	}
 }
-
-func shouldBreak(offSignal <-chan bool) bool {
-	select {
-	case <-offSignal:
-		return true
-	default:
-	}
-	return false
-}

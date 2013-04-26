@@ -280,34 +280,3 @@ func (r *avatarParser) ConsumeCrc() (crc uint16, err error) {
 func (r *avatarParser) Crc() (crc uint16) {
 	return r.crc.Crc()
 }
-
-// ----------------------------------------------------------------- //
-// CRC Writer -- for calculating CRC-16-CCIT, according to Avatar Spec
-// ----------------------------------------------------------------- //
-
-type CrcWriter struct {
-	crc uint16
-}
-
-func (w *CrcWriter) Crc() uint16 {
-	return w.crc
-}
-
-func (w *CrcWriter) Reset() {
-	w.crc = uint16(0)
-}
-
-func (w *CrcWriter) Write(p []byte) (n int, err error) {
-	for _, b := range p {
-		w.WriteByte(b)
-	}
-	return len(p), nil
-}
-
-func (w *CrcWriter) WriteByte(b byte) {
-	w.crc = (w.crc >> 8) | ((w.crc & 0xFF) << 8)
-	w.crc ^= uint16(b)
-	w.crc ^= (w.crc & 0xFF) >> 4
-	w.crc ^= (w.crc << 12) & 0xFFFF
-	w.crc ^= (w.crc & 0xFF) << 5
-}
