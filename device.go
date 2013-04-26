@@ -43,7 +43,7 @@ type Device interface {
 
 // ConnectFunc performs the low-level operation to connect
 // to the device
-type ConnectFunc func() (chan *DataFrame, error)
+type ConnectFunc func() error
 
 // DisconnectFunc perfoms the low-level operation to disconnect
 // from the device
@@ -57,6 +57,7 @@ type StreamFunc func(<-chan bool, chan<- *DataFrame)
 // baseDevice
 type baseDevice struct {
 	offSignal chan bool
+	recSignal chan bool
 	out       chan *DataFrame
 	lock      sync.Mutex
 	connected bool
@@ -65,6 +66,18 @@ type baseDevice struct {
 	connFunc    ConnectFunc
 	disconnFunc DisconnectFunc
 	streamFunc  StreamFunc
+}
+
+// Create a new base device that performs connectivity
+// and streaming based on the given function.
+func newBaseDevice(connFunc ConnectFunc, disconnFunc DisconnectFunc, streamFunc StreamFunc) *baseDevice {
+	return &baseDevice{
+		offSignal:   make(chan bool),
+		recSignal:   make(chan bool),
+		connFunc:    connFunc,
+		disconnFunc: disconnFunc,
+		streamFunc:  streamFunc,
+	}
 }
 
 func (d *baseDevice) Connect() (out <-chan *DataFrame, err error) {
@@ -77,10 +90,12 @@ func (d *baseDevice) Connect() (out <-chan *DataFrame, err error) {
 	}
 
 	// perform connect
-	d.out, err = d.connFunc()
-	if err != nil {
-		return nil, fmt.Errorf("could not connect: %v", err)
+	if err = d.connFunc(); err != nil {
+		return nil, fmt.Errorf("could not connect to the device: %v", err)
 	}
+
+	// create the output channel
+	d.out = make(chan *DataFrame, DataBufferSize)
 
 	// begin to stream
 	go func() {
@@ -113,6 +128,12 @@ func (d *baseDevice) Disconnect() (err error) {
 	return err
 }
 
+func (d *baseDevice) Connected() bool {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.connected
+}
+
 func (d *baseDevice) Out() <-chan *DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
@@ -132,82 +153,37 @@ func (d *baseDevice) Stop() {
 // ----------------------------------------------------------------- //
 
 type AvatarDevice struct {
-	serialPort string          // serial port like /dev/tty.AvatarEEG03009-SPPDev
-	offSignal  chan bool       // send a value to disconnect the device
-	reader     io.ReadCloser   // the reader of the serial port
-	output     chan *DataFrame // channel that delivers raw Avatar output
-	lock       sync.Mutex      // for synchronizing calls to control the device
-	connected  bool            // connection status
+	baseDevice
+	serialPort string // serial port like /dev/tty.AvatarEEG03009-SPPDev
 }
 
 // NewAvatarDevice creates a new AvatarEEG connection. The user 
 // can then start streaming data by calling Connect() and reading the 
 // output channel.
 func NewAvatarDevice(serialPort string) *AvatarDevice {
-	return &AvatarDevice{
-		serialPort: serialPort,
-		offSignal:  make(chan bool),
-	}
-}
+	var (
+		reader io.ReadCloser
+	)
 
-func (d *AvatarDevice) Connected() bool {
-	d.lock.Lock()
-	defer d.lock.Unlock()
-	return d.connected
-}
-
-func (d *AvatarDevice) Connect() (output <-chan *DataFrame, err error) {
-	d.lock.Lock()
-	defer d.lock.Unlock()
-
-	if d.connected {
-		return nil, fmt.Errorf("already connected to the device")
-	}
-
-	// connect to the reader for the port; this will
-	// fail if we are already reading from this port
-	reader, err := os.Open(d.serialPort)
-	if err != nil {
-		return nil, fmt.Errorf("cannot connect: %v", err)
-	}
-	d.reader = reader
-	d.output = make(chan *DataFrame, DataBufferSize)
-
-	go func() {
-		parseByteStream(d.reader, d.offSignal, d.output)
-	}()
-
-	d.connected = true
-	return d.output, nil
-}
-
-func (d *AvatarDevice) Disconnect() (err error) {
-	d.lock.Lock()
-	defer d.lock.Unlock()
-
-	if !d.connected {
+	// connect to the avatar by connecting to the
+	// specified serial port
+	connFunc := func() (err error) {
+		reader, err = os.Open(serialPort)
 		return
 	}
 
-	// send the off signal; will block until the
-	// offSignal is processed on the output thread
-	d.offSignal <- true
-	err = d.reader.Close() // best-effort
-	close(d.output)
-	d.connected = false
-	return
-}
+	// disconnect from the device
+	disconnFunc := func() error {
+		return reader.Close()
+	}
 
-func (d *AvatarDevice) Out() <-chan *DataFrame {
-	d.lock.Lock()
-	defer d.lock.Unlock()
-	return d.output
-}
+	// the streaming function
+	streamFunc := func(offSignal <-chan bool, out chan<- *DataFrame) {
+		parseByteStream(reader, offSignal, out)
+	}
 
-func (d *AvatarDevice) Record(file string) (err error) {
-	return
-}
-
-func (d *AvatarDevice) Stop() {
-
+	return &AvatarDevice{
+		baseDevice: *newBaseDevice(connFunc, disconnFunc, streamFunc),
+		serialPort: serialPort,
+	}
 }
