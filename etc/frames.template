@@ -1,0 +1,7 @@
+package goavatar
+
+var frames = []*DataFrame{
+	{{range .frames}}
+		{{. | printf "%+v\n"}},
+	{{end}}
+}
