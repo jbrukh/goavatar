@@ -41,8 +41,9 @@ type DataFrameHeader struct {
 // device. 
 type DataFrame struct {
 	DataFrameHeader
-	data [9][]float64 // raw ADC data for the channels
-	crc  uint16       // CRC-16-CCIT calculated on the entire frame not including CRC
+	data     [9][]float64 // raw ADC data for the channels
+	crc      uint16       // CRC-16-CCIT calculated on the entire frame not including CRC
+	received time.Time    // time this frame was received locally
 }
 
 // String
@@ -59,6 +60,11 @@ func (df *DataFrame) ChannelData(channel int) []float64 {
 
 func (df *DataFrame) ChannelDatas() *MultiBuffer {
 	return NewMultiBufferFromSlice(df.data[1 : df.Channels()+1])
+}
+
+// the time this data framed was received locally
+func (df *DataFrame) Received() time.Time {
+	return df.received
 }
 
 // SampleRate: the number of data samples delivered in one second (per channel)
