@@ -26,7 +26,7 @@ type Device interface {
 	// Disconnects from the device, closes the output channel,
 	// and cleans relevant resources. Calls to disconnect are
 	// idempotent.
-	Disconnect()
+	Disconnect() error
 
 	// Returns the output channel for the device. If the
 	// device has not been connected, the value of the
@@ -39,6 +39,92 @@ type Device interface {
 
 	// Stops recording the streaming data.
 	Stop()
+}
+
+// ConnectFunc performs the low-level operation to connect
+// to the device
+type ConnectFunc func() (chan *DataFrame, error)
+
+// DisconnectFunc perfoms the low-level operation to disconnect
+// from the device
+type DisconnectFunc func() error
+
+// StreamFunc performs the operation of reading the stream and
+// writing data frames to the output channel, while also listening
+// for recording signals.
+type StreamFunc func(<-chan bool, chan<- *DataFrame)
+
+// baseDevice
+type baseDevice struct {
+	offSignal chan bool
+	out       chan *DataFrame
+	lock      sync.Mutex
+	connected bool
+
+	// low-level ops
+	connFunc    ConnectFunc
+	disconnFunc DisconnectFunc
+	streamFunc  StreamFunc
+}
+
+func (d *baseDevice) Connect() (out <-chan *DataFrame, err error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	// check connection
+	if d.connected {
+		return nil, fmt.Errorf("already connected to the device")
+	}
+
+	// perform connect
+	d.out, err = d.connFunc()
+	if err != nil {
+		return nil, fmt.Errorf("could not connect: %v", err)
+	}
+
+	// begin to stream
+	go func() {
+		d.streamFunc(d.offSignal, d.out)
+	}()
+
+	// mark connected
+	d.connected = true
+	return d.out, nil
+}
+
+func (d *baseDevice) Disconnect() (err error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	// check for idempotency
+	if !d.connected {
+		return
+	}
+
+	// send the off signal; will block until the
+	// offSignal is processed on the output thread
+	d.offSignal <- true
+	close(d.out)
+
+	// disconnect
+	err = d.disconnFunc()
+	d.connected = false
+
+	return err
+}
+
+func (d *baseDevice) Out() <-chan *DataFrame {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.out
+}
+
+func (d *baseDevice) Record(file string) (err error) {
+	return
+}
+
+func (d *baseDevice) Stop() {
+
 }
 
 // ----------------------------------------------------------------- //
@@ -95,7 +181,7 @@ func (d *AvatarDevice) Connect() (output <-chan *DataFrame, err error) {
 	return d.output, nil
 }
 
-func (d *AvatarDevice) Disconnect() {
+func (d *AvatarDevice) Disconnect() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -106,9 +192,10 @@ func (d *AvatarDevice) Disconnect() {
 	// send the off signal; will block until the
 	// offSignal is processed on the output thread
 	d.offSignal <- true
-	d.reader.Close() // best-effort
+	err = d.reader.Close() // best-effort
 	close(d.output)
 	d.connected = false
+	return
 }
 
 func (d *AvatarDevice) Out() <-chan *DataFrame {

@@ -56,7 +56,7 @@ func (d *MockDevice) Connect() (output <-chan *DataFrame, err error) {
 }
 
 // Disconnect from the device.
-func (d *MockDevice) Disconnect() {
+func (d *MockDevice) Disconnect() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -69,6 +69,7 @@ func (d *MockDevice) Disconnect() {
 	d.offSignal <- true
 	close(d.output)
 	d.connected = false
+	return
 }
 
 func (d *MockDevice) Out() <-chan *DataFrame {
@@ -78,23 +79,17 @@ func (d *MockDevice) Out() <-chan *DataFrame {
 }
 
 func mockConnection(offSignal <-chan bool, output chan<- *DataFrame) {
+	tick := 0
 	for {
 		// break the loop if 
 		// there is an off signal
 		if shouldBreak(offSignal) {
 			break
 		}
-		output <- mockFrame()
+		output <- frames[tick%len(frames)]
+		tick++
 		time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 	}
-}
-
-var tick int = 0
-
-func mockFrame() (frame *DataFrame) {
-	inx := tick
-	tick++
-	return frames[inx%len(frames)]
 }
 
 func (d *MockDevice) Record(file string) (err error) {
