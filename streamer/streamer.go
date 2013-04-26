@@ -8,6 +8,7 @@ import (
 	"github.com/jbrukh/window"
 	"log"
 	"os"
+	"text/template"
 )
 
 const (
@@ -16,7 +17,7 @@ const (
 	DefaultRefreshRate = 5
 	DefaultMaxFrames   = 10000
 	WindowMultiple     = 10
-	DumpFile           = "frames.go"
+	DumpFile           = "frames.go.bak"
 )
 
 var (
@@ -72,20 +73,44 @@ func run(p *gplot.Plotter, out <-chan *DataFrame) {
 		window2 = window.New(*windowSize, WindowMultiple)
 	)
 
-	// var file *os.File
-	// if *dumpFrames {
-	// 	file, err := prepareDumpFile()
-	// 	if err != nil {
-	// 		log.Fatalf("could not prepare dump file: %v", err)
-	// 	}
-	// }
-	//defer file.Close()
+	var frames []*DataFrame
+	// if dumpFrames is true, we will buffer the data
+	// frames in memory and then dump them to frames.go
+	// at the end
+	if *dumpFrames {
+		frames = make([]*DataFrame, 0)
+		defer func() {
+			var file *os.File
+			var err error
+			if *dumpFrames {
+				file, err = os.OpenFile(DumpFile,
+					os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+				if err != nil {
+					log.Printf("could not prepare dump file: %v", err)
+					return
+				}
+			}
+			defer file.Close()
+			// now output
+			t := template.Must(template.New("").ParseFiles("etc/frames.template"))
+			if err = t.ExecuteTemplate(file, "frames.template", frames); err != nil {
+				log.Printf("error dumping to template: %v", err)
+			}
+		}()
+
+	}
 
 	for i := 0; i < *maxFrames; i++ {
 		df, ok := <-out
 		if !ok {
 			log.Printf("The data channel got closed (exiting)")
 			return
+		}
+
+		if *dumpFrames {
+			if len(frames) < 1000 {
+				frames = append(frames, df)
+			}
 		}
 
 		//log.Printf("Got df: %v", df.String())
@@ -103,13 +128,4 @@ func run(p *gplot.Plotter, out <-chan *DataFrame) {
 			p.Dual(window1.Slice(), window2.Slice(), "Ch1", "Ch2")
 		}
 	}
-}
-
-func prepareDumpFile() (file *os.File, err error) {
-	file, err = os.OpenFile(DumpFile, os.O_RDWR|os.O_CREATE, 0666)
-	if err != nil {
-		return nil, err
-	}
-	_, err = file.Write([]byte("package goavatar\n\n"))
-	return
 }

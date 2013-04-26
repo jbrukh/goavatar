@@ -1,7 +1,11 @@
 package goavatar
 
-var frames = []*DataFrame{
-	{{range .frames}}
-		{{. | printf "%+v\n"}},
+import (
+	"github.com/jbrukh/goavatar"
+)
+
+var frames = []*goavatar.DataFrame{
+	{{range .}}
+		{{. | printf "%#v"}},
 	{{end}}
 }
