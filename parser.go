@@ -58,7 +58,7 @@ func (df *DataFrame) ChannelData(channel int) []float64 {
 }
 
 func (df *DataFrame) ChannelDatas() *MultiBuffer {
-	return NewMultiBufferFromSlice(df.data[1:df.Channels()])
+	return NewMultiBufferFromSlice(df.data[1 : df.Channels()+1])
 }
 
 // SampleRate: the number of data samples delivered in one second (per channel)

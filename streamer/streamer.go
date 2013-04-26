@@ -7,6 +7,7 @@ import (
 	"github.com/jbrukh/gplot"
 	"github.com/jbrukh/window"
 	"log"
+	"os"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 	DefaultRefreshRate = 5
 	DefaultMaxFrames   = 10000
 	WindowMultiple     = 10
+	DumpFile           = "frames.go"
 )
 
 var (
@@ -23,6 +25,7 @@ var (
 	refreshRate *int    = flag.Int("refreshRate", DefaultRefreshRate, "the number of data points to buffer before refreshing")
 	maxFrames   *int    = flag.Int("maxFrames", DefaultMaxFrames, "maximum frames to read before turning off")
 	mockDevice  *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
+	dumpFrames  *bool   = flag.Bool("dumpFrames", false, "dump frames in Go format to frames.go")
 )
 
 func init() {
@@ -68,12 +71,23 @@ func run(p *gplot.Plotter, out <-chan *DataFrame) {
 		window1 = window.New(*windowSize, WindowMultiple)
 		window2 = window.New(*windowSize, WindowMultiple)
 	)
+
+	// var file *os.File
+	// if *dumpFrames {
+	// 	file, err := prepareDumpFile()
+	// 	if err != nil {
+	// 		log.Fatalf("could not prepare dump file: %v", err)
+	// 	}
+	// }
+	//defer file.Close()
+
 	for i := 0; i < *maxFrames; i++ {
 		df, ok := <-out
 		if !ok {
 			log.Printf("The data channel got closed (exiting)")
 			return
 		}
+
 		//log.Printf("Got df: %v", df.String())
 		for _, v := range df.ChannelData(1) {
 			window1.PushBack(v)
@@ -89,4 +103,13 @@ func run(p *gplot.Plotter, out <-chan *DataFrame) {
 			p.Dual(window1.Slice(), window2.Slice(), "Ch1", "Ch2")
 		}
 	}
+}
+
+func prepareDumpFile() (file *os.File, err error) {
+	file, err = os.OpenFile(DumpFile, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return nil, err
+	}
+	_, err = file.Write([]byte("package goavatar\n\n"))
+	return
 }

@@ -2,6 +2,7 @@ package goavatar
 
 import (
 	"fmt"
+	//"log"
 )
 
 type MultiBuffer struct {
@@ -9,13 +10,13 @@ type MultiBuffer struct {
 	data     [][]float64
 }
 
-func NewMultiBuffer(channels, size int) *MultiBuffer {
-	if channels < 1 || size < 1 {
+func NewMultiBuffer(channels, capacity int) *MultiBuffer {
+	if channels < 1 || capacity < 1 {
 		panic("nonsensical size")
 	}
 	data := make([][]float64, channels)
 	for i := 0; i < channels; i++ {
-		data[i] = make([]float64, size)
+		data[i] = make([]float64, 0, capacity)
 	}
 	return &MultiBuffer{
 		data:     data,
@@ -35,10 +36,12 @@ func NewMultiBufferFromSlice(data [][]float64) *MultiBuffer {
 			panic(str)
 		}
 	}
-	return &MultiBuffer{
+	m := &MultiBuffer{
 		channels: l,
 		data:     data,
 	}
+	//log.Printf("returning multibuffer %+v", m)
+	return m
 }
 
 func (b *MultiBuffer) Size() int {
@@ -78,9 +81,10 @@ func (b *MultiBuffer) Next(n int) (*MultiBuffer, bool) {
 	if !b.HasNext(n) {
 		return nil, false
 	}
-	buf := NewMultiBufferFromSlice(make([][]float64, b.channels))
+	buf := NewMultiBuffer(b.channels, n)
 	for c := 0; c < b.channels; c++ {
 		buf.data[c] = append(buf.data[c], b.data[c][:n]...)
+		b.data[c] = b.data[c][n:]
 	}
 	return buf, true
 }

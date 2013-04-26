@@ -157,9 +157,10 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 		channels = df.Channels()
 		sampleRate, _ = df.SampleRate()
 
-		// calculate how much we should batch
-		// given the frequency
-		batchSize = sampleRate / msg.Frequency
+		// warning: using "Frequency" here, but really mean
+		// latency, or period. 1000/L = f. So batch = sampleRate/f = ...
+		batchSize = sampleRate * msg.Frequency / 1000
+		log.Printf("setting batch size to %d", batchSize)
 
 		// send the success response
 		r := &ResponseMessage{
@@ -183,7 +184,7 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 		}
 
 		chs := df.ChannelDatas()
-		log.Printf("channelDatas: %+v", chs)
+		//log.Printf("channelDatas: %+v", chs)
 		buffers.AppendBuffer(chs)
 
 		// do we need to keep filling?
@@ -196,6 +197,7 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 
 		for buffers.HasNext(batchSize) {
 			batch, _ := buffers.Next(batchSize)
+			//log.Printf("batch %v", batch)
 			if !msg.Average {
 				for c := 0; c < channels; c++ {
 					data.Data[c] = batch.data[c][0] // TODO: fix this with getter methods
@@ -214,7 +216,7 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 
 			// TODO: fix this
 			data.Timestamp = df.Time().UnixNano()
-			log.Printf("sending %+v", data)
+			//log.Printf("sending %+v", data)
 			if err := websocket.JSON.Send(ws, data); err != nil {
 				log.Printf("error sending: %s\n", err)
 				return
