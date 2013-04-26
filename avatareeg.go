@@ -65,6 +65,7 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *DataFrame) {
 	reader := newAvatarParser(r)
 
+	log.Printf("calibrating...")
 	// calibrate the device
 	frames := make([]*DataFrame, DiagnosticFrames)
 	for i, _ := range frames {
@@ -87,7 +88,8 @@ func parseByteStream(r io.ReadCloser, offSignal <-chan bool, output chan<- *Data
 
 	// calibrate -- find the average difference between received time
 	// and generated time on the frame
-	phase(frames)
+	timeDiff := phase(frames)
+	log.Printf("average time diff (ns): %d", timeDiff)
 
 	for {
 		// break the loop if 
@@ -153,10 +155,12 @@ func parseFrame(reader *avatarParser) (frame *DataFrame, err error) {
 	return
 }
 
-func phase(frames []*DataFrame) int64 {
+func phase(frames []*DataFrame) (avg int64) {
 	diffs := make([]int64, len(frames))
 	for inx, f := range frames {
 		diffs[inx] = f.Received().UnixNano() - f.DataFrameHeader.Time().UnixNano()
 	}
-	return averageInt64(diffs)
+	avg = averageInt64(diffs)
+	log.Printf("time diffs (avg: %d): %v", avg, diffs)
+	return
 }
