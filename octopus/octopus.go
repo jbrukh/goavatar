@@ -28,15 +28,14 @@ func main() {
 
 	// get the device
 	if *mockDevice {
-		log.Printf("using the MockDevice")
 		device = NewMockDevice()
 	} else {
-		log.Printf("using the AvatarEEG on port %s", *serialPort)
 		device = NewAvatarDevice(*serialPort)
 	}
+	log.Printf("Device:\t%v", device.Name())
 
-	log.Printf("starting server, ControlEndpoint: http://localhost:%d%s; DataEndpoint: http://localhost:%d%s", *listenPort,
-		ControlEndpoint, *listenPort, DataEndpoint)
+	log.Printf("Control:\thttp://localhost:%d%s", *listenPort, ControlEndpoint)
+	log.Printf("Data:\thttp://localhost:%d%s", *listenPort, DataEndpoint)
 	port := fmt.Sprintf(":%d", *listenPort)
 
 	http.Handle(ControlEndpoint, ControlHandler(device, *verbose))

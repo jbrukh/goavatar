@@ -12,6 +12,9 @@ import (
 // Device represents an AvatarEEG device (or a mock device).
 type Device interface {
 
+	// Name of the device.
+	Name() string
+
 	// Connect to the device and return the output channel.
 	// Connecting to a device that is already connected is
 	// an error.
@@ -54,6 +57,7 @@ type StreamFunc func(<-chan bool, chan<- *DataFrame)
 
 // baseDevice
 type baseDevice struct {
+	name      string
 	offSignal chan bool
 	recSignal chan bool
 	out       chan *DataFrame
@@ -68,14 +72,19 @@ type baseDevice struct {
 
 // Create a new base device that performs connectivity
 // and streaming based on the given function.
-func newBaseDevice(connFunc ConnectFunc, disconnFunc DisconnectFunc, streamFunc StreamFunc) *baseDevice {
+func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc, streamFunc StreamFunc) *baseDevice {
 	return &baseDevice{
+		name:        name,
 		offSignal:   make(chan bool),
 		recSignal:   make(chan bool),
 		connFunc:    connFunc,
 		disconnFunc: disconnFunc,
 		streamFunc:  streamFunc,
 	}
+}
+
+func (d *baseDevice) Name() string {
+	return d.name
 }
 
 func (d *baseDevice) Connect() (out <-chan *DataFrame, err error) {

@@ -54,7 +54,7 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 	}
 
 	return &AvatarDevice{
-		baseDevice: *newBaseDevice(connFunc, disconnFunc, streamFunc),
+		baseDevice: *newBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc),
 		serialPort: serialPort,
 	}
 }

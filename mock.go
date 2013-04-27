@@ -44,6 +44,7 @@ func NewMockDevice() *MockDevice {
 
 	return &MockDevice{
 		baseDevice: *newBaseDevice(
+			"MockAvatarEEG",
 			connFunc,
 			disconnFunc,
 			streamFunc,
