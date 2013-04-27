@@ -11,7 +11,9 @@ import (
 // Constants
 //---------------------------------------------------------//
 
-const ()
+const (
+	SignificantDigits = 10000000000000000 // 16
+)
 
 //---------------------------------------------------------//
 // Handler -- for use with net/http HTTP server
@@ -22,8 +24,8 @@ const ()
 //
 //    http.Handle("/uri", socket.Handler(device))
 //
-func Handler(device Device) http.Handler {
-	return websocket.Handler(NewSocketListener(device))
+func Handler(device Device, verbose bool) http.Handler {
+	return websocket.Handler(NewSocketListener(device, verbose))
 }
 
 //---------------------------------------------------------//
@@ -56,8 +58,8 @@ type ResponseMessage struct {
 // that has not been seen before. The data messages come at a 
 // frequency specified in the initial control messages.
 type DataMessage struct {
-	Data      [8]float64 `json:"data"`      // the data for each channel, only first n relevant, n == # of channels
-	Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
+	Data      [8]int64 `json:"data"`      // the data for each channel, only first n relevant, n == # of channels
+	Timestamp int64    `json:"timestamp"` // timestamp corresponding to this data sample
 }
 
 //---------------------------------------------------------//
@@ -66,7 +68,7 @@ type DataMessage struct {
 
 // NewSocketListener creates a function that can be used
 // as a WebSocket handler. See also Handler(Device).
-func NewSocketListener(device Device) func(ws *websocket.Conn) {
+func NewSocketListener(device Device, verbose bool) func(ws *websocket.Conn) {
 	return func(ws *websocket.Conn) {
 		defer ws.Close()
 		for {
@@ -124,7 +126,7 @@ func NewSocketListener(device Device) func(ws *websocket.Conn) {
 
 				log.Printf("device is connected")
 				defer device.Disconnect()
-				go stream(device, ws, &msg)
+				go stream(device, ws, &msg, verbose)
 			}
 		}
 
@@ -139,7 +141,7 @@ func send(ws *websocket.Conn, msg interface{}) {
 	}
 }
 
-func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
+func stream(device Device, ws *websocket.Conn, msg *ControlMessage, verbose bool) {
 	defer device.Disconnect() // just in case
 	log.Printf("diagnosing the device...")
 	// first, diagnose the device
@@ -159,7 +161,7 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 
 		// warning: using "Frequency" here, but really mean
 		// latency, or period. 1000/L = f. So batch = sampleRate/f = ...
-		batchSize = sampleRate * msg.Frequency / 1000
+		batchSize = sampleRate / msg.Frequency
 		log.Printf("setting batch size to %d", batchSize)
 
 		// send the success response
@@ -197,26 +199,19 @@ func stream(device Device, ws *websocket.Conn, msg *ControlMessage) {
 
 		for buffers.HasNext(batchSize) {
 			batch, _ := buffers.Next(batchSize)
-			//log.Printf("batch %v", batch)
-			if !msg.Average {
-				for c := 0; c < channels; c++ {
-					data.Data[c] = batch.data[c][0] // TODO: fix this with getter methods
-				}
-			} else {
-				for c := 0; c < channels; c++ {
+			log.Printf("appending %d data points", batch.Size())
 
-					// find the average
-					sum := float64(0)
-					for j := 0; j < batchSize; j++ {
-						sum += batch.data[c][j] // TODO: fix this
-					}
-					data.Data[c] = sum / float64(batchSize)
-				}
+			//log.Printf("batch %v", batch)
+
+			for c := 0; c < channels; c++ {
+				data.Data[c] = int64(batch.data[c][0] * SignificantDigits) // TODO: fix this with getter methods
 			}
 
 			// TODO: fix this
 			data.Timestamp = df.Time().UnixNano()
-			//log.Printf("sending %+v", data)
+			if verbose {
+				log.Printf("sending %+v", data)
+			}
 			if err := websocket.JSON.Send(ws, data); err != nil {
 				log.Printf("error sending: %s\n", err)
 				return

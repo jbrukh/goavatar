@@ -18,6 +18,7 @@ var (
 	serialPort *string = flag.String("serialPort", DefaultSerialPort, "the serial port for the device")
 	mockDevice *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
 	listenPort *int    = flag.Int("listenPort", DefaultListenPort, "the websocket port on which to listen")
+	verbose    *bool   = flag.Bool("verbose", false, "whether the socket is verbose (shows outgoing data)")
 )
 
 func main() {
@@ -36,7 +37,7 @@ func main() {
 	log.Printf("starting server at endpoint http://localhost:%d%s", *listenPort, Endpoint)
 	port := fmt.Sprintf(":%d", *listenPort)
 
-	http.Handle(Endpoint, Handler(device))
+	http.Handle(Endpoint, Handler(device, *verbose))
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalf("could not start server: %v", err)
