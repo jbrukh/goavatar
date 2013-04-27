@@ -11,7 +11,8 @@ import (
 const (
 	DefaultSerialPort = "/dev/tty.AvatarEEG03009-SPPDev"
 	DefaultListenPort = 8000
-	Endpoint          = "/device"
+	ControlEndpoint   = "/control"
+	DataEndpoint      = "/device"
 )
 
 var (
@@ -34,10 +35,13 @@ func main() {
 		device = NewAvatarDevice(*serialPort)
 	}
 
-	log.Printf("starting server at endpoint http://localhost:%d%s", *listenPort, Endpoint)
+	log.Printf("starting server, ControlEndpoint: http://localhost:%d%s; DataEndpoint: http://localhost:%d%s", *listenPort,
+		ControlEndpoint, *listenPort, DataEndpoint)
 	port := fmt.Sprintf(":%d", *listenPort)
 
-	http.Handle(Endpoint, Handler(device, *verbose))
+	http.Handle(ControlEndpoint, ControlHandler(device, *verbose))
+	http.Handle(DataEndpoint, DataHandler(device, *verbose))
+
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalf("could not start server: %v", err)
