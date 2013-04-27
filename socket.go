@@ -2,8 +2,9 @@ package goavatar
 
 import (
 	"code.google.com/p/go.net/websocket"
-	//"io"
-	//"log"
+	"io"
+	"log"
+	"encoding/json"
 	"net/http"
 )
 
@@ -101,6 +102,16 @@ type DataMessage struct {
 func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	return func(ws *websocket.Conn) {
 		defer ws.Close()
+		for {
+			log.Printf("control: listening for incoming messages")
+			var message []byte
+			err := websocket.Message.Receive(ws, message)
+			if err != nil {
+				if err == io.EOF || err == io.ErrUnexpectedEOF || err = io.ErrClosedPipe {
+					log.Printf("connection closed")
+				}
+			}
+		}
 	}
 }
 
