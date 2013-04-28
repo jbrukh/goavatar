@@ -4,21 +4,24 @@ package goavatar
 // CRC Writer -- for calculating CRC-16-CCIT, according to Avatar Spec
 // ------------------------------------------------------------------- //
 
+// CrcWriter is a summary data structure
+// which continuously calculates the CRC
+// or bytes you put in it.
 type CrcWriter struct {
 	crc uint16
 }
 
-// return the current CRC value
+// Crc returns the current CRC value.
 func (w *CrcWriter) Crc() uint16 {
 	return w.crc
 }
 
-// reset the CRC calculation
+// Reset the CRC calculation.
 func (w *CrcWriter) Reset() {
 	w.crc = uint16(0)
 }
 
-// write a series of bytes to the CRC calculation
+// Write a series of bytes to the CrcWriter.
 func (w *CrcWriter) Write(p []byte) (n int, err error) {
 	for _, b := range p {
 		w.WriteByte(b)
@@ -26,7 +29,7 @@ func (w *CrcWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-// write a byte to the CRC calculation
+// Write a byte to the CrcWriter.
 func (w *CrcWriter) WriteByte(b byte) {
 	w.crc = (w.crc >> 8) | ((w.crc & 0xFF) << 8)
 	w.crc ^= uint16(b)
