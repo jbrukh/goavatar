@@ -416,8 +416,13 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 	absBatchSize := batchSize * sampleRate
 
 	b := NewSamplingBuffer(channels, sampleRate*batchSize*10, sampleRate)
-
+	kill := make(chan bool)
 	for {
+		// break if there was an error sending
+		// a message over the socket
+		if shouldBreak(kill) {
+			return
+		}
 		df, ok := <-out
 		if !ok {
 			return
@@ -451,6 +456,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 				err := websocket.JSON.Send(conn, msg)
 				if err != nil {
 					log.Printf("error sending data msg: %v\n", err)
+					kill <- true
 				}
 			}()
 		}
