@@ -22,6 +22,11 @@ var (
 	batchSize int // batch size
 )
 
+const (
+	DefaultPps       = 125
+	DefaultBatchSize = 25
+)
+
 //---------------------------------------------------------//
 // Handlers -- for use with net/http HTTP server
 //---------------------------------------------------------//
@@ -123,8 +128,8 @@ type InfoResponse struct {
 // that has not been seen before. The data messages come at a 
 // frequency specified in the initial control messages.
 type DataMessage struct {
-	Data      [8]float64 `json:"data"`      // the data for each channel, only first n relevant, n == # of channels
-	Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
+	Data [][]float64 `json:"data"` // the data for each channel, only first n relevant, n == # of channels
+	//Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
 }
 
 //---------------------------------------------------------//
@@ -285,6 +290,12 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 			goto Respond
 		}
 
+		if msg.BatchSize > msg.Pps {
+			r.Success = false
+			r.Err = "batchSize should not exceed pps"
+			goto Respond
+		}
+
 		// maybe someone is already using it
 		if s.device.Connected() {
 			r.Success = false
@@ -297,6 +308,13 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 
 		select {
 		case s.kickoff <- true:
+			// set the parameters; WARNING: since the
+			// device is already armed at this point, users
+			// should wait for our ConnectResponse before
+			// attempting to connect to the data endpoint
+			pps = msg.Pps
+			batchSize = msg.BatchSize
+
 			// device can accept a value, meaning
 			// no one request for connection is in
 			// an "armed" state, so we have succeeded
@@ -337,8 +355,8 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 }
 
 func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
-	return func(ws *websocket.Conn) {
-		defer ws.Close()
+	return func(conn *websocket.Conn) {
+		defer conn.Close()
 
 		// gate to see if it is armed
 		select {
@@ -349,7 +367,7 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 				if err != nil {
 					log.Printf("could not connect: %v", err)
 				}
-				go stream(device)
+				stream(conn, device, verbose)
 			} else {
 				log.Printf("WARNING: device was already operating")
 			}
@@ -362,7 +380,7 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	}
 }
 
-func stream(device Device) {
+func stream(conn *websocket.Conn, device Device, verbose bool) {
 	out := device.Out()
 	defer device.Disconnect()
 
@@ -376,8 +394,23 @@ func stream(device Device) {
 	channels := df.Channels()
 	devicePps, _ := df.SampleRate()
 
-	// now we need to sample every sampleRate/pps points
-	sampleRate := devicePps / pps // user sends 250, 125, etc
+	// just in case something went wrong
+	if pps < 1 || pps > devicePps {
+		pps = DefaultPps
+		log.Printf("WARNING: setting default PPS")
+	}
+
+	if batchSize > pps || batchSize < 1 {
+		batchSize = DefaultBatchSize
+		log.Printf("WARNING: setting default batchSize")
+	}
+
+	// now we need to sample every devicePps/pps points
+	sampleRate := devicePps / pps
+
+	// actual number of data points we must read
+	// in order to obtain a sampled batch of batchSize 
+	absBatchSize := batchSize * sampleRate
 
 	b := NewSamplingBuffer(channels, sampleRate*batchSize*10, sampleRate)
 
@@ -388,5 +421,25 @@ func stream(device Device) {
 		}
 
 		b.Append(df.Buffer())
+		for b.Size() > absBatchSize {
+			batch := b.SampleNext(absBatchSize)
+
+			// send it off
+			go func() {
+				msg := new(DataMessage)
+				msg.Data = make([][]float64, channels)
+				for i, _ := range msg.Data {
+					msg.Data[i] = batch.ChannelData(i)
+				}
+
+				if verbose {
+					log.Printf("sending data msg: %+v", msg)
+				}
+				err := websocket.JSON.Send(conn, msg)
+				if err != nil {
+					log.Printf("error sending data msg: %v\n", err)
+				}
+			}()
+		}
 	}
 }
