@@ -13,9 +13,11 @@ func newEmptyDevice() *baseDevice {
 		return nil // do nothing
 	}
 
-	streamFunc := func(offSignal <-chan bool, output chan<- *DataFrame) {
-		if shouldBreak(offSignal) {
+	streamFunc := func(control <-chan ControlCode, output chan<- *DataFrame) {
+		select {
+		case <-control:
 			return
+		default:
 		}
 	}
 
