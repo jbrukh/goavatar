@@ -40,6 +40,10 @@ type Device interface {
 
 	// Stops recording the streaming data.
 	Stop()
+
+	// Recording returns true if and only if the device is currently
+	// recording.
+	Recording() bool
 }
 
 // ConnectFunc performs the low-level operation to connect
@@ -52,7 +56,7 @@ type DisconnectFunc func() error
 
 // StreamFunc performs the operation of reading the stream and
 // writing data frames to the output channel, while also listening
-// for recording signals.
+// for control codes that tell it to terminate or record.
 type StreamFunc func(<-chan ControlCode, chan<- *DataFrame)
 
 // ControlCode is used for interacting with the parser of the stream,
@@ -60,9 +64,9 @@ type StreamFunc func(<-chan ControlCode, chan<- *DataFrame)
 type ControlCode int
 
 const (
-	Terminate ControlCode = iota
-	RecordStart
-	RecordStop
+	Terminate   ControlCode = iota // Terminate streaming
+	RecordStart                    // Start recording
+	RecordStop                     // Stop recording
 )
 
 // baseDevice
@@ -73,6 +77,7 @@ type baseDevice struct {
 	out       chan *DataFrame
 	lock      sync.Mutex
 	connected bool
+	recording bool
 
 	// low-level ops
 	connFunc    ConnectFunc
@@ -163,7 +168,7 @@ func (d *baseDevice) Record(file string) (err error) {
 
 	// TODO: set the file in the device
 	d.control <- RecordStart
-
+	d.recording = true
 	return
 }
 
@@ -173,6 +178,12 @@ func (d *baseDevice) Stop() {
 
 	// TODO: set the file in the device
 	d.control <- RecordStop
-
+	d.recording = false
 	return
+}
+
+func (d *baseDevice) Recording() bool {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.recording
 }
