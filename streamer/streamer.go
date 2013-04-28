@@ -113,11 +113,11 @@ func run(p *gplot.Plotter, out <-chan *DataFrame) {
 			}
 		}
 
-		//log.Printf("Got df: %v", df.String())
-		for _, v := range df.ChannelData(1) {
+		log.Printf("Got df: %v", df.String())
+		for _, v := range df.ChannelData(0) {
 			window1.PushBack(v)
 		}
-		for _, v := range df.ChannelData(2) {
+		for _, v := range df.ChannelData(1) {
 			window2.PushBack(v)
 		}
 

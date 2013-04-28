@@ -41,9 +41,9 @@ type DataFrameHeader struct {
 // device. 
 type DataFrame struct {
 	DataFrameHeader
-	data     [9][]float64 // raw ADC data for the channels
-	crc      uint16       // CRC-16-CCIT calculated on the entire frame not including CRC
-	received time.Time    // time this frame was received locally
+	data     *SamplingBuffer // processed data, in a multibuffer
+	crc      uint16          // CRC-16-CCIT calculated on the entire frame not including CRC
+	received time.Time       // time this frame was received locally
 }
 
 // String
@@ -51,15 +51,23 @@ func (df *DataFrame) String() string {
 	return fmt.Sprintf("\n%+v\n", *df)
 }
 
-func (df *DataFrame) ChannelData(channel int) []float64 {
-	if channel < 0 || channel > AvatarMaxChannels {
-		panic("you are trying to select a channel that doesn't exist")
-	}
-	return df.data[channel]
+// func (df *DataFrame) ChannelData(channel int) []float64 {
+// 	if channel < 0 || channel > AvatarMaxChannels {
+// 		panic("you are trying to select a channel that doesn't exist")
+// 	}
+// 	return df.data[channel]
+// }
+
+// func (df *DataFrame) ChannelDatas() *MultiBuffer {
+// 	return NewMultiBufferFromSlice(df.data[1 : df.Channels()+1])
+// }
+
+func (df *DataFrame) Buffer() *SamplingBuffer {
+	return df.data
 }
 
-func (df *DataFrame) ChannelDatas() *MultiBuffer {
-	return NewMultiBufferFromSlice(df.data[1 : df.Channels()+1])
+func (df *DataFrame) ChannelData(channel int) []float64 {
+	return df.data.ChannelData(channel)
 }
 
 // the time this data framed was received locally
@@ -220,7 +228,7 @@ func (r *avatarParser) ConsumeHeader() (h *DataFrameHeader, err error) {
 	return
 }
 
-func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (data [9][]float64, err error) {
+func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (b *SamplingBuffer, err error) {
 	// ascertain the size of the payload; if the frame is corrupted,
 	// this size will probably be too large, which will result in a
 	// bad reading of the data...
@@ -234,7 +242,7 @@ func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (data [9][]float6
 	for n != pSize {
 		nRead, err := r.reader.Read(payload[n:])
 		if err != nil {
-			return data, err
+			return nil, err
 		}
 		n += nRead
 	}
@@ -245,29 +253,44 @@ func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (data [9][]float6
 	// allocate the slices for the data
 	samples, channels := header.Samples(), header.Channels()
 	hasTrigger := header.HasTriggerChannel()
+	b = NewSamplingBuffer(channels, samples, 1)
 
-	// trigger channel comes first, if applicable
-	if hasTrigger {
-		data[0] = make([]float64, samples)
-	}
-
-	// then allocate the other channels, up to 8
-	for i := 1; i <= channels; i++ {
-		data[i] = make([]float64, samples)
-	}
-
-	// then for each sample, get the data
+	// TODO use one array
 	for j := 0; j < samples; j++ {
 		if hasTrigger {
-			data[0][j] = consumeDataPoint(payload, header)
-			// advance the payload
+			// just skip this
 			payload = payload[3:]
 		}
-		for i := 1; i <= channels; i++ {
-			data[i][j] = consumeDataPoint(payload, header)
+		p := make([]float64, channels)
+		for i, _ := range p {
+			p[i] = consumeDataPoint(payload, header)
 			payload = payload[3:]
 		}
+		b.PushSlice(p)
 	}
+
+	// // trigger channel comes first, if applicable
+	// if hasTrigger {
+	// 	data[0] = make([]float64, samples)
+	// }
+
+	// // then allocate the other channels, up to 8
+	// for i := 1; i <= channels; i++ {
+	// 	data[i] = make([]float64, samples)
+	// }
+
+	// // then for each sample, get the data
+	// for j := 0; j < samples; j++ {
+	// 	if hasTrigger {
+	// 		data[0][j] = consumeDataPoint(payload, header)
+	// 		// advance the payload
+	// 		payload = payload[3:]
+	// 	}
+	// 	for i := 1; i <= channels; i++ {
+	// 		data[i][j] = consumeDataPoint(payload, header)
+	// 		payload = payload[3:]
+	// 	}
+	// }
 	return
 }
 

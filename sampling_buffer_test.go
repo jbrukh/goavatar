@@ -108,5 +108,34 @@ func TestSampling(t *testing.T) {
 	if !(r.data[0] == 9 && r.data[1] == 9) {
 		t.Errorf("wrong samples")
 	}
+}
 
+func TestStream(t *testing.T) {
+	b := NewSamplingBuffer(2, 40, 3)
+	p := []float64{11, 11}
+
+	for i := 0; i < 100; i++ {
+		b.PushSlice(p)
+	}
+	if b.Size() != 100 {
+		t.Errorf("wrong size")
+	}
+}
+
+func TestChannelData(t *testing.T) {
+	b := NewSamplingBuffer(2, 40, 3)
+	p := []float64{0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9}
+	b.PushSlice(p)
+
+	if b.Size() != 10 {
+		t.Errorf("wrong size")
+	}
+
+	ch0 := b.ChannelData(0)
+	ch1 := b.ChannelData(1)
+	for i := 0; i < 10; i++ {
+		if ch0[i] != float64(i) || ch1[i] != float64(i) {
+			t.Errorf("wrong channel data")
+		}
+	}
 }

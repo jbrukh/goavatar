@@ -66,7 +66,7 @@ type InfoMessage struct {
 // immediately begins to flow on the data endpoint.
 type ConnectMessage struct {
 	Id          string `json:"id"`           // should be non-empty
-	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	MessageType string `json:"message_type"` // will be "connect"
 	Connect     bool   `json:"connect"`      // boolean to engage or disengage the device
 	Pps         int    `json:"pps"`          // points per second, between 1-250
 	BatchSize   int    `json:"batch_size"`   // batch size; <= than pps
@@ -363,34 +363,30 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 }
 
 func stream(device Device) {
-	// out := device.Out()
-	// defer device.Disconnect()
+	out := device.Out()
+	defer device.Disconnect()
 
-	// // diagnose the situation
-	// df, ok := <-out
-	// if !ok {
-	// 	return
-	// }
+	// diagnose the situation
+	df, ok := <-out
+	if !ok {
+		return
+	}
 
-	// // get the channels
-	// channels := df.Channels()
-	// sampleRate, _ := df.SampleRate()
+	// get the channels
+	channels := df.Channels()
+	devicePps, _ := df.SampleRate()
 
-	// // now we need to sample every sampleRate/pps points
-	// subSampleRate := sampleRate / pps // TODO
+	// now we need to sample every sampleRate/pps points
+	sampleRate := devicePps / pps // user sends 250, 125, etc
 
-	// b := NewMultiBuffer(channels, sampleRate)
+	b := NewSamplingBuffer(channels, sampleRate*batchSize*10, sampleRate)
 
-	// for {
-	// 	df, ok := <-out
-	// 	if !ok {
-	// 		return
-	// 	}
+	for {
+		df, ok := <-out
+		if !ok {
+			return
+		}
 
-	// 	b.Append(df.ChannelDatas())
-	// 	for b.HasNext(batchSize) {
-	// 		batch := b.Next(batchSize)
-
-	// 	}
-	// }
+		b.Append(df.Buffer())
+	}
 }

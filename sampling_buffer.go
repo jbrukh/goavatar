@@ -76,6 +76,19 @@ func (b *SamplingBuffer) Next(n int) *SamplingBuffer {
 	return buf
 }
 
+// Returns the channel data for a particular channel [0...channels).
+func (b *SamplingBuffer) ChannelData(channel int) []float64 {
+	if channel < 0 || channel >= b.channels {
+		panic("no such channel")
+	}
+	size := b.Size()
+	result := make([]float64, size)
+	for i, _ := range result {
+		result[i] = b.data[i*b.channels+channel]
+	}
+	return result
+}
+
 // Remove the next n points and sample them according
 // to the sample rate.
 func (b *SamplingBuffer) SampleNext(n int) *SamplingBuffer {
