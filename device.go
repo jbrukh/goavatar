@@ -69,11 +69,17 @@ const (
 	RecordStop                     // Stop recording
 )
 
-// baseDevice
+// baseDevice provides the basic framework for devices, including
+// the skeleton implementation that keeps track of connection and
+// recording state and thread-safety. However, the baseDevice provides
+// no logic for streaming data and expects this functionality to
+// be parameterized.
+//
+// In particular, implementors should respect the control channel
+// and should send output data on the output channel.
 type baseDevice struct {
 	name      string
 	control   chan ControlCode
-	recSignal chan bool
 	out       chan *DataFrame
 	lock      sync.Mutex
 	connected bool
@@ -91,7 +97,6 @@ func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc
 	return &baseDevice{
 		name:        name,
 		control:     make(chan ControlCode),
-		recSignal:   make(chan bool),
 		connFunc:    connFunc,
 		disconnFunc: disconnFunc,
 		streamFunc:  streamFunc,
