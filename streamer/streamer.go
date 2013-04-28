@@ -17,7 +17,7 @@ const (
 	DefaultRefreshRate = 5
 	DefaultMaxFrames   = 10000
 	WindowMultiple     = 10
-	DumpFile           = "frames.go.bak"
+	DumpFile           = "frames.go"
 )
 
 var (

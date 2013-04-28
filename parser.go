@@ -51,6 +51,42 @@ func (df *DataFrame) String() string {
 	return fmt.Sprintf("\n%+v\n", *df)
 }
 
+func (df *DataFrame) AsCode() string {
+	f := `&DataFrame{
+		DataFrameHeader:DataFrameHeader{
+			FieldSampleRateVersion:%#v, 
+			FieldFrameSize:%#v, 
+			FieldFrameType:%#v, 
+			FieldFrameCount:%#v, 
+			FieldChannels:%#v, 
+			FieldSamples:%#v, 
+			FieldVoltRange:%#v, 
+			FieldTimestamp:%#v, 
+			FieldFracSecs:%#v,
+		},
+		data:NewSamplingBufferFromSlice(%d, 1, %#v), 
+		crc:%#v, 
+		received:time.Unix(%v, %v),
+	}`
+	return fmt.Sprintf(f,
+		df.FieldSampleRateVersion,
+		df.FieldFrameSize,
+		df.FieldFrameType,
+		df.FieldFrameCount,
+		df.FieldChannels,
+		df.FieldSamples,
+		df.FieldVoltRange,
+		df.FieldTimestamp,
+		df.FieldFracSecs,
+		df.Buffer().Channels(),
+		df.Buffer().data,
+		df.crc,
+		df.received.Unix(),
+		df.received.UnixNano(),
+	)
+
+}
+
 // func (df *DataFrame) ChannelData(channel int) []float64 {
 // 	if channel < 0 || channel > AvatarMaxChannels {
 // 		panic("you are trying to select a channel that doesn't exist")
