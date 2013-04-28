@@ -2,15 +2,25 @@ package goavatar
 
 import (
 	"code.google.com/p/go.net/websocket"
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
-	"encoding/json"
 	"net/http"
 )
 
 //---------------------------------------------------------//
 // Constants
 //---------------------------------------------------------//
+
+// the kickoff channel, sharing state between
+// the control and data endpoints; only one
+// connect request can succeed
+var (
+	kickoff   = make(chan bool, 1)
+	pps       int // points per second
+	batchSize int // batch size
+)
 
 //---------------------------------------------------------//
 // Handlers -- for use with net/http HTTP server
@@ -40,8 +50,14 @@ func DataHandler(device Device, verbose bool) http.Handler {
 
 // Base type for messages.
 type Message struct {
-	CorrelationId string `json:"correlationId"` // should be non-empty
-	MessageType   string `json:"messageType"`   // will be one of {"connect", "record"}
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+}
+
+// Basic information about the server.
+type InfoMessage struct {
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}	
 }
 
 // ConnectMessage is used to connect to the device
@@ -49,9 +65,11 @@ type Message struct {
 // sent to indicate success or failure, and data
 // immediately begins to flow on the data endpoint.
 type ConnectMessage struct {
-	Message
-	Connect   bool   `json:"connect"`   // boolean to engage or disengage the device
-	Frequency string `json:"frequency"` // how many messages to send to the front-end per second
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Connect     bool   `json:"connect"`      // boolean to engage or disengage the device
+	Pps         int    `json:"pps"`          // points per second, between 1-250
+	BatchSize   int    `json:"batch_size"`   // batch size; <= than pps
 }
 
 // RecordMessage is used to trigger recording on
@@ -59,31 +77,45 @@ type ConnectMessage struct {
 // is sent to indicate success (if recording has commenced) or
 // failure (if the device is off, or other errors).
 type RecordMessage struct {
-	Message
-	Record bool `json:"record"` // start or stop recording
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Record      bool   `json:"record"`       // start or stop recording
 }
 
 // Base type for response messages.
-type ResponseMessage struct {
-	Message
-	Success bool   `json:"success"` // whether or not the control message was successful
-	Err     string `json:"err"`     // error text, if any
+type Response struct {
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Success     bool   `json:"success"`      // whether or not the control message was successful
+	Err         string `json:"err"`          // error text, if any
 }
 
 // ConnectResponseMessage is sent in response to a ConnectMessage.
 // The MessageType is set to "connect".
-type ConnectResponseMessage struct {
-	ResponseMessage
-	Channels  int `json:"channels"`  // number of channels
-	VoltRange int `json:"voltRange"` // range of mVpp measurement of the device
-	// may in the future include information about the device
-	// sample rate and frames, etc.
+type ConnectResponse struct {
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Success     bool   `json:"success"`      // whether or not the control message was successful
+	Err         string `json:"err"`          // error text, if any
+	Status      string `json:"status"`       // device status
 }
 
 // RecordResponseMessage is sent in response to a RecordMessage.
 // The MessageType is set to "record".
-type RecordResponseMessage struct {
-	ResponseMessage
+type RecordResponse struct {
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Success     bool   `json:"success"`      // whether or not the control message was successful
+	Err         string `json:"err"`          // error text, if any
+}
+
+type InfoResponse struct {
+	Id          string `json:"id"`           // should be non-empty
+	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Success     bool   `json:"success"`      // whether or not the control message was successful
+	Err         string `json:"err"`          // error text, if any
+	Version     string `json:"version"`
+	DeviceName  string `json:"device_name"`
 }
 
 // DataMessage returns datapoints from the device across 
@@ -100,178 +132,265 @@ type DataMessage struct {
 //---------------------------------------------------------//
 
 func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
-	return func(ws *websocket.Conn) {
-		defer ws.Close()
+	// return the actual handler function
+	return func(conn *websocket.Conn) {
+		defer conn.Close()
+		controller := &SocketController{
+			conn:    conn,
+			kickoff: kickoff, // there is only one kickoff channel
+			device:  device,
+		}
+
 		for {
-			log.Printf("control: listening for incoming messages")
-			var message []byte
-			err := websocket.Message.Receive(ws, message)
+			log.Printf("listening for incoming messages")
+
+			msgBytes, msgBase, err := controller.Receive()
 			if err != nil {
-				if err == io.EOF || err == io.ErrUnexpectedEOF || err = io.ErrClosedPipe {
-					log.Printf("connection closed")
+				if err == io.EOF || err.Error() == "EOF" {
+					break
 				}
+				continue
+			}
+
+			log.Printf("received: %s", msgBytes)
+
+			// message types
+			msgType := msgBase.MessageType
+			switch msgType {
+
+			case "info":
+				controller.ProcessInfoMessage(msgBytes, msgBase.Id)
+
+			case "connect":
+				controller.ProcessConnectMessage(msgBytes, msgBase.Id)
+
+			case "record":
+				controller.ProcessRecordMessage(msgBytes, msgBase.Id)
+
+			default:
+				errStr := fmt.Sprintf("unknown message type: '%s'", msgType)
+				controller.SendErrorResponse(msgBase.Id, errStr)
+				continue
 			}
 		}
 	}
 }
 
-func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
-	return func(ws *websocket.Conn) {
-		defer ws.Close()
+// SocketController encapsulates all of the
+// business logic of sending and receiving
+// control messages.
+type SocketController struct {
+	conn    *websocket.Conn
+	kickoff chan bool
+	device  Device
+}
+
+// Receive receives control messages. If there is
+// a problem with the connection, or the message
+// you send has a bad "header", then an err is
+// reported.
+func (s *SocketController) Receive() (msgBytes []byte, msgBase Message, err error) {
+	// get the raw bytes
+	err = websocket.Message.Receive(s.conn, &msgBytes)
+	if err != nil {
+		log.Printf("websocket: %v", err)
+		return
+	}
+
+	// get the type
+	err = json.Unmarshal(msgBytes, &msgBase)
+	if err != nil {
+		s.SendErrorResponse(msgBase.Id, "error getting message type")
+	}
+	return
+}
+
+// SendErrorResponse sends error messages; these 
+// are usually for internal server errors.
+func (s *SocketController) SendErrorResponse(id, errStr string) {
+	// create the error message
+	r := new(Response)
+	r.MessageType = "error"
+	r.Id = id
+	r.Success = false
+	r.Err = errStr
+
+	// log
+	log.Printf("sending error response: %+v", r)
+
+	// send it off
+	err := websocket.JSON.Send(s.conn, r)
+	if err != nil {
+		log.Printf("error sending: %v\n", err)
+	}
+	return
+}
+
+func (s *SocketController) SendResponse(r interface{}) {
+	log.Printf("sending response: %+v", r)
+	// send it off
+	err := websocket.JSON.Send(s.conn, r)
+	if err != nil {
+		log.Printf("error sending: %v\n", err)
 	}
 }
 
-// // NewSocketListener creates a function that can be used
-// // as a WebSocket handler. See also Handler(Device).
-// func NewSocketListener(device Device, verbose bool) func(ws *websocket.Conn) {
-// 	return func(ws *websocket.Conn) {
-// 		defer ws.Close()
-// 		for {
-// 			log.Printf("listening...")
-// 			// listen
-// 			var msg ControlMessage
-// 			if err := websocket.JSON.Receive(ws, &msg); err != nil {
-// 				if err == io.EOF {
-// 					log.Printf("connection closed")
-// 				} else {
-// 					log.Printf("error receiving: %v (closing)", err)
-// 				}
-// 				break
-// 			}
-// 			log.Printf("received: %+v", msg)
+func (s *SocketController) ProcessInfoMessage(msgBytes []byte, id string) {
+	log.Printf("INFO")
 
-// 			// disengage?
-// 			if !msg.Connect {
-// 				log.Printf("disengaging the device")
-// 				device.Disconnect()
-// 				continue
-// 			}
+	var msg InfoMessage
+	if err := json.Unmarshal(msgBytes, &msg); err != nil {
+		s.SendErrorResponse(id, err.Error())
+	}
 
-// 			// engage?
-// 			if msg.Connect {
-// 				// device already connected?
-// 				if device.Connected() {
-// 					send(ws, &ResponseMessage{
-// 						Success: false,
-// 						Err:     "device already connected",
-// 					})
-// 					continue
-// 				}
+	r := new(InfoResponse)
+	r.MessageType = "info"
+	r.Id = msg.Id
+	r.Success = true
+	r.Version = "0.1"
+	r.DeviceName = s.device.Name()
 
-// 				// frequency is weird?
-// 				if msg.Frequency < 1 || msg.Frequency > 250 {
-// 					send(ws, &ResponseMessage{
-// 						Success: false,
-// 						Err:     "frequency should be 1 to 250",
-// 					})
-// 					continue
-// 				}
+	s.SendResponse(r)
+}
 
-// 				// connect
-// 				log.Printf("connecting to the device...")
-// 				_, err := device.Connect()
-// 				if err != nil {
-// 					log.Printf("could not connect: %v", err)
-// 					send(ws, &ResponseMessage{
-// 						Success: false,
-// 						Err:     "could not connect to the device",
-// 					})
-// 					continue
-// 				}
+func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
+	log.Printf("CONNECT")
 
-// 				log.Printf("device is connected")
-// 				defer device.Disconnect()
-// 				go stream(device, ws, &msg, verbose)
-// 			}
-// 		}
+	var msg ConnectMessage
+	if err := json.Unmarshal(msgBytes, &msg); err != nil {
+		s.SendErrorResponse(id, err.Error())
+	}
 
-// 	}
-// }
+	// start building the response
+	r := new(ConnectResponse)
+	r.MessageType = "connect"
+	r.Id = msg.Id
 
-// // send a message on a the WebSocket
-// func send(ws *websocket.Conn, msg interface{}) {
-// 	err := websocket.JSON.Send(ws, msg)
-// 	if err != nil {
-// 		log.Printf("error sending: %s\n", err)
-// 	}
-// }
+	// should we disconnect?
+	if !msg.Connect {
+		s.device.Disconnect()
+		r.Success = true
+		r.Status = "disconnected"
+		goto Respond
 
-// func stream(device Device, ws *websocket.Conn, msg *ControlMessage, verbose bool) {
-// 	defer device.Disconnect() // just in case
-// 	log.Printf("diagnosing the device...")
-// 	// first, diagnose the device
-// 	out := device.Out()
-// 	var (
-// 		channels   int
-// 		sampleRate int
-// 		batchSize  int
-// 	)
-// 	if df, ok := <-out; !ok {
-// 		log.Printf("device died prematurely, before it could be diagnosed")
-// 		return
-// 	} else {
-// 		// record the diagnostics
-// 		channels = df.Channels()
-// 		sampleRate, _ = df.SampleRate()
+	}
 
-// 		// warning: using "Frequency" here, but really mean
-// 		// latency, or period. 1000/L = f. So batch = sampleRate/f = ...
-// 		batchSize = sampleRate / msg.Frequency
-// 		log.Printf("setting batch size to %d", batchSize)
+	// should we connect?
+	if msg.Connect {
 
-// 		// send the success response
-// 		r := &ResponseMessage{
-// 			Success:   true,
-// 			Channels:  channels,
-// 			VoltRange: df.VoltRange(),
-// 		}
-// 		log.Printf("sending response: %+v", r)
-// 		send(ws, r)
-// 	}
+		// are the parameters sane?
+		if msg.Pps < 1 || msg.Pps > 250 {
+			r.Success = false
+			r.Err = "pps should be between 1 and 250"
+			goto Respond
+		}
 
-// 	buffers := NewMultiBuffer(channels, 1024)
+		// maybe someone is already using it
+		if s.device.Connected() {
+			r.Success = false
+			r.Status = "busy"
+			r.Err = "device is already connected"
+		}
 
-// 	// now run as long as the device is
-// 	// connected
-// 	for device.Connected() {
-// 		df, ok := <-device.Out()
-// 		if !ok {
-// 			log.Printf("device has disconnected")
-// 			return
-// 		}
+		// ok, now we can tell the data endpoint
+		// to stream when it is connected
 
-// 		chs := df.ChannelDatas()
-// 		//log.Printf("channelDatas: %+v", chs)
-// 		buffers.AppendBuffer(chs)
+		select {
+		case s.kickoff <- true:
+			// device can accept a value, meaning
+			// no one request for connection is in
+			// an "armed" state, so we have succeeded
+			r.Success = true
+			r.Status = "armed"
+			goto Respond
 
-// 		// do we need to keep filling?
-// 		if !buffers.HasNext(batchSize) {
-// 			continue
-// 		}
+		default:
+			// the kickoff channel is blocked, so some
+			// other request has armed the device for
+			// streaming
+			r.Success = false
+			r.Status = "armed"
+			r.Err = "device is already armed"
+			goto Respond
+		}
 
-// 		// ...no, there is enough for a batch
-// 		data := new(DataMessage)
+	}
 
-// 		for buffers.HasNext(batchSize) {
-// 			batch, _ := buffers.Next(batchSize)
-// 			log.Printf("appending %d data points", batch.Size())
+Respond:
+	s.SendResponse(r)
+}
 
-// 			//log.Printf("batch %v", batch)
+func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
+	var msg RecordMessage
+	if err := json.Unmarshal(msgBytes, &msg); err != nil {
+		s.SendErrorResponse(id, err.Error())
+	}
 
-// 			for c := 0; c < channels; c++ {
-// 				data.Data[c] = batch.data[c][0] // TODO: fix this with getter methods
-// 			}
+	r := new(RecordResponse)
+	r.MessageType = "record"
+	r.Id = msg.Id
+	r.Success = false
+	r.Err = "not implemented"
 
-// 			// TODO: fix this
-// 			data.Timestamp = df.Time().UnixNano()
-// 			if verbose {
-// 				log.Printf("sending %+v", data)
-// 			}
-// 			if err := websocket.JSON.Send(ws, data); err != nil {
-// 				log.Printf("error sending: %s\n", err)
-// 				return
-// 			}
-// 		}
+	//Respond:
+	s.SendResponse(r)
+}
 
-// 	}
-// }
+func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
+	return func(ws *websocket.Conn) {
+		defer ws.Close()
+
+		// gate to see if it is armed
+		select {
+		case <-kickoff:
+			// we connect and begin to stream
+			if !device.Connected() {
+				_, err := device.Connect()
+				if err != nil {
+					log.Printf("could not connect: %v", err)
+				}
+				go stream(device)
+			} else {
+				log.Printf("WARNING: device was already operating")
+			}
+
+		default:
+			// kickoff is blocked, meaning no one has
+			// armed the device; we close the socket
+			return
+		}
+	}
+}
+
+func stream(device Device) {
+	out := device.Out()
+	defer device.Disconnect()
+
+	// diagnose the situation
+	df, ok := <-out
+	if !ok {
+		return
+	}
+
+	// get the channels
+	channels := df.Channels()
+	sampleRate, _ := df.SampleRate()
+
+	// now we need to sample every sampleRate/pps points
+	subSampleRate := sampleRate / pps // TODO
+
+	b := NewMultiBuffer(channels, sampleRate)
+
+	for {
+		df, ok := <-out
+		if !ok {
+			return
+		}
+
+		b.Append(df.ChannelDatas())
+		for b.HasNext(batchSize) {
+			batch := b.Next(batchSize)
+
+		}
+	}
+}
