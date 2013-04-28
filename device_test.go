@@ -20,6 +20,7 @@ func newEmptyDevice() *baseDevice {
 	}
 
 	return newBaseDevice(
+		"UnitTestMockDevice",
 		connFunc,
 		disconnFunc,
 		streamFunc,

@@ -363,34 +363,34 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 }
 
 func stream(device Device) {
-	out := device.Out()
-	defer device.Disconnect()
+	// out := device.Out()
+	// defer device.Disconnect()
 
-	// diagnose the situation
-	df, ok := <-out
-	if !ok {
-		return
-	}
+	// // diagnose the situation
+	// df, ok := <-out
+	// if !ok {
+	// 	return
+	// }
 
-	// get the channels
-	channels := df.Channels()
-	sampleRate, _ := df.SampleRate()
+	// // get the channels
+	// channels := df.Channels()
+	// sampleRate, _ := df.SampleRate()
 
-	// now we need to sample every sampleRate/pps points
-	subSampleRate := sampleRate / pps // TODO
+	// // now we need to sample every sampleRate/pps points
+	// subSampleRate := sampleRate / pps // TODO
 
-	b := NewMultiBuffer(channels, sampleRate)
+	// b := NewMultiBuffer(channels, sampleRate)
 
-	for {
-		df, ok := <-out
-		if !ok {
-			return
-		}
+	// for {
+	// 	df, ok := <-out
+	// 	if !ok {
+	// 		return
+	// 	}
 
-		b.Append(df.ChannelDatas())
-		for b.HasNext(batchSize) {
-			batch := b.Next(batchSize)
+	// 	b.Append(df.ChannelDatas())
+	// 	for b.HasNext(batchSize) {
+	// 		batch := b.Next(batchSize)
 
-		}
-	}
+	// 	}
+	// }
 }
