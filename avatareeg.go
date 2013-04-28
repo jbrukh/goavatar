@@ -14,7 +14,7 @@ import (
 
 const (
 	DataBufferSize   = 1024
-	DiagnosticFrames = 50
+	DiagnosticFrames = 10
 )
 
 var BadCrcErr = errors.New("frame had bad crc")
