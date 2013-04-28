@@ -57,7 +57,7 @@ type Message struct {
 // Basic information about the server.
 type InfoMessage struct {
 	Id          string `json:"id"`           // should be non-empty
-	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}	
+	MessageType string `json:"message_type"` // should be "info"
 }
 
 // ConnectMessage is used to connect to the device
@@ -66,10 +66,10 @@ type InfoMessage struct {
 // immediately begins to flow on the data endpoint.
 type ConnectMessage struct {
 	Id          string `json:"id"`           // should be non-empty
-	MessageType string `json:"message_type"` // will be "connect"
+	MessageType string `json:"message_type"` // should be "connect"
 	Connect     bool   `json:"connect"`      // boolean to engage or disengage the device
-	Pps         int    `json:"pps"`          // points per second, between 1-250
-	BatchSize   int    `json:"batch_size"`   // batch size; <= than pps
+	Pps         int    `json:"pps"`          // points per second, one of 250, 125, 83, ..., 250/k
+	BatchSize   int    `json:"batch_size"`   // points to return per batch
 }
 
 // RecordMessage is used to trigger recording on
@@ -78,13 +78,13 @@ type ConnectMessage struct {
 // failure (if the device is off, or other errors).
 type RecordMessage struct {
 	Id          string `json:"id"`           // should be non-empty
-	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	MessageType string `json:"message_type"` // should be "record"
 	Record      bool   `json:"record"`       // start or stop recording
 }
 
 // Base type for response messages.
 type Response struct {
-	Id          string `json:"id"`           // should be non-empty
+	Id          string `json:"id"`           // echo of your correlation id
 	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
 	Success     bool   `json:"success"`      // whether or not the control message was successful
 	Err         string `json:"err"`          // error text, if any
@@ -93,29 +93,29 @@ type Response struct {
 // ConnectResponseMessage is sent in response to a ConnectMessage.
 // The MessageType is set to "connect".
 type ConnectResponse struct {
-	Id          string `json:"id"`           // should be non-empty
-	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Id          string `json:"id"`           // echo of your correlation id
+	MessageType string `json:"message_type"` // will be "connect"
 	Success     bool   `json:"success"`      // whether or not the control message was successful
 	Err         string `json:"err"`          // error text, if any
-	Status      string `json:"status"`       // device status
+	Status      string `json:"status"`       // device status, one of {"armed", "busy", "disconnected"}
 }
 
 // RecordResponseMessage is sent in response to a RecordMessage.
 // The MessageType is set to "record".
 type RecordResponse struct {
-	Id          string `json:"id"`           // should be non-empty
-	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Id          string `json:"id"`           // echo of your correlation id
+	MessageType string `json:"message_type"` // will be "record"
 	Success     bool   `json:"success"`      // whether or not the control message was successful
 	Err         string `json:"err"`          // error text, if any
 }
 
 type InfoResponse struct {
-	Id          string `json:"id"`           // should be non-empty
-	MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+	Id          string `json:"id"`           // echo of your correlation id
+	MessageType string `json:"message_type"` // will be "info"
 	Success     bool   `json:"success"`      // whether or not the control message was successful
 	Err         string `json:"err"`          // error text, if any
-	Version     string `json:"version"`
-	DeviceName  string `json:"device_name"`
+	Version     string `json:"version"`      // octopus server version
+	DeviceName  string `json:"device_name"`  // device name
 }
 
 // DataMessage returns datapoints from the device across 
