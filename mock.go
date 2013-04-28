@@ -1,6 +1,7 @@
 package goavatar
 
 import (
+	"log"
 	"time"
 )
 
@@ -30,11 +31,21 @@ func NewMockDevice() *MockDevice {
 	}
 
 	// STREAM
-	streamFunc := func(offSignal <-chan bool, output chan<- *DataFrame) {
+	streamFunc := func(control <-chan ControlCode, output chan<- *DataFrame) {
 		tick := 0
 		for {
-			if shouldBreak(offSignal) {
-				break
+			select {
+			case cc := <-control:
+				if cc == Terminate {
+					break
+				} else if cc == RecordStart {
+					log.Printf("REC: START")
+				} else if cc == RecordStop {
+					log.Printf("REC: STOP")
+				}
+				// ignore weird control codes
+			default:
+				// continue streaming
 			}
 			output <- frames[tick%len(frames)]
 			tick++

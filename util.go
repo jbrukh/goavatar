@@ -3,9 +3,9 @@ package goavatar
 // determine whether a trigger switch has been
 // flipped (where flipping means to send any
 // value over the channel)
-func shouldBreak(offSignal <-chan bool) bool {
+func anySignal(control <-chan ControlCode) bool {
 	select {
-	case <-offSignal:
+	case <-control:
 		return true
 	default:
 	}

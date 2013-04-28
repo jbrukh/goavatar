@@ -420,9 +420,12 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 	for {
 		// break if there was an error sending
 		// a message over the socket
-		if shouldBreak(kill) {
+		select {
+		case <-kill:
 			return
+		default:
 		}
+
 		df, ok := <-out
 		if !ok {
 			return

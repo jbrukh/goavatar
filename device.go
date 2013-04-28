@@ -53,12 +53,22 @@ type DisconnectFunc func() error
 // StreamFunc performs the operation of reading the stream and
 // writing data frames to the output channel, while also listening
 // for recording signals.
-type StreamFunc func(<-chan bool, chan<- *DataFrame)
+type StreamFunc func(<-chan ControlCode, chan<- *DataFrame)
+
+// ControlCode is used for interacting with the parser of the stream,
+// which is operating on a separate thread through the control channel.
+type ControlCode int
+
+const (
+	Terminate ControlCode = iota
+	RecordStart
+	RecordStop
+)
 
 // baseDevice
 type baseDevice struct {
 	name      string
-	offSignal chan bool
+	control   chan ControlCode
 	recSignal chan bool
 	out       chan *DataFrame
 	lock      sync.Mutex
@@ -75,7 +85,7 @@ type baseDevice struct {
 func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc, streamFunc StreamFunc) *baseDevice {
 	return &baseDevice{
 		name:        name,
-		offSignal:   make(chan bool),
+		control:     make(chan ControlCode),
 		recSignal:   make(chan bool),
 		connFunc:    connFunc,
 		disconnFunc: disconnFunc,
@@ -106,7 +116,7 @@ func (d *baseDevice) Connect() (out <-chan *DataFrame, err error) {
 
 	// begin to stream
 	go func() {
-		d.streamFunc(d.offSignal, d.out)
+		d.streamFunc(d.control, d.out)
 	}()
 
 	// mark connected
@@ -124,8 +134,8 @@ func (d *baseDevice) Disconnect() (err error) {
 	}
 
 	// send the off signal; will block until the
-	// offSignal is processed on the output thread
-	d.offSignal <- true
+	// control code is processed on the output thread
+	d.control <- Terminate
 	close(d.out)
 
 	// disconnect
@@ -148,9 +158,21 @@ func (d *baseDevice) Out() <-chan *DataFrame {
 }
 
 func (d *baseDevice) Record(file string) (err error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	// TODO: set the file in the device
+	d.control <- RecordStart
+
 	return
 }
 
 func (d *baseDevice) Stop() {
+	d.lock.Lock()
+	defer d.lock.Unlock()
 
+	// TODO: set the file in the device
+	d.control <- RecordStop
+
+	return
 }
