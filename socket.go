@@ -27,6 +27,8 @@ const (
 	DefaultBatchSize = 25
 )
 
+var Multiplier int64 = 10000000000000000
+
 //---------------------------------------------------------//
 // Handlers -- for use with net/http HTTP server
 //---------------------------------------------------------//
@@ -45,8 +47,8 @@ func ControlHandler(device Device, verbose bool) http.Handler {
 //
 //    http.Handle("/uri", socket.DataHandler(device, true))
 //
-func DataHandler(device Device, verbose bool) http.Handler {
-	return websocket.Handler(NewDataSocket(device, verbose))
+func DataHandler(device Device, verbose bool, integers bool) http.Handler {
+	return websocket.Handler(NewDataSocket(device, verbose, integers))
 }
 
 //---------------------------------------------------------//
@@ -129,6 +131,7 @@ type InfoResponse struct {
 // frequency specified in the initial control messages.
 type DataMessage struct {
 	Data [][]float64 `json:"data"` // the data for each channel, only first n relevant, n == # of channels
+	Ints [][]int64   `json:"ints"` // the data for each channel, as integers
 	//Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
 }
 
@@ -354,7 +357,7 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 	s.SendResponse(r)
 }
 
-func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
+func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		defer conn.Close()
 
@@ -367,7 +370,7 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 				if err != nil {
 					log.Printf("could not connect: %v", err)
 				}
-				stream(conn, device, verbose)
+				stream(conn, device, verbose, integers)
 			} else {
 				log.Printf("WARNING: device was already operating")
 			}
@@ -380,7 +383,7 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	}
 }
 
-func stream(conn *websocket.Conn, device Device, verbose bool) {
+func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 	out := device.Out()
 	defer device.Disconnect()
 
@@ -427,11 +430,21 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 			// send it off
 			go func() {
 				msg := new(DataMessage)
-				msg.Data = make([][]float64, channels)
-				for i, _ := range msg.Data {
-					msg.Data[i] = batch.ChannelData(i)
+				if integers {
+					msg.Ints = make([][]int64, channels)
+					for i, _ := range msg.Ints {
+						ch := batch.ChannelData(i)
+						msg.Ints[i] = make([]int64, len(ch))
+						for j, _ := range msg.Ints[i] {
+							msg.Ints[i][j] = int64(ch[j] * float64(Multiplier))
+						}
+					}
+				} else {
+					msg.Data = make([][]float64, channels)
+					for i, _ := range msg.Data {
+						msg.Data[i] = batch.ChannelData(i)
+					}
 				}
-
 				if verbose {
 					log.Printf("sending data msg: %+v", msg)
 				}

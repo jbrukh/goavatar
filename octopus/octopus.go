@@ -20,6 +20,7 @@ var (
 	mockDevice *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
 	listenPort *int    = flag.Int("listenPort", DefaultListenPort, "the websocket port on which to listen")
 	verbose    *bool   = flag.Bool("verbose", false, "whether the socket is verbose (shows outgoing data)")
+	integers   *bool   = flag.Bool("integers", false, "whether to return integral data")
 )
 
 func main() {
@@ -39,7 +40,7 @@ func main() {
 	port := fmt.Sprintf(":%d", *listenPort)
 
 	http.Handle(ControlEndpoint, ControlHandler(device, *verbose))
-	http.Handle(DataEndpoint, DataHandler(device, *verbose))
+	http.Handle(DataEndpoint, DataHandler(device, *verbose, *integers))
 
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
