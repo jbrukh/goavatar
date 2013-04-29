@@ -53,8 +53,12 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 		parseByteStream(reader, control, out)
 	}
 
+	recorderFunc := func(file string) Recorder {
+		return NewFileRecorder(file)
+	}
+
 	return &AvatarDevice{
-		baseDevice: *newBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc),
+		baseDevice: *newBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc, recorderFunc),
 		serialPort: serialPort,
 	}
 }
@@ -94,14 +98,11 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 	log.Printf("average time diff (ns): %d", timeDiff)
 
 	for {
+		// any control code will break this loop
 		select {
 		case cc := <-control:
 			if cc == Terminate {
 				break
-			} else if cc == RecordStart {
-				log.Printf("REC: START")
-			} else if cc == RecordStop {
-				log.Printf("REC: STOP")
 			}
 			// ignore weird control codes
 		default:

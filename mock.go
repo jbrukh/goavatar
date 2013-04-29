@@ -1,7 +1,7 @@
 package goavatar
 
 import (
-	"log"
+	//"log"
 	"time"
 )
 
@@ -38,10 +38,6 @@ func NewMockDevice() *MockDevice {
 			case cc := <-control:
 				if cc == Terminate {
 					break
-				} else if cc == RecordStart {
-					log.Printf("REC: START")
-				} else if cc == RecordStop {
-					log.Printf("REC: STOP")
 				}
 				// ignore weird control codes
 			default:
@@ -53,12 +49,17 @@ func NewMockDevice() *MockDevice {
 		}
 	}
 
+	recorderFunc := func(file string) Recorder {
+		return NewFileRecorder(file)
+	}
+
 	return &MockDevice{
 		baseDevice: *newBaseDevice(
 			"MockAvatarEEG",
 			connFunc,
 			disconnFunc,
 			streamFunc,
+			recorderFunc,
 		),
 	}
 }

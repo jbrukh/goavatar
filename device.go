@@ -2,6 +2,7 @@ package goavatar
 
 import (
 	"fmt"
+	"log"
 	"sync"
 )
 
@@ -59,14 +60,15 @@ type DisconnectFunc func() error
 // for control codes that tell it to terminate or record.
 type StreamFunc func(<-chan ControlCode, chan<- *DataFrame)
 
+// RecorderFunc produces a recorder for the given file
+type RecorderFunc func(file string) Recorder
+
 // ControlCode is used for interacting with the parser of the stream,
 // which is operating on a separate thread through the control channel.
 type ControlCode int
 
 const (
-	Terminate   ControlCode = iota // Terminate streaming
-	RecordStart                    // Start recording
-	RecordStop                     // Stop recording
+	Terminate ControlCode = iota // Terminate streaming
 )
 
 // baseDevice provides the basic framework for devices, including
@@ -85,22 +87,26 @@ type baseDevice struct {
 	lock      sync.Mutex
 	connected bool
 	recording bool
+	recorder  Recorder
 
 	// low-level ops
-	connFunc    ConnectFunc
-	disconnFunc DisconnectFunc
-	streamFunc  StreamFunc
+	connFunc     ConnectFunc
+	disconnFunc  DisconnectFunc
+	streamFunc   StreamFunc
+	recorderFunc RecorderFunc
 }
 
 // Create a new base device that performs connectivity
 // and streaming based on the given function.
-func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc, streamFunc StreamFunc) *baseDevice {
+func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc,
+	streamFunc StreamFunc, recorderFunc RecorderFunc) *baseDevice {
 	return &baseDevice{
-		name:        name,
-		control:     make(chan ControlCode),
-		connFunc:    connFunc,
-		disconnFunc: disconnFunc,
-		streamFunc:  streamFunc,
+		name:         name,
+		control:      make(chan ControlCode),
+		connFunc:     connFunc,
+		disconnFunc:  disconnFunc,
+		streamFunc:   streamFunc,
+		recorderFunc: recorderFunc,
 	}
 }
 
@@ -122,9 +128,10 @@ func (d *baseDevice) Connect() (err error) {
 		return fmt.Errorf("could not connect to the device: %v", err)
 	}
 
-	// create the output channel
+	// create the internal output channel
 	d.out = make(chan *DataFrame, DataBufferSize)
-	//d.publicOut = make(chan *DataFrame, DataBufferSize)
+	d.publicOut = make(chan *DataFrame, DataBufferSize)
+	go d.interceptOut()
 
 	// begin to stream
 	go func() {
@@ -149,6 +156,7 @@ func (d *baseDevice) Disconnect() (err error) {
 	// control code is processed on the output thread
 	d.control <- Terminate
 	close(d.out)
+	close(d.publicOut)
 
 	// disconnect
 	err = d.disconnFunc()
@@ -166,15 +174,26 @@ func (d *baseDevice) Connected() bool {
 func (d *baseDevice) Out() <-chan *DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
-	return d.out
+	return d.publicOut
 }
 
 func (d *baseDevice) Record(file string) (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
+	if d.recording {
+		return fmt.Errorf("already recording")
+	}
+
 	// TODO: set the file in the device
-	d.control <- RecordStart
+	if d.recorder = d.recorderFunc(file); d.recorder == nil {
+		return fmt.Errorf("no recorder was provided")
+	}
+
+	if err := d.recorder.Start(); err != nil {
+		return fmt.Errorf("could not start the recorder: %v", err)
+	}
+
 	d.recording = true
 	return
 }
@@ -183,8 +202,15 @@ func (d *baseDevice) Stop() {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	// TODO: set the file in the device
-	d.control <- RecordStop
+	if !d.recording {
+		return
+	}
+
+	if err := d.recorder.Stop(); err != nil {
+		log.Printf("could not shut down the recorder: %v", err)
+	}
+	d.recorder = nil
+
 	d.recording = false
 	return
 }
@@ -193,4 +219,26 @@ func (d *baseDevice) Recording() bool {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.recording
+}
+
+func (d *baseDevice) interceptOut() {
+	for {
+		df, ok := <-d.out
+		if !ok {
+			// in case user closes the
+			// output channel of his own accord
+			close(d.publicOut)
+			return
+		}
+
+		d.lock.Lock()
+		if d.recording {
+			// TODO: make async?
+			d.recorder.ProcessFrame(df)
+		}
+		d.lock.Unlock()
+
+		// otherwise, pump data into publicOut
+		d.publicOut <- df
+	}
 }

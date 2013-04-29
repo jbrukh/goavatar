@@ -343,17 +343,31 @@ Respond:
 
 func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 	var msg RecordMessage
-	if err := json.Unmarshal(msgBytes, &msg); err != nil {
+	var err error
+	if err = json.Unmarshal(msgBytes, &msg); err != nil {
 		s.SendErrorResponse(id, err.Error())
 	}
 
 	r := new(RecordResponse)
 	r.MessageType = "record"
 	r.Id = msg.Id
-	r.Success = false
-	r.Err = "not implemented"
 
-	//Respond:
+	if s.device.Recording() {
+		r.Success = false
+		r.Err = "already recording"
+		goto Respond
+	}
+
+	err = s.device.Record("test")
+	if err != nil {
+		r.Success = false
+		r.Err = err.Error()
+		goto Respond
+	}
+
+	r.Success = true
+
+Respond:
 	s.SendResponse(r)
 }
 
