@@ -55,11 +55,11 @@ func main() {
 	}
 
 	// connect to it
-	out, err := device.Connect()
-	if err != nil {
+	if err := device.Connect(); err != nil {
 		log.Printf("Error: %v\n", err)
 		return
 	}
+	out := device.Out()
 
 	run(p, out)
 

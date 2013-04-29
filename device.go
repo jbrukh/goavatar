@@ -18,7 +18,7 @@ type Device interface {
 	// Connect to the device and return the output channel.
 	// Connecting to a device that is already connected is
 	// an error.
-	Connect() (<-chan *DataFrame, error)
+	Connect() error
 
 	// Connected returns true if and only if the device is
 	// currently connected.
@@ -81,6 +81,7 @@ type baseDevice struct {
 	name      string
 	control   chan ControlCode
 	out       chan *DataFrame
+	publicOut chan *DataFrame
 	lock      sync.Mutex
 	connected bool
 	recording bool
@@ -107,22 +108,23 @@ func (d *baseDevice) Name() string {
 	return d.name
 }
 
-func (d *baseDevice) Connect() (out <-chan *DataFrame, err error) {
+func (d *baseDevice) Connect() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
 	// check connection
 	if d.connected {
-		return nil, fmt.Errorf("already connected to the device")
+		return fmt.Errorf("already connected to the device")
 	}
 
 	// perform connect
 	if err = d.connFunc(); err != nil {
-		return nil, fmt.Errorf("could not connect to the device: %v", err)
+		return fmt.Errorf("could not connect to the device: %v", err)
 	}
 
 	// create the output channel
 	d.out = make(chan *DataFrame, DataBufferSize)
+	//d.publicOut = make(chan *DataFrame, DataBufferSize)
 
 	// begin to stream
 	go func() {
@@ -131,7 +133,7 @@ func (d *baseDevice) Connect() (out <-chan *DataFrame, err error) {
 
 	// mark connected
 	d.connected = true
-	return d.out, nil
+	return nil
 }
 
 func (d *baseDevice) Disconnect() (err error) {

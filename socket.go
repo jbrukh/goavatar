@@ -366,7 +366,7 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 		case <-kickoff:
 			// we connect and begin to stream
 			if !device.Connected() {
-				_, err := device.Connect()
+				err := device.Connect()
 				if err != nil {
 					log.Printf("could not connect: %v", err)
 				}
