@@ -152,11 +152,18 @@ func (d *baseDevice) Disconnect() (err error) {
 		return
 	}
 
+	log.Printf("disconnecting the device")
+
 	// send the off signal; will block until the
 	// control code is processed on the output thread
 	d.control <- Terminate
-	close(d.out)
-	close(d.publicOut)
+
+	// if we are in the process of recording, we
+	// should stop
+	if d.recording {
+		d.recorder.Stop()
+		d.recording = false
+	}
 
 	// disconnect
 	err = d.disconnFunc()
@@ -222,12 +229,10 @@ func (d *baseDevice) Recording() bool {
 }
 
 func (d *baseDevice) interceptOut() {
+	defer close(d.publicOut)
 	for {
 		df, ok := <-d.out
 		if !ok {
-			// in case user closes the
-			// output channel of his own accord
-			close(d.publicOut)
 			return
 		}
 

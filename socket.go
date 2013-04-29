@@ -276,11 +276,21 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 
 	// should we disconnect?
 	if !msg.Connect {
-		s.device.Disconnect()
-		r.Success = true
-		r.Status = "disconnected"
+		err := s.device.Disconnect()
+		if err != nil {
+			r.Success = false
+			r.Status = "error"
+			r.Err = err.Error()
+		} else {
+			r.Success = true
+			r.Status = "disconnected"
+			// also, disarm the device
+			select {
+			case <-s.kickoff:
+			default:
+			}
+		}
 		goto Respond
-
 	}
 
 	// should we connect?
@@ -352,20 +362,33 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.MessageType = "record"
 	r.Id = msg.Id
 
-	if s.device.Recording() {
+	if !s.device.Connected() {
 		r.Success = false
-		r.Err = "already recording"
+		r.Err = "device is not streaming"
 		goto Respond
 	}
 
-	err = s.device.Record("test")
-	if err != nil {
-		r.Success = false
-		r.Err = err.Error()
+	if !msg.Record {
+		s.device.Stop()
+		r.Success = true
 		goto Respond
 	}
 
-	r.Success = true
+	if msg.Record {
+		if s.device.Recording() {
+			r.Success = false
+			r.Err = "already recording"
+			goto Respond
+		}
+
+		err = s.device.Record("test")
+		if err != nil {
+			r.Success = false
+			r.Err = err.Error()
+			goto Respond
+		}
+		r.Success = true
+	}
 
 Respond:
 	s.SendResponse(r)

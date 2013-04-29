@@ -1,7 +1,7 @@
 package goavatar
 
 import (
-	//"log"
+	"log"
 	"time"
 )
 
@@ -31,19 +31,21 @@ func NewMockDevice() *MockDevice {
 	}
 
 	// STREAM
-	streamFunc := func(control <-chan ControlCode, output chan<- *DataFrame) {
+	streamFunc := func(control <-chan ControlCode, out chan<- *DataFrame) {
+		defer close(out)
 		tick := 0
 		for {
 			select {
 			case cc := <-control:
 				if cc == Terminate {
-					break
+					log.Printf("got a terminate, will break")
+					return
 				}
 				// ignore weird control codes
 			default:
 				// continue streaming
 			}
-			output <- frames[tick%len(frames)]
+			out <- frames[tick%len(frames)]
 			tick++
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}

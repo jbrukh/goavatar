@@ -102,7 +102,7 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 		select {
 		case cc := <-control:
 			if cc == Terminate {
-				break
+				return
 			}
 			// ignore weird control codes
 		default:
