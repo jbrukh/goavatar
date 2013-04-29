@@ -1,8 +1,17 @@
 package goavatar
 
 import (
+	//"log"
 	"testing"
+	"time"
 )
+
+type MockRecorder struct {
+}
+
+func (r *MockRecorder) Start() (err error)                     { return }
+func (r *MockRecorder) ProcessFrame(df *DataFrame) (err error) { return }
+func (r *MockRecorder) Stop() (err error)                      { return }
 
 func newEmptyDevice() *baseDevice {
 	connFunc := func() error {
@@ -13,12 +22,20 @@ func newEmptyDevice() *baseDevice {
 		return nil // do nothing
 	}
 
-	streamFunc := func(control <-chan ControlCode, output chan<- *DataFrame) {
-		select {
-		case <-control:
-			return
-		default:
+	streamFunc := func(control <-chan ControlCode, output chan<- *DataFrame) (err error) {
+		for {
+			select {
+			case <-control:
+				return
+			default:
+			}
+			time.Sleep(time.Second)
 		}
+		return
+	}
+
+	recorderFunc := func(file string) Recorder {
+		return &MockRecorder{}
 	}
 
 	return newBaseDevice(
@@ -26,6 +43,7 @@ func newEmptyDevice() *baseDevice {
 		connFunc,
 		disconnFunc,
 		streamFunc,
+		recorderFunc,
 	)
 }
 
@@ -36,7 +54,7 @@ func TestConnectionLogic(t *testing.T) {
 		t.Errorf("didn't connect")
 	}
 
-	_, err := d.Connect()
+	err := d.Connect()
 	if err == nil {
 		t.Errorf("failed to block second connect")
 	}
@@ -63,16 +81,16 @@ func TestConnectionLogic(t *testing.T) {
 
 func TestCleanupLogic(t *testing.T) {
 	d := newEmptyDevice()
-	if d.out != nil {
+	if d.out != nil || d.publicOut != nil {
 		t.Errorf("has an out channel for some reason")
 	}
 
-	_, err := d.Connect()
+	err := d.Connect()
 	if err != nil {
 		t.Errorf("failed to connect")
 	}
 
-	if d.out == nil {
+	if d.out == nil || d.publicOut == nil {
 		t.Errorf("didn't create out channel")
 	}
 
@@ -80,7 +98,12 @@ func TestCleanupLogic(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed to disconnect")
 	}
+
 	ensureClosed(t, d.out)
+
+	// wait for worker thread to close the public out
+	time.Sleep(time.Millisecond * 500)
+	ensureClosed(t, d.publicOut)
 }
 
 func ensureClosed(t *testing.T, out chan *DataFrame) {

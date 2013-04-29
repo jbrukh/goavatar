@@ -48,17 +48,27 @@ type Device interface {
 }
 
 // ConnectFunc performs the low-level operation to connect
-// to the device
+// to the device. This usually means opening the port of the
+// device for reading.
 type ConnectFunc func() error
 
 // DisconnectFunc perfoms the low-level operation to disconnect
-// from the device
+// from the device. This usually means closing the port of the
+// device.
 type DisconnectFunc func() error
 
 // StreamFunc performs the operation of reading the stream and
-// writing data frames to the output channel, while also listening
-// for control codes that tell it to terminate or record.
-type StreamFunc func(<-chan ControlCode, chan<- *DataFrame)
+// writing data frames to the output channel. This function is
+// expected to obey the following contract:
+//
+// (1) It shalt not perform any resource cleanup, this is the
+//     job of the DisconnectFunc. It shalt not call 
+//     device.Disconnect() or close the output channel.
+// (2) It shalt obey the ControlCode channel: upon receiving
+//     a Terminate code, it shall exit with no errors.
+// (3) Upon any error, it shall return that error.
+//
+type StreamFunc func(<-chan ControlCode, chan<- *DataFrame) error
 
 // RecorderFunc produces a recorder for the given file
 type RecorderFunc func(file string) Recorder
@@ -69,6 +79,7 @@ type ControlCode int
 
 const (
 	Terminate ControlCode = iota // Terminate streaming
+	Terminated
 )
 
 // baseDevice provides the basic framework for devices, including
@@ -88,6 +99,7 @@ type baseDevice struct {
 	connected bool
 	recording bool
 	recorder  Recorder
+	wg        sync.WaitGroup
 
 	// low-level ops
 	connFunc     ConnectFunc
@@ -131,11 +143,28 @@ func (d *baseDevice) Connect() (err error) {
 	// create the internal output channel
 	d.out = make(chan *DataFrame, DataBufferSize)
 	d.publicOut = make(chan *DataFrame, DataBufferSize)
-	go d.interceptOut()
+
+	// run the interceptor worker
+	go func() {
+		d.wg.Add(1)
+		d.interceptOut()
+		d.wg.Done()
+	}()
 
 	// begin to stream
 	go func() {
-		d.streamFunc(d.control, d.out)
+		d.wg.Add(1)
+		// run the streamer and listen for errors
+		if err := d.streamFunc(d.control, d.out); err != nil {
+			log.Printf("error in streamer: %v", err)
+		}
+		d.wg.Done()
+
+		// on error or exit, we will disconnect the device
+		if err := d.Disconnect(); err != nil {
+			log.Printf("error on disconnect: $v", err)
+		}
+
 	}()
 
 	// mark connected
@@ -154,9 +183,22 @@ func (d *baseDevice) Disconnect() (err error) {
 
 	log.Printf("disconnecting the device")
 
-	// send the off signal; will block until the
+	// send the Terminate signal; will block until the
 	// control code is processed on the output thread
 	d.control <- Terminate
+
+	// close the internal output channel, as the streamer
+	// is now guaranteed to exit, not pushing to d.out
+	// any more
+	close(d.out)
+
+	// interceptor will react to the d.out channel closing
+	// by itself exiting; we wait until that happens...
+	d.wg.Wait()
+
+	// then we close the publicOut channel so that consumers
+	// are aware that we are disconnecting
+	close(d.publicOut)
 
 	// if we are in the process of recording, we
 	// should stop
@@ -229,7 +271,6 @@ func (d *baseDevice) Recording() bool {
 }
 
 func (d *baseDevice) interceptOut() {
-	defer close(d.publicOut)
 	for {
 		df, ok := <-d.out
 		if !ok {

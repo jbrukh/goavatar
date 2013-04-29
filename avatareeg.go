@@ -49,8 +49,8 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 	}
 
 	// the streaming function
-	streamFunc := func(control <-chan ControlCode, out chan<- *DataFrame) {
-		parseByteStream(reader, control, out)
+	streamFunc := func(control <-chan ControlCode, out chan<- *DataFrame) error {
+		return parseByteStream(reader, control, out)
 	}
 
 	recorderFunc := func(file string) Recorder {
@@ -66,7 +66,7 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 // parseByteStream parses the byte stream coming out of the device and writes the output
 // to the output channel parameter. It also listens on the offSignal channel for any
 // data, in which case it will stop listening the device and return.
-func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- *DataFrame) {
+func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- *DataFrame) (err error) {
 	reader := newAvatarParser(r)
 
 	log.Printf("calibrating...")
@@ -76,7 +76,7 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 		// any message on the control channel
 		// will break this loop
 		if anySignal(control) {
-			return
+			return nil
 		}
 
 		// collect the frames for calibration
@@ -86,7 +86,7 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 				continue // just skip bad frames
 			} else {
 				log.Printf("could not calibrate the device: %v", err)
-				return
+				return err
 			}
 		}
 		frames[i] = frame
@@ -102,7 +102,7 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 		select {
 		case cc := <-control:
 			if cc == Terminate {
-				return
+				return nil
 			}
 			// ignore weird control codes
 		default:
@@ -113,7 +113,7 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 		if err != nil {
 			log.Printf("error parsing frame: %v", err)
 			if err == io.EOF || err == io.ErrUnexpectedEOF || err == io.ErrClosedPipe {
-				return // stream is hosed
+				return err // stream is hosed
 			} else {
 				continue
 			}
@@ -121,6 +121,7 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 
 		output <- frame
 	}
+	return nil
 }
 
 func parseFrame(reader *avatarParser) (frame *DataFrame, err error) {
