@@ -7,11 +7,29 @@ import (
 )
 
 type MockRecorder struct {
+	started   bool
+	processed bool
+	stopped   bool
 }
 
-func (r *MockRecorder) Start() (err error)                     { return }
-func (r *MockRecorder) ProcessFrame(df *DataFrame) (err error) { return }
-func (r *MockRecorder) Stop() (err error)                      { return }
+func (r *MockRecorder) Start() (err error) {
+	r.started = true
+	return
+}
+func (r *MockRecorder) ProcessFrame(df *DataFrame) (err error) {
+	r.processed = true
+	return
+}
+func (r *MockRecorder) Stop() (err error) {
+	r.stopped = true
+	return
+}
+func (r *MockRecorder) Reset() {
+	r.started = false
+	r.processed = false
+	r.stopped = false
+	return
+}
 
 func newEmptyDevice() *baseDevice {
 	connFunc := func() error {
@@ -22,15 +40,12 @@ func newEmptyDevice() *baseDevice {
 		return nil // do nothing
 	}
 
-	streamFunc := func(control <-chan ControlCode, output chan<- *DataFrame) (err error) {
-		for {
-			select {
-			case <-control:
-				return
-			default:
-			}
-			time.Sleep(time.Second)
+	streamFunc := func(c *Control) (err error) {
+		for !c.ShouldTerminate() {
+			time.Sleep(time.Millisecond * 100)
+			c.Send(&DataFrame{})
 		}
+		c.Close()
 		return
 	}
 
@@ -81,7 +96,7 @@ func TestConnectionLogic(t *testing.T) {
 
 func TestCleanupLogic(t *testing.T) {
 	d := newEmptyDevice()
-	if d.out != nil || d.publicOut != nil {
+	if d.control != nil {
 		t.Errorf("has an out channel for some reason")
 	}
 
@@ -90,7 +105,7 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	if d.out == nil || d.publicOut == nil {
+	if d.control.out == nil {
 		t.Errorf("didn't create out channel")
 	}
 
@@ -99,11 +114,77 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to disconnect")
 	}
 
-	ensureClosed(t, d.out)
+	ensureClosed(t, d.control.out)
+}
 
-	// wait for worker thread to close the public out
-	time.Sleep(time.Millisecond * 500)
-	ensureClosed(t, d.publicOut)
+func TestRecord(t *testing.T) {
+	d := newEmptyDevice()
+	err := d.Connect()
+	if err != nil || !d.Connected() {
+		t.Errorf("failed to connect")
+	}
+
+	err = d.Record("")
+	if err != nil || !d.Recording() {
+		t.Errorf("failed to start recording, or wrong status")
+	}
+
+	r := d.recorder.(*MockRecorder)
+	if !r.started {
+		t.Errorf("mock recorder didn't start")
+	}
+
+	// wait for a single data frame to go through
+	<-d.Out()
+
+	if !r.processed {
+		t.Errorf("mock recorder didn't process")
+	}
+
+	d.Stop()
+	if err != nil || d.Recording() {
+		t.Errorf("recorder failed to stop")
+	}
+
+	if !r.stopped {
+		t.Errorf("mock recorder didn't hit stop")
+	}
+
+	err = d.Disconnect()
+	if err != nil || d.Connected() {
+		t.Errorf("couldn't disconnect: %v", err)
+	}
+}
+
+func TestRecordWhenOff(t *testing.T) {
+	d := newEmptyDevice()
+	err := d.Record("")
+	if err == nil {
+		t.Errorf("should have failed, the device is not connected")
+	}
+}
+
+func TestMultipleRecording(t *testing.T) {
+	d := newEmptyDevice()
+	err := d.Connect()
+	if err != nil || !d.Connected() {
+		t.Errorf("failed to connect")
+	}
+
+	err = d.Record("")
+	if err != nil || !d.Recording() {
+		t.Errorf("failed to start recording, or wrong status")
+	}
+
+	err = d.Record("")
+	if err == nil {
+		t.Errorf("should have failed, device is already recording")
+	}
+
+	err = d.Disconnect()
+	if err != nil || d.Connected() {
+		t.Errorf("couldn't disconnect: %v", err)
+	}
 }
 
 func ensureClosed(t *testing.T, out chan *DataFrame) {

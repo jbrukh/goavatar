@@ -49,8 +49,8 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 	}
 
 	// the streaming function
-	streamFunc := func(control <-chan ControlCode, out chan<- *DataFrame) error {
-		return parseByteStream(reader, control, out)
+	streamFunc := func(c *Control) error {
+		return parseByteStream(reader, c)
 	}
 
 	recorderFunc := func(file string) Recorder {
@@ -66,16 +66,14 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 // parseByteStream parses the byte stream coming out of the device and writes the output
 // to the output channel parameter. It also listens on the offSignal channel for any
 // data, in which case it will stop listening the device and return.
-func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- *DataFrame) (err error) {
+func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 	reader := newAvatarParser(r)
-
+	defer c.Close()
 	log.Printf("calibrating...")
 	// calibrate the device
 	frames := make([]*DataFrame, DiagnosticFrames)
 	for i, _ := range frames {
-		// any message on the control channel
-		// will break this loop
-		if anySignal(control) {
+		if c.ShouldTerminate() {
 			return nil
 		}
 
@@ -98,15 +96,8 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 	log.Printf("average time diff (ns): %d", timeDiff)
 
 	for {
-		// any control code will break this loop
-		select {
-		case cc := <-control:
-			if cc == Terminate {
-				return nil
-			}
-			// ignore weird control codes
-		default:
-			// continue streaming
+		if c.ShouldTerminate() {
+			return nil
 		}
 
 		frame, err := parseFrame(reader)
@@ -119,7 +110,7 @@ func parseByteStream(r io.ReadCloser, control <-chan ControlCode, output chan<- 
 			}
 		}
 
-		output <- frame
+		c.Send(frame)
 	}
 	return nil
 }

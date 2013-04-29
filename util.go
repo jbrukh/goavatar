@@ -1,17 +1,5 @@
 package goavatar
 
-// determine whether a trigger switch has been
-// flipped (where flipping means to send any
-// value over the channel)
-func anySignal(control <-chan ControlCode) bool {
-	select {
-	case <-control:
-		return true
-	default:
-	}
-	return false
-}
-
 // return the average of an array
 func averageFloat64(arr []float64) float64 {
 	if len(arr) < 1 {

@@ -30,19 +30,14 @@ func NewMockDevice() *MockDevice {
 	}
 
 	// STREAM
-	streamFunc := func(control <-chan ControlCode, out chan<- *DataFrame) error {
+	streamFunc := func(c *Control) error {
+		defer c.Close()
 		tick := 0
 		for {
-			select {
-			case cc := <-control:
-				if cc == Terminate {
-					return nil
-				}
-				// ignore weird control codes
-			default:
-				// continue streaming
+			if c.ShouldTerminate() {
+				return nil
 			}
-			out <- frames[tick%len(frames)]
+			c.Send(frames[tick%len(frames)])
 			tick++
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}

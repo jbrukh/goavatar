@@ -30,10 +30,7 @@ type Device interface {
 	// idempotent.
 	Disconnect() error
 
-	// Returns the output channel for the device. If the
-	// device has not been connected, the value of the
-	// channel is nil. If the device has been disconnected
-	// the channel will be closed.
+	// Returns the output channel for the device. 
 	Out() <-chan *DataFrame
 
 	// Starts recording the streaming data to a file.
@@ -63,24 +60,50 @@ type DisconnectFunc func() error
 //
 // (1) It shalt not perform any resource cleanup, this is the
 //     job of the DisconnectFunc. It shalt not call 
-//     device.Disconnect() or close the output channel.
-// (2) It shalt obey the ControlCode channel: upon receiving
-//     a Terminate code, it shall exit with no errors.
+//     device.Disconnect().
+// (2) It shalt obey c.ShouldTerminate() and exit without error.
 // (3) Upon any error, it shall return that error.
 //
-type StreamFunc func(<-chan ControlCode, chan<- *DataFrame) error
+type StreamFunc func(c *Control) error
 
 // RecorderFunc produces a recorder for the given file
 type RecorderFunc func(file string) Recorder
 
-// ControlCode is used for interacting with the parser of the stream,
-// which is operating on a separate thread through the control channel.
-type ControlCode int
+type Control struct {
+	done chan bool
+	out  chan *DataFrame
+	d    *baseDevice
+}
 
-const (
-	Terminate ControlCode = iota // Terminate streaming
-	Terminated
-)
+func newControl(d *baseDevice) *Control {
+	return &Control{
+		done: make(chan bool),
+		out:  make(chan *DataFrame, DataBufferSize),
+		d:    d,
+	}
+}
+
+func (control *Control) ShouldTerminate() bool {
+	select {
+	case <-control.done:
+		return true
+	default:
+	}
+	return false
+}
+
+func (control *Control) Send(df *DataFrame) {
+	control.out <- df
+	if !control.ShouldTerminate() {
+		if control.d.Recording() {
+			control.d.recorder.ProcessFrame(df)
+		}
+	}
+}
+
+func (control *Control) Close() {
+	close(control.out)
+}
 
 // baseDevice provides the basic framework for devices, including
 // the skeleton implementation that keeps track of connection and
@@ -92,14 +115,11 @@ const (
 // and should send output data on the output channel.
 type baseDevice struct {
 	name      string
-	control   chan ControlCode
-	out       chan *DataFrame
-	publicOut chan *DataFrame
 	lock      sync.Mutex
 	connected bool
 	recording bool
 	recorder  Recorder
-	wg        sync.WaitGroup
+	control   *Control
 
 	// low-level ops
 	connFunc     ConnectFunc
@@ -114,7 +134,6 @@ func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc
 	streamFunc StreamFunc, recorderFunc RecorderFunc) *baseDevice {
 	return &baseDevice{
 		name:         name,
-		control:      make(chan ControlCode),
 		connFunc:     connFunc,
 		disconnFunc:  disconnFunc,
 		streamFunc:   streamFunc,
@@ -140,25 +159,15 @@ func (d *baseDevice) Connect() (err error) {
 		return fmt.Errorf("could not connect to the device: %v", err)
 	}
 
-	// create the internal output channel
-	d.out = make(chan *DataFrame, DataBufferSize)
-	d.publicOut = make(chan *DataFrame, DataBufferSize)
-
-	// run the interceptor worker
-	go func() {
-		d.wg.Add(1)
-		d.interceptOut()
-		d.wg.Done()
-	}()
+	// create the controller
+	d.control = newControl(d)
 
 	// begin to stream
 	go func() {
-		d.wg.Add(1)
 		// run the streamer and listen for errors
-		if err := d.streamFunc(d.control, d.out); err != nil {
+		if err := d.streamFunc(d.control); err != nil {
 			log.Printf("error in streamer: %v", err)
 		}
-		d.wg.Done()
 
 		// on error or exit, we will disconnect the device
 		if err := d.Disconnect(); err != nil {
@@ -181,24 +190,7 @@ func (d *baseDevice) Disconnect() (err error) {
 		return
 	}
 
-	log.Printf("disconnecting the device")
-
-	// send the Terminate signal; will block until the
-	// control code is processed on the output thread
-	d.control <- Terminate
-
-	// close the internal output channel, as the streamer
-	// is now guaranteed to exit, not pushing to d.out
-	// any more
-	close(d.out)
-
-	// interceptor will react to the d.out channel closing
-	// by itself exiting; we wait until that happens...
-	d.wg.Wait()
-
-	// then we close the publicOut channel so that consumers
-	// are aware that we are disconnecting
-	close(d.publicOut)
+	d.control.done <- true
 
 	// if we are in the process of recording, we
 	// should stop
@@ -223,7 +215,7 @@ func (d *baseDevice) Connected() bool {
 func (d *baseDevice) Out() <-chan *DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
-	return d.publicOut
+	return d.control.out
 }
 
 func (d *baseDevice) Record(file string) (err error) {
@@ -232,6 +224,10 @@ func (d *baseDevice) Record(file string) (err error) {
 
 	if d.recording {
 		return fmt.Errorf("already recording")
+	}
+
+	if !d.connected {
+		return fmt.Errorf("device is not connected")
 	}
 
 	// TODO: set the file in the device
@@ -268,23 +264,4 @@ func (d *baseDevice) Recording() bool {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.recording
-}
-
-func (d *baseDevice) interceptOut() {
-	for {
-		df, ok := <-d.out
-		if !ok {
-			return
-		}
-
-		d.lock.Lock()
-		if d.recording {
-			// TODO: make async?
-			d.recorder.ProcessFrame(df)
-		}
-		d.lock.Unlock()
-
-		// otherwise, pump data into publicOut
-		d.publicOut <- df
-	}
 }
