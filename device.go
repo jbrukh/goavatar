@@ -34,7 +34,7 @@ type Device interface {
 	Out() <-chan *DataFrame
 
 	// Starts recording the streaming data to a file.
-	Record() (err error)
+	Record(token string) (err error)
 
 	// Stops recording the streaming data.
 	Stop() (outFile string, err error)
@@ -67,7 +67,7 @@ type DisconnectFunc func() error
 type StreamFunc func(c *Control) error
 
 // RecorderProvider produces a recorder for the given file
-type RecorderProvider func() Recorder
+type RecorderProvider func(string) Recorder
 
 type Control struct {
 	done chan bool
@@ -228,7 +228,7 @@ func (d *baseDevice) Out() <-chan *DataFrame {
 	return d.control.out
 }
 
-func (d *baseDevice) Record() (err error) {
+func (d *baseDevice) Record(token string) (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -240,7 +240,7 @@ func (d *baseDevice) Record() (err error) {
 		return fmt.Errorf("device is not connected")
 	}
 
-	if d.recorder = d.recorderFunc(); d.recorder == nil {
+	if d.recorder = d.recorderFunc(token); d.recorder == nil {
 		return fmt.Errorf("no recorder was provided")
 	}
 

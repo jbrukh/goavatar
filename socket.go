@@ -87,6 +87,7 @@ type RecordMessage struct {
 	Id          string `json:"id"`           // should be non-empty
 	MessageType string `json:"message_type"` // should be "record"
 	Record      bool   `json:"record"`       // start or stop recording
+	Token       string `json:"token"`        // authentication token for upload
 }
 
 // Base type for response messages.
@@ -384,7 +385,7 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 			goto Respond
 		}
 
-		err = s.device.Record()
+		err = s.device.Record(msg.Token)
 		if err != nil {
 			r.Err = err.Error()
 			goto Respond

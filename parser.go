@@ -305,28 +305,6 @@ func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (b *SamplingBuffe
 		b.PushSlice(p)
 	}
 
-	// // trigger channel comes first, if applicable
-	// if hasTrigger {
-	// 	data[0] = make([]float64, samples)
-	// }
-
-	// // then allocate the other channels, up to 8
-	// for i := 1; i <= channels; i++ {
-	// 	data[i] = make([]float64, samples)
-	// }
-
-	// // then for each sample, get the data
-	// for j := 0; j < samples; j++ {
-	// 	if hasTrigger {
-	// 		data[0][j] = consumeDataPoint(payload, header)
-	// 		// advance the payload
-	// 		payload = payload[3:]
-	// 	}
-	// 	for i := 1; i <= channels; i++ {
-	// 		data[i][j] = consumeDataPoint(payload, header)
-	// 		payload = payload[3:]
-	// 	}
-	// }
 	return
 }
 
