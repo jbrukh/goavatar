@@ -53,12 +53,12 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 		return parseByteStream(reader, c)
 	}
 
-	recorderFunc := func(file string) Recorder {
-		return NewFileRecorder(file)
+	recorderProvider := func() Recorder {
+		return &FileRecorder{}
 	}
 
 	return &AvatarDevice{
-		baseDevice: *newBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc, recorderFunc),
+		baseDevice: *newBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc, recorderProvider),
 		serialPort: serialPort,
 	}
 }

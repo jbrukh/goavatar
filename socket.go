@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 )
 
 //---------------------------------------------------------//
@@ -115,6 +114,7 @@ type RecordResponse struct {
 	MessageType string `json:"message_type"` // will be "record"
 	Success     bool   `json:"success"`      // whether or not the control message was successful
 	Err         string `json:"err"`          // error text, if any
+	File        string `json:"file"`         // output file
 }
 
 type InfoResponse struct {
@@ -362,31 +362,30 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 	r := new(RecordResponse)
 	r.MessageType = "record"
 	r.Id = msg.Id
+	r.Success = false
 
 	if !s.device.Connected() {
-		r.Success = false
 		r.Err = "device is not streaming"
 		goto Respond
 	}
 
 	if !msg.Record {
-		s.device.Stop()
-		r.Success = true
+		outFile, err := s.device.Stop()
+		if err == nil {
+			r.Success = true
+			r.File = outFile
+		}
 		goto Respond
 	}
 
 	if msg.Record {
 		if s.device.Recording() {
-			r.Success = false
 			r.Err = "already recording"
 			goto Respond
 		}
 
-		fileName := fmt.Sprintf("var/%s.bin", time.Now().Format(time.RFC3339Nano))
-
-		err = s.device.Record(fileName)
+		err = s.device.Record()
 		if err != nil {
-			r.Success = false
 			r.Err = err.Error()
 			goto Respond
 		}

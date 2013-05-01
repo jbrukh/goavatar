@@ -20,9 +20,9 @@ func (r *MockRecorder) ProcessFrame(df *DataFrame) (err error) {
 	r.processed = true
 	return
 }
-func (r *MockRecorder) Stop() (err error) {
+func (r *MockRecorder) Stop() (outFile string, err error) {
 	r.stopped = true
-	return
+	return "somefile", nil
 }
 func (r *MockRecorder) Reset() {
 	r.started = false
@@ -49,7 +49,7 @@ func newEmptyDevice() *baseDevice {
 		return
 	}
 
-	recorderFunc := func(file string) Recorder {
+	recorderProvider := func() Recorder {
 		return &MockRecorder{}
 	}
 
@@ -58,7 +58,7 @@ func newEmptyDevice() *baseDevice {
 		connFunc,
 		disconnFunc,
 		streamFunc,
-		recorderFunc,
+		recorderProvider,
 	)
 }
 
@@ -124,7 +124,7 @@ func TestRecord(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	err = d.Record("")
+	err = d.Record()
 	if err != nil || !d.Recording() {
 		t.Errorf("failed to start recording, or wrong status")
 	}
@@ -158,7 +158,7 @@ func TestRecord(t *testing.T) {
 
 func TestRecordWhenOff(t *testing.T) {
 	d := newEmptyDevice()
-	err := d.Record("")
+	err := d.Record()
 	if err == nil {
 		t.Errorf("should have failed, the device is not connected")
 	}
@@ -171,12 +171,12 @@ func TestMultipleRecording(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	err = d.Record("")
+	err = d.Record()
 	if err != nil || !d.Recording() {
 		t.Errorf("failed to start recording, or wrong status")
 	}
 
-	err = d.Record("")
+	err = d.Record()
 	if err == nil {
 		t.Errorf("should have failed, device is already recording")
 	}
@@ -184,6 +184,10 @@ func TestMultipleRecording(t *testing.T) {
 	err = d.Disconnect()
 	if err != nil || d.Connected() {
 		t.Errorf("couldn't disconnect: %v", err)
+	}
+
+	if d.Recording() {
+		t.Errorf("recording didn't stop")
 	}
 }
 

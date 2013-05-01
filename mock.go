@@ -44,8 +44,8 @@ func NewMockDevice() *MockDevice {
 		return nil
 	}
 
-	recorderFunc := func(file string) Recorder {
-		return NewFileRecorder(file)
+	recorderProvider := func() Recorder {
+		return &FileRecorder{}
 	}
 
 	return &MockDevice{
@@ -54,7 +54,7 @@ func NewMockDevice() *MockDevice {
 			connFunc,
 			disconnFunc,
 			streamFunc,
-			recorderFunc,
+			recorderProvider,
 		),
 	}
 }

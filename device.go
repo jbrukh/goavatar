@@ -34,10 +34,10 @@ type Device interface {
 	Out() <-chan *DataFrame
 
 	// Starts recording the streaming data to a file.
-	Record(file string) (err error)
+	Record() (err error)
 
 	// Stops recording the streaming data.
-	Stop()
+	Stop() (outFile string, err error)
 
 	// Recording returns true if and only if the device is currently
 	// recording.
@@ -66,8 +66,8 @@ type DisconnectFunc func() error
 //
 type StreamFunc func(c *Control) error
 
-// RecorderFunc produces a recorder for the given file
-type RecorderFunc func(file string) Recorder
+// RecorderProvider produces a recorder for the given file
+type RecorderProvider func() Recorder
 
 type Control struct {
 	done chan bool
@@ -125,13 +125,13 @@ type baseDevice struct {
 	connFunc     ConnectFunc
 	disconnFunc  DisconnectFunc
 	streamFunc   StreamFunc
-	recorderFunc RecorderFunc
+	recorderFunc RecorderProvider
 }
 
 // Create a new base device that performs connectivity
 // and streaming based on the given function.
 func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc,
-	streamFunc StreamFunc, recorderFunc RecorderFunc) *baseDevice {
+	streamFunc StreamFunc, recorderFunc RecorderProvider) *baseDevice {
 	return &baseDevice{
 		name:         name,
 		connFunc:     connFunc,
@@ -218,7 +218,7 @@ func (d *baseDevice) Out() <-chan *DataFrame {
 	return d.control.out
 }
 
-func (d *baseDevice) Record(file string) (err error) {
+func (d *baseDevice) Record() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -230,7 +230,7 @@ func (d *baseDevice) Record(file string) (err error) {
 		return fmt.Errorf("device is not connected")
 	}
 
-	if d.recorder = d.recorderFunc(file); d.recorder == nil {
+	if d.recorder = d.recorderFunc(); d.recorder == nil {
 		return fmt.Errorf("no recorder was provided")
 	}
 
@@ -242,7 +242,7 @@ func (d *baseDevice) Record(file string) (err error) {
 	return
 }
 
-func (d *baseDevice) Stop() {
+func (d *baseDevice) Stop() (outFile string, err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -250,7 +250,7 @@ func (d *baseDevice) Stop() {
 		return
 	}
 
-	if err := d.recorder.Stop(); err != nil {
+	if outFile, err = d.recorder.Stop(); err != nil {
 		log.Printf("could not shut down the recorder: %v", err)
 	}
 	d.recorder = nil
