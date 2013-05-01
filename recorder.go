@@ -1,6 +1,7 @@
 package goavatar
 
 import (
+	"encoding/binary"
 	"log"
 	"os"
 )
@@ -13,29 +14,37 @@ type Recorder interface {
 }
 
 type FileRecorder struct {
-	file *os.File
+	fileName string
+	file     *os.File
 }
 
-func NewFileRecorder(file string) *FileRecorder {
+func NewFileRecorder(fileName string) *FileRecorder {
 	return &FileRecorder{
-	// TODO!
+		fileName: fileName,
 	}
 }
 
 func (r *FileRecorder) Start() (err error) {
-	// open the file
-	log.Printf("opening the file")
+	log.Printf("opening file for writing: %v", r.fileName)
+	r.file, err = os.OpenFile(r.fileName, os.O_CREATE|os.O_WRONLY, 0655)
 	return
 }
 
 func (r *FileRecorder) ProcessFrame(df *DataFrame) (err error) {
-	// open the file
-	log.Printf("recording the frame %#v", *df)
+	data := df.Buffer().data
+	//l := len(data)
+
+	// TODO: do multiple writes
+	err = binary.Write(r.file, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
 	return
 }
 
 func (r *FileRecorder) Stop() (err error) {
 	// open the file
-	log.Printf("closing the file")
+	log.Printf("closing the file: %v", r.fileName)
+	r.file.Close()
 	return
 }

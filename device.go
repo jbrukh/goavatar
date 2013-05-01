@@ -230,7 +230,6 @@ func (d *baseDevice) Record(file string) (err error) {
 		return fmt.Errorf("device is not connected")
 	}
 
-	// TODO: set the file in the device
 	if d.recorder = d.recorderFunc(file); d.recorder == nil {
 		return fmt.Errorf("no recorder was provided")
 	}

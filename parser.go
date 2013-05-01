@@ -277,7 +277,7 @@ func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (b *SamplingBuffe
 	// read until the whole payload is read
 	for n != pSize {
 		nRead, err := r.reader.Read(payload[n:])
-		if err != nil {
+		if err != nil { // BUG! will be err when nRead < expected
 			return nil, err
 		}
 		n += nRead

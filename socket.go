@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 //---------------------------------------------------------//
@@ -381,7 +382,9 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 			goto Respond
 		}
 
-		err = s.device.Record("test")
+		fileName := fmt.Sprintf("var/%s.bin", time.Now().Format(time.RFC3339Nano))
+
+		err = s.device.Record(fileName)
 		if err != nil {
 			r.Success = false
 			r.Err = err.Error()
