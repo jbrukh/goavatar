@@ -169,8 +169,10 @@ func (d *baseDevice) Connect() (err error) {
 			log.Printf("error in streamer: %v", err)
 		}
 
-		// on error or exit, we will disconnect the device
-		if err := d.Disconnect(); err != nil {
+		// on error or exit, we will disconnect the device;
+		// since we know the streamer has exited we will
+		// not send the done signal
+		if err := d.disconnect(true); err != nil {
 			log.Printf("error on disconnect: $v", err)
 		}
 
@@ -182,6 +184,10 @@ func (d *baseDevice) Connect() (err error) {
 }
 
 func (d *baseDevice) Disconnect() (err error) {
+	return d.disconnect(false)
+}
+
+func (d *baseDevice) disconnect(ignoreDone bool) (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -190,7 +196,11 @@ func (d *baseDevice) Disconnect() (err error) {
 		return
 	}
 
-	d.control.done <- true
+	// when we know the streamer goroutine has
+	// exited, we should skip this step
+	if !ignoreDone {
+		d.control.done <- true
+	}
 
 	// if we are in the process of recording, we
 	// should stop

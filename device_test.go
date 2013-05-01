@@ -2,6 +2,7 @@ package goavatar
 
 import (
 	//"log"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -60,6 +61,15 @@ func newEmptyDevice() *baseDevice {
 		streamFunc,
 		recorderProvider,
 	)
+}
+
+// Returns a device whose stream always has errors.
+func newErrorProneDevice() *baseDevice {
+	b := newEmptyDevice()
+	b.streamFunc = func(c *Control) (err error) {
+		return fmt.Errorf("too bad")
+	}
+	return b
 }
 
 func TestConnectionLogic(t *testing.T) {
@@ -188,6 +198,15 @@ func TestMultipleRecording(t *testing.T) {
 
 	if d.Recording() {
 		t.Errorf("recording didn't stop")
+	}
+}
+
+func TestErrorProneStream(t *testing.T) {
+	d := newErrorProneDevice()
+	d.Connect()
+	time.Sleep(time.Millisecond * 100) // wait for device to fail
+	if d.Connected() {
+		t.Errorf("device should have disconnected, probably")
 	}
 }
 
