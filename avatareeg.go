@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
 )
 
 // ----------------------------------------------------------------- //
@@ -67,18 +66,19 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 // to the output channel parameter. It also listens on the offSignal channel for any
 // data, in which case it will stop listening the device and return.
 func parseByteStream(r io.ReadCloser, c *Control) (err error) {
-	reader := newAvatarParser(r)
+	parser := NewAvatarParser(r)
 	defer c.Close()
 	log.Printf("calibrating...")
 	// calibrate the device
 	frames := make([]*DataFrame, DiagnosticFrames)
-	for i, _ := range frames {
+	for i := range frames {
 		if c.ShouldTerminate() {
 			return nil
 		}
+		log.Printf("frame...")
 
 		// collect the frames for calibration
-		frame, err := parseFrame(reader)
+		frame, err := parser.ParseFrame()
 		if err != nil {
 			if err == BadCrcErr {
 				continue // just skip bad frames
@@ -100,7 +100,7 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 			return nil
 		}
 
-		frame, err := parseFrame(reader)
+		frame, err := parser.ParseFrame()
 		if err != nil {
 			log.Printf("error parsing frame: %v", err)
 			if err == io.EOF || err == io.ErrUnexpectedEOF || err == io.ErrClosedPipe {
@@ -113,49 +113,6 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 		c.Send(frame)
 	}
 	return nil
-}
-
-func parseFrame(reader *avatarParser) (frame *DataFrame, err error) {
-	// read the frame
-	err = reader.ConsumeSync()
-	if err != nil {
-		return
-	}
-
-	// once the sync byte has been read,
-	// this is technically the time the 
-	// frame has been received, assuming
-	// it is a correct frame
-	t := time.Now()
-
-	header, err := reader.ConsumeHeader()
-	if err != nil {
-		return
-	}
-
-	data, err := reader.ConsumePayload(header)
-	if err != nil {
-		return
-	}
-
-	crc, err := reader.ConsumeCrc()
-	if err != nil {
-		return
-	}
-
-	// collect the frame
-	frame = &DataFrame{
-		DataFrameHeader: *header,
-		data:            data,
-		crc:             crc,
-		received:        t,
-	}
-	ourCrc := reader.Crc()
-	if ourCrc != crc {
-		log.Printf("Bad CRC: %+v (expected: %d)", *frame, ourCrc)
-		err = BadCrcErr
-	}
-	return
 }
 
 func phase(frames []*DataFrame) (avg int64) {

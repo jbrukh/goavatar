@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"log"
 	"time"
 )
 
@@ -19,11 +20,11 @@ const (
 	AvatarFracSecs          = time.Duration(4096) // fractional second parts
 	AvatarMaxFramesSize     = 454                 //  22 + 3*9*16 = 454 (including trigger channel)
 	AvatarAdcRange          = 16777216            // 2^24
-	AvatarDataPointBytes    = 3
+	AvatarPointSize         = 3
 	AvatarExpectedSamples   = 16
-	AvatarSanePayload       = 8 * AvatarExpectedSamples * AvatarDataPointBytes
+	AvatarSanePayload       = 8 * AvatarExpectedSamples * AvatarPointSize
 	AvatarMaxChannels       = 8
-	AvatarHeaderSize        = 19
+	AvatarHeaderSize        = 19 // not including sync byte
 )
 
 // The possible sample rates that the Avatar
@@ -52,8 +53,8 @@ type DataFrameHeader struct {
 type DataFrame struct {
 	DataFrameHeader
 	data     *SamplingBuffer // processed data, in a multibuffer
-	crc      uint16          // CRC-16-CCIT calculated on the entire frame not including CRC
 	received time.Time       // time this frame was received locally
+	crc      uint16          // crc of the frame
 }
 
 // String
@@ -174,7 +175,7 @@ func (h *DataFrameHeader) Time() time.Time {
 
 // Payload size
 func (h *DataFrameHeader) PayloadSize() int {
-	return h.Channels() * h.Samples() * AvatarDataPointBytes
+	return h.Channels() * h.Samples() * AvatarPointSize
 }
 
 // ----------------------------------------------------------------- //
@@ -187,33 +188,11 @@ type avatarParser struct {
 	crc    CrcWriter
 }
 
-// create a new crcReader
-func newAvatarParser(reader io.ReadCloser) *avatarParser {
+// create a new parser
+func NewAvatarParser(reader io.ReadCloser) *avatarParser {
 	return &avatarParser{
 		reader: bufio.NewReader(reader),
 	}
-}
-
-func (r *avatarParser) Reset() {
-	// reset the buffer and header
-	r.crc.Reset()
-}
-
-// resets the buffer and searches for 
-// the next sync byte
-func (r *avatarParser) ConsumeSync() (err error) {
-	r.Reset()
-
-	// sync up with the stream, reading up
-	// until the sync up value
-	_, err = r.reader.ReadBytes(AvatarSyncByte)
-	if err != nil {
-		return err
-	}
-
-	// note the sync byte
-	r.crc.WriteByte(AvatarSyncByte)
-	return
 }
 
 // TODO: we know the size of the entire frame, so we can peek at it
@@ -226,109 +205,133 @@ func (r *avatarParser) ConsumeSync() (err error) {
 // With future versions we may adjust number of samples to optimize
 // Bluetooth performance and may have hardware that supports up to 24
 // channels."
-func (r *avatarParser) ConsumeHeader() (h *DataFrameHeader, err error) {
-	h = new(DataFrameHeader)
+func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
+	// reset the crc calculation
+	r.crc.Reset()
 
-	// at this point, we have consumed the sync byte; we will peek ahead
+	log.Printf("reading sync")
+
+	// sync up with the stream, reading up
+	// until the sync up value
+	_, err = r.reader.ReadBytes(AvatarSyncByte)
+	if err != nil {
+		return nil, err
+	}
+
+	timeReceived := time.Now()
+
+	// note the sync byte
+	r.crc.WriteByte(AvatarSyncByte)
+
+	// at this point, we will peek ahead
 	// just 3 bytes which is enough to read the frame size
 	three, err := r.reader.Peek(3)
 	if err != nil {
 		return nil, err
 	}
 
-	// check the frame size
+	log.Printf("checking frame size")
+
+	// check the frame size; using bit shifting for efficiency;
+	// this allows us to determine early whether the frame is
+	// good without consuming the reader and possibly skipping
+	// sync bytes if there is corruption
 	frameSize := int(uint16(three[1]) << 8 & uint16(three[2]))
+	log.Printf("frame size: %d", frameSize)
+
 	if frameSize > AvatarMaxFramesSize {
 		return nil, fmt.Errorf("this frame is over max frame size: %d", frameSize)
 	}
 
+	log.Printf("reading frame")
+
 	// now that we know the frame size, we can read the
 	// whole frame and check the CRC; the frame size
 	// includes the sync byte and the CRC
-	frame, err := r.reader.Peek(frameSize)
+	frame, err := r.reader.Peek(frameSize) // frame minus sync
 	if err != nil {
 		return nil, err
 	}
 
+	log.Printf("read frame")
+
 	// the stated CRC
 	l := len(frame)
+	log.Printf("frame size: %d", l)
+
 	crc := uint16(frame[l-2]) << 8 & uint16(frame[l-1])
 
+	log.Printf("read crc")
+
 	// the calculated CRC
-	r.crc.Write(frame)
+	r.crc.Write(frame[:l-2])
 	ourCrc := r.crc.Crc()
 
 	// check the crc
 	if crc != ourCrc {
-		return nil, fmt.Errorf("crc doesn't match: expected %d but calculed %d", crc, ourCrc)
+		return nil, fmt.Errorf("crc doesn't match: expected %d but calculated %d", crc, ourCrc)
 	}
 
-	// everything is okay, read the header in
-	buf := bytes.NewBuffer(frame[:AvatarHeaderSize])
-	err = binary.Read(buf, binary.BigEndian, h)
+	log.Printf("crc ok")
+
+	// everything is okay, now
+	// we actually read the frame
+	_, err = io.ReadFull(r.reader, frame) // careful, overwriting data and making assumptions
 	if err != nil {
 		return nil, err
 	}
 
-	return
-}
-
-func (r *avatarParser) ConsumePayload(header *DataFrameHeader) (b *SamplingBuffer, err error) {
-	// ascertain the size of the payload; if the frame is corrupted,
-	// this size will probably be too large, which will result in a
-	// bad reading of the data...
-
-	pSize := header.PayloadSize()
-	// ok, now read it
-	payload := make([]byte, pSize)
-	n := 0
-
-	// read until the whole payload is read
-	for n != pSize {
-		nRead, err := r.reader.Read(payload[n:])
-		if err != nil { // BUG! will be err when nRead < expected
-			return nil, err
-		}
-		n += nRead
+	header := new(DataFrameHeader)
+	buf := bytes.NewBuffer(frame[:AvatarHeaderSize])
+	err = binary.Read(buf, binary.BigEndian, header)
+	if err != nil {
+		return nil, err
 	}
 
-	// note the payload
-	r.crc.Write(payload)
+	// get the size of the payload
+	pSize := header.PayloadSize()
+
+	// do a sanity check
+	expFrameSize := 1 + AvatarHeaderSize + pSize + 2
+	if expFrameSize != frameSize {
+		return nil, fmt.Errorf("frameSize didn't jive, expected: %d got: %d", expFrameSize, frameSize)
+	}
+
+	// get the payload
+	payload := frame[AvatarHeaderSize : l-2] // excluding header and crc
 
 	// allocate the slices for the data
-	samples, channels := header.Samples(), header.Channels()
-	hasTrigger := header.HasTriggerChannel()
-	b = NewSamplingBuffer(channels, samples, 1)
+	var (
+		samples    = header.Samples()
+		channels   = header.Channels()
+		hasTrigger = header.HasTriggerChannel()
+		data       = NewSamplingBuffer(channels, samples, 1)
+		p          = make([]float64, channels*samples*AvatarPointSize)
+	)
 
-	// TODO use one array
+	// write the samples in blocks
 	for j := 0; j < samples; j++ {
 		if hasTrigger {
-			// just skip this
-			payload = payload[3:]
+			// skip the trigger channel
+			payload = payload[AvatarPointSize:]
 		}
-		p := make([]float64, channels)
-		for i, _ := range p {
-			p[i] = consumeDataPoint(payload, header)
-			payload = payload[3:]
+		for k := 0; k < channels; k++ {
+			p[j*channels+k] = consumeDataPoint(payload, float64(header.VoltRange()))
+			payload = payload[AvatarPointSize:]
 		}
-		b.PushSlice(p)
 	}
+	data.PushSlice(p)
 
+	dataFrame = &DataFrame{
+		DataFrameHeader: *header,
+		data:            data,
+		received:        timeReceived,
+		crc:             crc,
+	}
 	return
 }
 
-func consumeDataPoint(payload []byte, header *DataFrameHeader) float64 {
+func consumeDataPoint(payload []byte, voltRange float64) float64 {
 	raw := uint32(payload[0])<<16 | uint32(payload[1])<<8 | uint32(payload[2])
-	return ((float64(raw) / float64(1000) / float64(AvatarAdcRange)) * float64(header.VoltRange()))
-}
-
-// read the crc
-func (r *avatarParser) ConsumeCrc() (crc uint16, err error) {
-	// read the crc
-	err = binary.Read(r.reader, binary.BigEndian, &crc)
-	return
-}
-
-func (r *avatarParser) Crc() (crc uint16) {
-	return r.crc.Crc()
+	return ((float64(raw) / float64(1000) / float64(AvatarAdcRange)) * voltRange)
 }
