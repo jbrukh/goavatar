@@ -23,6 +23,7 @@ const (
 	AvatarExpectedSamples   = 16
 	AvatarSanePayload       = 8 * AvatarExpectedSamples * AvatarDataPointBytes
 	AvatarMaxChannels       = 8
+	AvatarHeaderSize        = 19
 )
 
 // The possible sample rates that the Avatar
@@ -210,7 +211,7 @@ func (r *avatarParser) ConsumeSync() (err error) {
 		return err
 	}
 
-	// note the start byte
+	// note the sync byte
 	r.crc.WriteByte(AvatarSyncByte)
 	return
 }
@@ -228,35 +229,47 @@ func (r *avatarParser) ConsumeSync() (err error) {
 func (r *avatarParser) ConsumeHeader() (h *DataFrameHeader, err error) {
 	h = new(DataFrameHeader)
 
-	// let's peek at the header; there's a chance it is corrupted, and
-	// if so, we will want just skip to the next sync instead of reading
-	// it in (or else we risk losing more data because we're not properly
-	// synced up)
-	buf, err := r.reader.Peek(19)
-	if err != nil {
-		return nil, err
-	}
-	buffer := bytes.NewBuffer(buf)
-
-	// read-ahead the header into the buffer to check it
-	err = binary.Read(buffer, binary.BigEndian, h)
+	// at this point, we have consumed the sync byte; we will peek ahead
+	// just 3 bytes which is enough to read the frame size
+	three, err := r.reader.Peek(3)
 	if err != nil {
 		return nil, err
 	}
 
-	// check that it is sane
-	pSize := h.PayloadSize()
-	if pSize > AvatarSanePayload || h.FrameSize()-22 != pSize {
-		return nil, fmt.Errorf("Size of payload over threshhold (or doesn't match); wanted %d", pSize)
-	} else {
-		// buf should be 19 bytes long
-		if _, err := r.reader.Read(buf); err != nil {
-			return nil, err
-		}
+	// check the frame size
+	frameSize := int(uint16(three[1]) << 8 & uint16(three[2]))
+	if frameSize > AvatarMaxFramesSize {
+		return nil, fmt.Errorf("this frame is over max frame size: %d", frameSize)
 	}
 
-	// note the header
-	err = binary.Write(&r.crc, binary.BigEndian, h)
+	// now that we know the frame size, we can read the
+	// whole frame and check the CRC; the frame size
+	// includes the sync byte and the CRC
+	frame, err := r.reader.Peek(frameSize)
+	if err != nil {
+		return nil, err
+	}
+
+	// the stated CRC
+	l := len(frame)
+	crc := uint16(frame[l-2]) << 8 & uint16(frame[l-1])
+
+	// the calculated CRC
+	r.crc.Write(frame)
+	ourCrc := r.crc.Crc()
+
+	// check the crc
+	if crc != ourCrc {
+		return nil, fmt.Errorf("crc doesn't match: expected %d but calculed %d", crc, ourCrc)
+	}
+
+	// everything is okay, read the header in
+	buf := bytes.NewBuffer(frame[:AvatarHeaderSize])
+	err = binary.Read(buf, binary.BigEndian, h)
+	if err != nil {
+		return nil, err
+	}
+
 	return
 }
 
