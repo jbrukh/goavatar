@@ -9,16 +9,25 @@ import (
 	"time"
 )
 
+// These values are valid with the firmware version
+// on the device that we have acquired. In the future
+// they may change as the format is updated.
 const (
 	AvatarSyncByte          = 0xAA
-	AvatarExpectedVersion   = 3 // version
-	AvatarExpectedFrameType = 1 // data frame
-	AvatarFracSecs          = time.Duration(4096)
+	AvatarExpectedVersion   = 3                   // version
+	AvatarExpectedFrameType = 1                   // data frame
+	AvatarFracSecs          = time.Duration(4096) // fractional second parts
+	AvatarMaxFramesSize     = 454                 //  22 + 3*9*16 = 454 (including trigger channel)
+	AvatarAdcRange          = 16777216            // 2^24
 	AvatarDataPointBytes    = 3
-	AvatarSanePayload       = 8 * 32 * AvatarDataPointBytes
-	AvatarAdcRange          = 16777216 // 2^24
+	AvatarExpectedSamples   = 16
+	AvatarSanePayload       = 8 * AvatarExpectedSamples * AvatarDataPointBytes
 	AvatarMaxChannels       = 8
 )
+
+// The possible sample rates that the Avatar
+// currently supports.
+var AvatarSampleRates = []int{250, 500, 1000}
 
 // ----------------------------------------------------------------- //
 // AvatarEEG Data Frame and Parsing
@@ -51,6 +60,7 @@ func (df *DataFrame) String() string {
 	return fmt.Sprintf("\n%+v\n", *df)
 }
 
+// Return this dataframe as Go code.
 func (df *DataFrame) AsCode() string {
 	f := `&DataFrame{
 		DataFrameHeader:DataFrameHeader{
@@ -87,17 +97,6 @@ func (df *DataFrame) AsCode() string {
 
 }
 
-// func (df *DataFrame) ChannelData(channel int) []float64 {
-// 	if channel < 0 || channel > AvatarMaxChannels {
-// 		panic("you are trying to select a channel that doesn't exist")
-// 	}
-// 	return df.data[channel]
-// }
-
-// func (df *DataFrame) ChannelDatas() *MultiBuffer {
-// 	return NewMultiBufferFromSlice(df.data[1 : df.Channels()+1])
-// }
-
 func (df *DataFrame) Buffer() *SamplingBuffer {
 	return df.data
 }
@@ -111,17 +110,14 @@ func (df *DataFrame) Received() time.Time {
 	return df.received
 }
 
-// SampleRate: the number of data samples delivered in one second (per channel)
-func (h *DataFrameHeader) SampleRate() (sampleRate int, err error) {
-	sr := (h.FieldSampleRateVersion >> 6)
-	if sr == 0x00 {
-		return 250, nil
-	} else if sr == 0x01 {
-		return 500, nil
-	} else if sr == 0x02 {
-		return 1000, nil
+// SampleRate: the number of data samples delivered in one
+// second (per channel)
+func (h *DataFrameHeader) SampleRate() (sampleRate int) {
+	sr := int(h.FieldSampleRateVersion >> 6)
+	if sr < 0 || sr > 2 {
+		return 0
 	}
-	return 0, fmt.Errorf("Unknown sample rate")
+	return AvatarSampleRates[sr]
 }
 
 // Version
@@ -149,7 +145,7 @@ func (h *DataFrameHeader) HasTriggerChannel() bool {
 	return (h.FieldChannels >> 7) > 0
 }
 
-// Channels
+// Channels (number of, not including trigger)
 func (h *DataFrameHeader) Channels() int {
 	// zero the first bit for the trigger channel
 	return int(h.FieldChannels & 0x7F)

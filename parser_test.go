@@ -9,19 +9,19 @@ func TestSampleRateVersion(t *testing.T) {
 
 	// test 250
 	h.FieldSampleRateVersion = 0x03
-	if rate, _ := h.SampleRate(); rate != 250 || h.Version() != 3 {
+	if rate := h.SampleRate(); rate != 250 || h.Version() != 3 {
 		t.Errorf("Wrong sample rate: %v", rate)
 	}
 
 	// test 500
 	h.FieldSampleRateVersion = 0x43
-	if rate, _ := h.SampleRate(); rate != 500 || h.Version() != 3 {
+	if rate := h.SampleRate(); rate != 500 || h.Version() != 3 {
 		t.Errorf("Wrong sample rate: %v", rate)
 	}
 
 	// test 1000
 	h.FieldSampleRateVersion = 0x83
-	if rate, _ := h.SampleRate(); rate != 1000 || h.Version() != 3 {
+	if rate := h.SampleRate(); rate != 1000 || h.Version() != 3 {
 		t.Errorf("Wrong sample rate: %v", rate)
 	}
 }

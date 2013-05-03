@@ -435,7 +435,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 
 	// get the channels
 	channels := df.Channels()
-	devicePps, _ := df.SampleRate()
+	devicePps := df.SampleRate()
 
 	// just in case something went wrong
 	if pps < 1 || pps > devicePps {
