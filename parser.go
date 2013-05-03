@@ -82,7 +82,7 @@ func (df *DataFrame) AsCode() string {
 		df.Buffer().data,
 		df.crc,
 		df.received.Unix(),
-		df.received.UnixNano(),
+		df.received.Nanosecond(),
 	)
 
 }
