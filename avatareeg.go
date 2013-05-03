@@ -75,7 +75,6 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 		if c.ShouldTerminate() {
 			return nil
 		}
-		log.Printf("frame...")
 
 		// collect the frames for calibration
 		frame, err := parser.ParseFrame()
@@ -103,11 +102,7 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 		frame, err := parser.ParseFrame()
 		if err != nil {
 			log.Printf("error parsing frame: %v", err)
-			if err == io.EOF || err == io.ErrUnexpectedEOF || err == io.ErrClosedPipe {
-				return err // stream is hosed
-			} else {
-				continue
-			}
+			return err
 		}
 
 		c.Send(frame)

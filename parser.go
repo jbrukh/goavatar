@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log"
 	"time"
 )
 
@@ -209,8 +208,6 @@ func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
 	// reset the crc calculation
 	r.crc.Reset()
 
-	log.Printf("reading sync")
-
 	// sync up with the stream, reading up
 	// until the sync up value
 	_, err = r.reader.ReadBytes(AvatarSyncByte)
@@ -230,38 +227,26 @@ func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
 		return nil, err
 	}
 
-	log.Printf("checking frame size")
-
 	// check the frame size; using bit shifting for efficiency;
 	// this allows us to determine early whether the frame is
 	// good without consuming the reader and possibly skipping
 	// sync bytes if there is corruption
-	frameSize := int(uint16(three[1]) << 8 & uint16(three[2]))
-	log.Printf("frame size: %d", frameSize)
-
+	frameSize := int(uint16(three[1])<<8 | uint16(three[2]))
 	if frameSize > AvatarMaxFramesSize {
 		return nil, fmt.Errorf("this frame is over max frame size: %d", frameSize)
 	}
 
-	log.Printf("reading frame")
-
 	// now that we know the frame size, we can read the
 	// whole frame and check the CRC; the frame size
 	// includes the sync byte and the CRC
-	frame, err := r.reader.Peek(frameSize) // frame minus sync
+	frame, err := r.reader.Peek(frameSize - 1) // frame minus sync
 	if err != nil {
 		return nil, err
 	}
 
-	log.Printf("read frame")
-
 	// the stated CRC
 	l := len(frame)
-	log.Printf("frame size: %d", l)
-
-	crc := uint16(frame[l-2]) << 8 & uint16(frame[l-1])
-
-	log.Printf("read crc")
+	crc := uint16(frame[l-2])<<8 | uint16(frame[l-1])
 
 	// the calculated CRC
 	r.crc.Write(frame[:l-2])
@@ -271,8 +256,6 @@ func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
 	if crc != ourCrc {
 		return nil, fmt.Errorf("crc doesn't match: expected %d but calculated %d", crc, ourCrc)
 	}
-
-	log.Printf("crc ok")
 
 	// everything is okay, now
 	// we actually read the frame
@@ -306,7 +289,7 @@ func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
 		channels   = header.Channels()
 		hasTrigger = header.HasTriggerChannel()
 		data       = NewSamplingBuffer(channels, samples, 1)
-		p          = make([]float64, channels*samples*AvatarPointSize)
+		p          = make([]float64, channels*samples)
 	)
 
 	// write the samples in blocks
