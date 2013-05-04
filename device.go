@@ -9,10 +9,14 @@ import (
 	"sync"
 )
 
+// ----------------------------------------------------------------- //
+// Constants
+// ----------------------------------------------------------------- //
+
 const DataFrameBufferSize = 1024
 
 // ----------------------------------------------------------------- //
-// Device
+// Device -- interface for devices
 // ----------------------------------------------------------------- //
 
 // Device represents an AvatarEEG device (or a mock device).
@@ -26,20 +30,20 @@ type Device interface {
 	// an error.
 	Connect() error
 
-	// Connected returns true if and only if the device is
-	// currently connected.
-	Connected() bool
-
 	// Disconnects from the device, closes the output channel,
 	// and cleans relevant resources. Calls to disconnect are
 	// idempotent.
 	Disconnect() error
 
+	// Connected returns true if and only if the device is
+	// currently connected.
+	Connected() bool
+
 	// Returns the output channel for the device. 
 	Out() <-chan DataFrame
 
 	// Starts recording the streaming data to a file.
-	Record(token string) (err error)
+	Record() (err error)
 
 	// Stops recording the streaming data.
 	Stop() (outFile string, err error)
@@ -48,6 +52,10 @@ type Device interface {
 	// recording.
 	Recording() bool
 }
+
+// ----------------------------------------------------------------- //
+// Subscriptions
+// ----------------------------------------------------------------- //
 
 // ConnectFunc performs the low-level operation to connect
 // to the device. This usually means opening the port of the
@@ -72,7 +80,12 @@ type DisconnectFunc func() error
 type StreamFunc func(c *Control) error
 
 // RecorderProvider produces a recorder for the given file
-type RecorderProvider func(string) Recorder
+type RecorderProvider func() Recorder
+
+// ----------------------------------------------------------------- //
+// Device Control -- used by implementation providers to report
+// data and know when to disconnect
+// ----------------------------------------------------------------- //
 
 type Control struct {
 	done chan bool
@@ -109,6 +122,10 @@ func (control *Control) Send(df DataFrame) {
 func (control *Control) Close() {
 	close(control.out)
 }
+
+// ----------------------------------------------------------------- //
+// Base Device -- skeleton implementation for Octopus devices
+// ----------------------------------------------------------------- //
 
 // BaseDevice provides the basic framework for devices, including
 // the skeleton implementation that keeps track of connection and
@@ -233,7 +250,7 @@ func (d *BaseDevice) Out() <-chan DataFrame {
 	return d.control.out
 }
 
-func (d *BaseDevice) Record(token string) (err error) {
+func (d *BaseDevice) Record() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -245,7 +262,7 @@ func (d *BaseDevice) Record(token string) (err error) {
 		return fmt.Errorf("device is not connected")
 	}
 
-	if d.recorder = d.recorderFunc(token); d.recorder == nil {
+	if d.recorder = d.recorderFunc(); d.recorder == nil {
 		return fmt.Errorf("no recorder was provided")
 	}
 

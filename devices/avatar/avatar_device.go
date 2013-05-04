@@ -56,8 +56,8 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 		return parseByteStream(reader, c)
 	}
 
-	recorderProvider := func(token string) Recorder {
-		return NewFileRecorder(token)
+	recorderProvider := func() Recorder {
+		return new(FileRecorder)
 	}
 
 	return &AvatarDevice{

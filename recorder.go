@@ -22,21 +22,12 @@ type Recorder interface {
 	Start() error
 	ProcessFrame(DataFrame) error
 	Stop() (fileName string, err error)
-	Token() string
 }
 
 type FileRecorder struct {
 	file     *os.File
 	m        io.Writer
 	tempFile string
-	token    string
-}
-
-// Create a new file recorder with a token.
-func NewFileRecorder(token string) *FileRecorder {
-	return &FileRecorder{
-		token: token,
-	}
 }
 
 func (r *FileRecorder) Start() (err error) {
@@ -76,10 +67,6 @@ func (r *FileRecorder) Stop() (fileName string, err error) {
 	}
 
 	return
-}
-
-func (r *FileRecorder) Token() string {
-	return r.token
 }
 
 func tmpFile() string {

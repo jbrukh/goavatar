@@ -40,7 +40,7 @@ Protocol
     // Base type for messages.
     type Message struct {
         Id          string `json:"id"`           // should be non-empty
-        MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+        MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "upload", "error"}
     }
 
     // Basic information about the server.
@@ -69,13 +69,21 @@ Protocol
         Id          string `json:"id"`           // should be non-empty
         MessageType string `json:"message_type"` // should be "record"
         Record      bool   `json:"record"`       // start or stop recording
+    }
+
+    // UploadMessage is used to trigger upload of a
+    // recorded resource available in the local repository.
+    type UploadMessage struct {
+        Id          string `json:"id"`           // should be non-empty
+        MessageType string `json:"message_type"` // should be "upload"
         Token       string `json:"token"`        // authentication token for upload
+        ResourceId  string `json:"resource_id"`  // id of the resource to upload
     }
 
     // Base type for response messages.
     type Response struct {
         Id          string `json:"id"`           // echo of your correlation id
-        MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "error"}
+        MessageType string `json:"message_type"` // will be one of {"info", connect", "record", "upload", "error"}
         Success     bool   `json:"success"`      // whether or not the control message was successful
         Err         string `json:"err"`          // error text, if any
     }
@@ -97,7 +105,17 @@ Protocol
         MessageType string `json:"message_type"` // will be "record"
         Success     bool   `json:"success"`      // whether or not the control message was successful
         Err         string `json:"err"`          // error text, if any
-        File        string `json:"file"`         // output file
+        ResourceId  string `json:"resource_id"`  // id of the resource
+    }
+
+    // UploadResponse is sent in response to an UploadMessage, providing
+    // the URL of the uploaded resource.
+    type UploadResponse struct {
+        Id          string `json:"id"`           // echo of your correlation id
+        MessageType string `json:"message_type"` // will be "upload"
+        Success     bool   `json:"success"`      // whether or not the control message was successful
+        Err         string `json:"err"`          // error text, if any
+        ResourceUrl string `json:"resource_url"` // url of the uploaded resource
     }
 
     type InfoResponse struct {

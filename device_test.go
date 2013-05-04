@@ -29,10 +29,6 @@ func (r *MockRecorder) Stop() (outFile string, err error) {
 	return "somefile", nil
 }
 
-func (r *MockRecorder) Token() string {
-	return ""
-}
-
 func (r *MockRecorder) Reset() {
 	r.started = false
 	r.processed = false
@@ -58,7 +54,7 @@ func newEmptyDevice() *BaseDevice {
 		return
 	}
 
-	recorderProvider := func(token string) Recorder {
+	recorderProvider := func() Recorder {
 		return &MockRecorder{}
 	}
 
@@ -169,7 +165,7 @@ func TestRecord(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	err = d.Record("")
+	err = d.Record()
 	if err != nil || !d.Recording() {
 		t.Errorf("failed to start recording, or wrong status")
 	}
@@ -203,7 +199,7 @@ func TestRecord(t *testing.T) {
 
 func TestRecordWhenOff(t *testing.T) {
 	d := newEmptyDevice()
-	err := d.Record("")
+	err := d.Record()
 	if err == nil {
 		t.Errorf("should have failed, the device is not connected")
 	}
@@ -216,12 +212,12 @@ func TestMultipleRecording(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	err = d.Record("")
+	err = d.Record()
 	if err != nil || !d.Recording() {
 		t.Errorf("failed to start recording, or wrong status")
 	}
 
-	err = d.Record("")
+	err = d.Record()
 	if err == nil {
 		t.Errorf("should have failed, device is already recording")
 	}

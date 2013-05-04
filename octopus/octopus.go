@@ -39,7 +39,6 @@ func main() {
 		device = NewAvatarDevice(*serialPort)
 	}
 	log.Printf("Device:\t%v", device.Name())
-
 	log.Printf("Control:\thttp://localhost:%d%s", *listenPort, ControlEndpoint)
 	log.Printf("Data:\thttp://localhost:%d%s", *listenPort, DataEndpoint)
 	port := fmt.Sprintf(":%d", *listenPort)

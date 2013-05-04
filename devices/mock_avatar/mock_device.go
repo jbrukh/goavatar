@@ -49,8 +49,8 @@ func NewMockDevice() *MockDevice {
 		return nil
 	}
 
-	recorderProvider := func(token string) Recorder {
-		return NewFileRecorder(token)
+	recorderProvider := func() Recorder {
+		return new(FileRecorder)
 	}
 
 	return &MockDevice{
