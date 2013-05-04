@@ -1,3 +1,6 @@
+//
+// Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
+//
 package goavatar
 
 // return the average of an array

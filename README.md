@@ -120,3 +120,8 @@ Protocol
         //Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
 
     }
+
+License
+=======
+
+Copyright (c) 2013. Jake Brukhman/Octopus. All rights reserved. This is proprietary software. Do not distribute.
