@@ -4,7 +4,7 @@
 package avatar
 
 import (
-	//. "github.com/jbrukh/goavatar"
+	//"fmt"
 	"testing"
 )
 
@@ -80,4 +80,19 @@ func TestChannels(t *testing.T) {
 	}
 }
 
-// TODO other fields
+func TestTimestamps(t *testing.T) {
+	df := MockAvatarFrames[0]
+	if df.SampleRate() != 250 {
+		t.Errorf("expecting frame to have 250 sample rate, but not the case")
+	}
+	expDiff := int64(4000000) // 4 ms
+	ts := df.Timestamps()
+	tLast := ts[0]
+	for _, v := range ts[1:] {
+		d := v - tLast
+		if d != expDiff {
+			t.Errorf("unexpected time diff: %d", d)
+		}
+		tLast = v
+	}
+}

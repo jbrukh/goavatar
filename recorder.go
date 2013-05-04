@@ -21,9 +21,10 @@ var repo = "var/" // TODO: generalize
 type Recorder interface {
 	Start() error
 	ProcessFrame(DataFrame) error
-	Stop() (fileName string, err error)
+	Stop() (id string, err error)
 }
 
+// DEPRECATED -- use OctopusFileRecorder
 type FileRecorder struct {
 	file     *os.File
 	m        io.Writer
@@ -56,17 +57,17 @@ func (r *FileRecorder) ProcessFrame(df DataFrame) (err error) {
 	return
 }
 
-func (r *FileRecorder) Stop() (fileName string, err error) {
+func (r *FileRecorder) Stop() (id string, err error) {
 	// open the file
 	log.Printf("closing the file: %v", r.tempFile)
 	r.file.Close()
 
-	fileName = filepath.Join(repo, fmt.Sprintf("%x.parallel", hash.Sum(nil)))
+	fileName := filepath.Join(repo, fmt.Sprintf("%x.parallel", hash.Sum(nil)))
 	if err = os.Rename(r.tempFile, fileName); err != nil {
 		log.Printf("couldn't rename temp file: %v", r.tempFile)
 	}
 
-	return
+	return filepath.Base(fileName), nil
 }
 
 func tmpFile() string {

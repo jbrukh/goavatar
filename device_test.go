@@ -103,6 +103,10 @@ func (f *MockFrame) Generated() (t time.Time) {
 	return
 }
 
+func (f *MockFrame) Timestamps() (ts []int64) {
+	return
+}
+
 func TestConnectionLogic(t *testing.T) {
 	d := newEmptyDevice()
 	d.Connect()

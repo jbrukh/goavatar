@@ -92,6 +92,14 @@ func (b *SamplingBuffer) ChannelData(channel int) []float64 {
 	return result
 }
 
+func (b *SamplingBuffer) ParallelData(sample int) []float64 {
+	if sample < 0 || sample >= b.Size() {
+		panic("no such sample")
+	}
+	m, M := sample*b.channels, (sample+1)*b.channels
+	return b.data[m:M]
+}
+
 // Remove the next n points and sample them according
 // to the sample rate.
 func (b *SamplingBuffer) SampleNext(n int) *SamplingBuffer {

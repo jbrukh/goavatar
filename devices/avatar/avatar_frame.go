@@ -26,70 +26,6 @@ type AvatarHeader struct {
 	FieldFracSecs          uint16
 }
 
-// AvatarDataFrame represents the raw data that is transmitted from the AvatarEEG
-// device. 
-type AvatarDataFrame struct {
-	AvatarHeader
-	data     *SamplingBuffer // processed data, in a multibuffer
-	received time.Time       // time this frame was received locally
-	crc      uint16          // crc of the frame
-}
-
-// String
-func (df *AvatarDataFrame) String() string {
-	return fmt.Sprintf("\n%+v\n", *df)
-}
-
-// Return this dataframe as Go code.
-func (df *AvatarDataFrame) AsCode() string {
-	f := `&AvatarDataFrame{
-		AvatarHeader:AvatarHeader{
-			FieldSampleRateVersion:%#v, 
-			FieldFrameSize:%#v, 
-			FieldFrameType:%#v, 
-			FieldFrameCount:%#v, 
-			FieldChannels:%#v, 
-			FieldSamples:%#v, 
-			FieldVoltRange:%#v, 
-			FieldTimestamp:%#v, 
-			FieldFracSecs:%#v,
-		},
-		data:NewSamplingBufferFromSlice(%d, 1, %#v), 
-		crc:%#v, 
-		received:time.Unix(%v, %v),
-	}`
-	return fmt.Sprintf(f,
-		df.FieldSampleRateVersion,
-		df.FieldFrameSize,
-		df.FieldFrameType,
-		df.FieldFrameCount,
-		df.FieldChannels,
-		df.FieldSamples,
-		df.FieldVoltRange,
-		df.FieldTimestamp,
-		df.FieldFracSecs,
-		df.Buffer().Channels(),
-		df.Buffer().RawData(),
-		df.crc,
-		df.received.Unix(),
-		df.received.Nanosecond(),
-	)
-
-}
-
-func (df *AvatarDataFrame) Buffer() *SamplingBuffer {
-	return df.data
-}
-
-func (df *AvatarDataFrame) ChannelData(channel int) []float64 {
-	return df.data.ChannelData(channel)
-}
-
-// the time this data framed was received locally
-func (df *AvatarDataFrame) Received() time.Time {
-	return df.received
-}
-
 // SampleRate: the number of data samples delivered in one
 // second (per channel)
 func (h *AvatarHeader) SampleRate() (sampleRate int) {
@@ -151,7 +87,88 @@ func (h *AvatarHeader) Generated() time.Time {
 	return time.Unix(int64(h.FieldTimestamp), int64(time.Duration(h.FieldFracSecs)*time.Second/AvatarFracSecs))
 }
 
+func (h *AvatarHeader) Timestamps() []int64 {
+	timestamps := make([]int64, int(h.FieldSamples))
+	ts := h.Generated().UnixNano()
+	δ := 1000000000 / h.SampleRate()
+	for t := range timestamps {
+		timestamps[t] = ts + int64(δ)*int64(t)
+	}
+	return timestamps
+}
+
 // Payload size
 func (h *AvatarHeader) PayloadSize() int {
 	return h.Channels() * h.Samples() * AvatarPointSize
+}
+
+// AvatarDataFrame represents the raw data that is transmitted from the AvatarEEG
+// device. 
+type AvatarDataFrame struct {
+	AvatarHeader
+	data     *SamplingBuffer // processed data, in a multibuffer
+	received time.Time       // time this frame was received locally
+	crc      uint16          // crc of the frame
+}
+
+// String
+func (df *AvatarDataFrame) String() string {
+	return fmt.Sprintf("\n%+v\n", *df)
+}
+
+// Return this dataframe as Go code.
+func (df *AvatarDataFrame) AsCode() string {
+	f := `&AvatarDataFrame{
+			AvatarHeader:AvatarHeader{
+				FieldSampleRateVersion:%#v, 
+				FieldFrameSize:%#v, 
+				FieldFrameType:%#v, 
+				FieldFrameCount:%#v, 
+				FieldChannels:%#v, 
+				FieldSamples:%#v, 
+				FieldVoltRange:%#v, 
+				FieldTimestamp:%#v, 
+				FieldFracSecs:%#v,
+			},
+			data:NewSamplingBufferFromSlice(%d, 1, %#v), 
+			crc:%#v, 
+			received:time.Unix(%v, %v),
+		}`
+	return fmt.Sprintf(f,
+		df.FieldSampleRateVersion,
+		df.FieldFrameSize,
+		df.FieldFrameType,
+		df.FieldFrameCount,
+		df.FieldChannels,
+		df.FieldSamples,
+		df.FieldVoltRange,
+		df.FieldTimestamp,
+		df.FieldFracSecs,
+		df.Buffer().Channels(),
+		df.Buffer().RawData(),
+		df.crc,
+		df.received.Unix(),
+		df.received.Nanosecond(),
+	)
+
+}
+
+// Buffer
+func (df *AvatarDataFrame) Buffer() *SamplingBuffer {
+	return df.data
+}
+
+// ChannelData
+func (df *AvatarDataFrame) ChannelData(channel int) []float64 {
+	return df.data.ChannelData(channel)
+}
+
+// the time this data framed was received locally
+func (df *AvatarDataFrame) Received() time.Time {
+	return df.received
+}
+
+// Crc
+func (df *AvatarDataFrame) Crc() uint16 {
+	return df.crc
 }

@@ -17,9 +17,8 @@ type MockDevice struct {
 	BaseDevice
 }
 
-// NewDevice creates a new Device. The user can then start
-// streaming data by calling Connect() and reading the 
-// output channel.
+// Mock AvatarEEG device that plays pre-recorded frames on
+// repeat.
 func NewMockDevice() *MockDevice {
 
 	// CONNECT

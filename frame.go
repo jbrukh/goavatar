@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// A generic data frame.
 type DataFrame interface {
 	Buffer() *SamplingBuffer
 	Channels() int
@@ -14,4 +15,5 @@ type DataFrame interface {
 	SampleRate() int
 	Received() time.Time
 	Generated() time.Time
+	Timestamps() []int64
 }

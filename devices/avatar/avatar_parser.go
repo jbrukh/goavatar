@@ -145,7 +145,6 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 		samples    = header.Samples()
 		channels   = header.Channels()
 		hasTrigger = header.HasTriggerChannel()
-		data       = NewSamplingBuffer(channels, samples, 1)
 		p          = make([]float64, channels*samples)
 	)
 
@@ -160,8 +159,8 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 			payload = payload[AvatarPointSize:]
 		}
 	}
-	data.PushSlice(p)
 
+	data := NewSamplingBufferFromSlice(channels, 1, p)
 	dataFrame = &AvatarDataFrame{
 		AvatarHeader: *header,
 		data:         data,
