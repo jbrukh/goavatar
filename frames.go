@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-var frames = []*DataFrame{
+var frames = []*AvatarDataFrame{
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -23,8 +23,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182842, 1367182842795139000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -40,8 +40,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182842, 1367182842856323000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -57,8 +57,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182842, 1367182842917720000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -74,8 +74,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182842, 1367182842978895000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -91,8 +91,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843043632000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -108,8 +108,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843161416000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -125,8 +125,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843171338000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -142,8 +142,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843235159000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -159,8 +159,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843299043000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -176,8 +176,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843362647000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -193,8 +193,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843425122000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -210,8 +210,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843491433000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -227,8 +227,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843554063000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -244,8 +244,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843616537000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -261,8 +261,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843694702000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -278,8 +278,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843755285000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -295,8 +295,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843818305000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -312,8 +312,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843879976000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -329,8 +329,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182843, 1367182843942720000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -346,8 +346,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844003962000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -363,8 +363,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844065148000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -380,8 +380,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844127664000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -397,8 +397,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844195658000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -414,8 +414,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844255213000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -431,8 +431,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844321501000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -448,8 +448,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844385267000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -465,8 +465,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844448936000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -482,8 +482,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844512619000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -499,8 +499,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844575247000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -516,8 +516,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844642697000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -533,8 +533,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844706535000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -550,8 +550,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844770354000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -567,8 +567,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844831334000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -584,8 +584,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844895250000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -601,8 +601,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182844, 1367182844972027000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -618,8 +618,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845033133000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -635,8 +635,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845095262000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -652,8 +652,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845156418000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -669,8 +669,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845218315000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -686,8 +686,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845278966000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -703,8 +703,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845341392000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -720,8 +720,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845408849000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -737,8 +737,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845481493000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -754,8 +754,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845543991000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -771,8 +771,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845606501000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -788,8 +788,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845669445000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -805,8 +805,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845730693000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -822,8 +822,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845790085000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -839,8 +839,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845852578000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -856,8 +856,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845917564000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -873,8 +873,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182845, 1367182845980250000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -890,8 +890,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846046456000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -907,8 +907,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846110150000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -924,8 +924,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846173854000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -941,8 +941,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846238284000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -958,8 +958,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846318813000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -975,8 +975,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846380233000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -992,8 +992,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846441367000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1009,8 +1009,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846502557000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1026,8 +1026,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846563987000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1043,8 +1043,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846626265000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1060,8 +1060,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846689534000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1077,8 +1077,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846748980000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1094,8 +1094,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846812714000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1111,8 +1111,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846876620000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1128,8 +1128,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182846, 1367182846938894000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1145,8 +1145,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847003825000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1162,8 +1162,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847066589000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1179,8 +1179,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847133376000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1196,8 +1196,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847197723000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1213,8 +1213,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847261373000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1230,8 +1230,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847323944000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1247,8 +1247,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847387529000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1264,8 +1264,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847451540000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1281,8 +1281,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847513921000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1298,8 +1298,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847580203000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1315,8 +1315,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847642475000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1332,8 +1332,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847705115000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1349,8 +1349,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847771590000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1366,8 +1366,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847835122000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1383,8 +1383,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847898910000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1400,8 +1400,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182847, 1367182847988298000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1417,8 +1417,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848023961000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1434,8 +1434,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848090092000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1451,8 +1451,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848152681000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1468,8 +1468,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848217732000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1485,8 +1485,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848280054000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1502,8 +1502,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848346370000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1519,8 +1519,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848435206000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1536,8 +1536,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848472616000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1553,8 +1553,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848536544000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1570,8 +1570,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848600202000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1587,8 +1587,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848665274000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1604,8 +1604,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848727644000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1621,8 +1621,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848792622000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1638,8 +1638,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848855134000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1655,8 +1655,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182848, 1367182848921321000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1672,8 +1672,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849010823000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1689,8 +1689,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849045174000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1706,8 +1706,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849113919000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1723,8 +1723,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849178856000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1740,8 +1740,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849243824000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1757,8 +1757,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849307679000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1774,8 +1774,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849371571000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1791,8 +1791,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849435318000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1808,8 +1808,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849496433000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1825,8 +1825,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849560286000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1842,8 +1842,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849624034000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1859,8 +1859,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849687624000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1876,8 +1876,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849751502000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1893,8 +1893,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849840838000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1910,8 +1910,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849875063000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1927,8 +1927,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182849, 1367182849942775000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1944,8 +1944,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850005054000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1961,8 +1961,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850077648000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1978,8 +1978,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850140822000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -1995,8 +1995,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850201442000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2012,8 +2012,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850263877000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2029,8 +2029,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850345234000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2046,8 +2046,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850407780000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2063,8 +2063,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850468900000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2080,8 +2080,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850530144000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2097,8 +2097,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850591489000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2114,8 +2114,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850652686000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2131,8 +2131,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850715108000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2148,8 +2148,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850777807000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2165,8 +2165,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850840046000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2182,8 +2182,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850902604000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2199,8 +2199,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182850, 1367182850966469000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2216,8 +2216,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851028951000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2233,8 +2233,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851095264000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2250,8 +2250,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851156341000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2267,8 +2267,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851218901000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2284,8 +2284,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851286929000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2301,8 +2301,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851347744000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2318,8 +2318,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851437048000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2335,8 +2335,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851472537000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2352,8 +2352,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851541483000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2369,8 +2369,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851603900000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2386,8 +2386,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851666471000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2403,8 +2403,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851757190000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2420,8 +2420,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851791277000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2437,8 +2437,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851860122000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2454,8 +2454,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182851, 1367182851949018000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2471,8 +2471,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852127752000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2488,8 +2488,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852133924000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2505,8 +2505,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852140066000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2522,8 +2522,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852177577000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2539,8 +2539,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852243928000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2556,8 +2556,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852306459000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2573,8 +2573,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852368909000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2590,8 +2590,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852435046000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2607,8 +2607,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852498995000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2624,8 +2624,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852562713000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2641,8 +2641,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852626358000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2658,8 +2658,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852690190000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2675,8 +2675,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852752579000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2692,8 +2692,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852818902000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2709,8 +2709,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852881488000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2726,8 +2726,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182852, 1367182852943890000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2743,8 +2743,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853010119000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2760,8 +2760,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853099722000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2777,8 +2777,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853133879000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2794,8 +2794,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853202712000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2811,8 +2811,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853266469000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2828,8 +2828,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853328900000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2845,8 +2845,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853391367000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2862,8 +2862,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853456420000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2879,8 +2879,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853518917000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2896,8 +2896,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853585217000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2913,8 +2913,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853648932000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2930,8 +2930,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853712557000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2947,8 +2947,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853776451000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2964,8 +2964,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853840171000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2981,8 +2981,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853906472000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -2998,8 +2998,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182853, 1367182853967714000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3015,8 +3015,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854030038000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3032,8 +3032,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854095150000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3049,8 +3049,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854158969000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3066,8 +3066,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854248393000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3083,8 +3083,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854282701000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3100,8 +3100,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854368763000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3117,8 +3117,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854431479000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3134,8 +3134,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854492564000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3151,8 +3151,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854553966000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3168,8 +3168,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854615050000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3185,8 +3185,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854676230000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3202,8 +3202,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854739528000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3219,8 +3219,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854800088000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3236,8 +3236,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854862535000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3253,8 +3253,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854926437000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3270,8 +3270,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182854, 1367182854997651000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3287,8 +3287,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855058987000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3304,8 +3304,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855120867000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3321,8 +3321,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855186477000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3338,8 +3338,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855247574000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3355,8 +3355,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855310003000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3372,8 +3372,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855373954000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3389,8 +3389,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855437545000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3406,8 +3406,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855501306000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3423,8 +3423,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855569082000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3440,8 +3440,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855632504000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3457,8 +3457,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855696281000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3474,8 +3474,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855758844000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3491,8 +3491,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855824327000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3508,8 +3508,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855886368000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3525,8 +3525,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182855, 1367182855948747000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3542,8 +3542,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856012690000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3559,8 +3559,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856076445000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3576,8 +3576,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856138869000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3593,8 +3593,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856203980000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3610,8 +3610,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856266320000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3627,8 +3627,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856332082000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3644,8 +3644,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856418355000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3661,8 +3661,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856477745000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3678,8 +3678,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856540130000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3695,8 +3695,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856602750000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3712,8 +3712,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856665818000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3729,8 +3729,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856726574000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3746,8 +3746,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856787670000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3763,8 +3763,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856849577000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3780,8 +3780,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856908841000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3797,8 +3797,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182856, 1367182856970044000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3814,8 +3814,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857059564000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3831,8 +3831,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857093995000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3848,8 +3848,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857162793000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3865,8 +3865,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857226327000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3882,8 +3882,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857288900000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3899,8 +3899,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857353868000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3916,8 +3916,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857416585000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3933,8 +3933,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857481593000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3950,8 +3950,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857543738000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3967,8 +3967,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857610300000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -3984,8 +3984,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857673923000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4001,8 +4001,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857747675000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4018,8 +4018,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857950062000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4035,8 +4035,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857956332000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4052,8 +4052,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857961294000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4069,8 +4069,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182857, 1367182857998215000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4086,8 +4086,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858059044000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4103,8 +4103,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858120244000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4120,8 +4120,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858183827000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4137,8 +4137,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858247796000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4154,8 +4154,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858337057000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4171,8 +4171,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858372756000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4188,8 +4188,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858441477000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4205,8 +4205,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858503844000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4222,8 +4222,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858566542000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4239,8 +4239,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858631526000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4256,8 +4256,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858693900000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4273,8 +4273,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858760169000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4290,8 +4290,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858823785000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4307,8 +4307,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858887747000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4324,8 +4324,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182858, 1367182858951513000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4341,8 +4341,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859026379000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4358,8 +4358,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859087756000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4375,8 +4375,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859149410000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4392,8 +4392,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859208887000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4409,8 +4409,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859270318000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4426,8 +4426,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859333942000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4443,8 +4443,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859397680000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4460,8 +4460,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859461775000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4477,8 +4477,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859523922000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4494,8 +4494,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859606539000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4511,8 +4511,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859667788000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4528,8 +4528,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859728832000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4545,8 +4545,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859790043000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4562,8 +4562,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859851281000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4579,8 +4579,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859914587000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4596,8 +4596,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182859, 1367182859973975000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4613,8 +4613,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860037736000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4630,8 +4630,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860101290000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4647,8 +4647,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860190945000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4664,8 +4664,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860223967000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4681,8 +4681,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860291488000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4698,8 +4698,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860356359000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4715,8 +4715,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860418819000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4732,8 +4732,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860485906000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4749,8 +4749,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860548871000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4766,8 +4766,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860612781000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4783,8 +4783,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860676538000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4800,8 +4800,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860740132000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4817,8 +4817,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860802490000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4834,8 +4834,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860868873000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4851,8 +4851,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860957127000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4868,8 +4868,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182860, 1367182860992669000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4885,8 +4885,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861060057000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4902,8 +4902,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861126280000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4919,8 +4919,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861191465000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4936,8 +4936,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861257724000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4953,8 +4953,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861320260000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4970,8 +4970,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861381909000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -4987,8 +4987,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861458927000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5004,8 +5004,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861520165000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5021,8 +5021,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861591410000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5038,8 +5038,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861650181000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5055,8 +5055,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861715046000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5072,8 +5072,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861870128000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5089,8 +5089,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861876501000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5106,8 +5106,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861885781000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5123,8 +5123,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182861, 1367182861951461000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5140,8 +5140,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862016264000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5157,8 +5157,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862081372000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5174,8 +5174,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862143946000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5191,8 +5191,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862210349000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5208,8 +5208,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862273782000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5225,8 +5225,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862338738000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5242,8 +5242,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862421337000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5259,8 +5259,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862482660000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5276,8 +5276,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862544609000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5293,8 +5293,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862603845000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5310,8 +5310,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862665175000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5327,8 +5327,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862727592000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5344,8 +5344,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862790223000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5361,8 +5361,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862852680000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5378,8 +5378,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182862, 1367182862915316000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5395,8 +5395,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863380767000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5412,8 +5412,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863382793000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5429,8 +5429,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863387628000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5446,8 +5446,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863392672000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5463,8 +5463,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863397499000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5480,8 +5480,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863402772000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5497,8 +5497,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863416189000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5514,8 +5514,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863426830000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5531,8 +5531,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863487488000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5548,8 +5548,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863551542000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5565,8 +5565,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863613859000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5582,8 +5582,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863704631000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5599,8 +5599,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863739047000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5616,8 +5616,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863806605000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5633,8 +5633,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863870075000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5650,8 +5650,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863934320000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5667,8 +5667,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182863, 1367182863996225000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5684,8 +5684,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864063970000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5701,8 +5701,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864126422000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5718,8 +5718,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864189086000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5735,8 +5735,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864279471000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5752,8 +5752,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864314025000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5769,8 +5769,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864381532000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5786,8 +5786,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864445126000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5803,8 +5803,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864516393000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5820,8 +5820,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864578750000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5837,8 +5837,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864643824000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5854,8 +5854,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864718851000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5871,8 +5871,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864782628000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5888,8 +5888,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864845114000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5905,8 +5905,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864906312000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5922,8 +5922,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182864, 1367182864969288000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5939,8 +5939,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865028964000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5956,8 +5956,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865092054000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5973,8 +5973,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865155285000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -5990,8 +5990,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865287677000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6007,8 +6007,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865294480000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6024,8 +6024,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865353966000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6041,8 +6041,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865401319000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6058,8 +6058,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865467695000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6075,8 +6075,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865555586000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6092,8 +6092,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865615198000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6109,8 +6109,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865677723000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6126,8 +6126,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865725070000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6143,8 +6143,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865787760000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6160,8 +6160,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865851337000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6177,8 +6177,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865914434000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6194,8 +6194,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182865, 1367182865980255000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6211,8 +6211,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866042756000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6228,8 +6228,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866105313000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6245,8 +6245,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866172561000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6262,8 +6262,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866235018000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6279,8 +6279,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866298818000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6296,8 +6296,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866362813000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6313,8 +6313,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866422679000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6330,8 +6330,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866490045000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6347,8 +6347,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866552615000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6364,8 +6364,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866617577000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6381,8 +6381,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866681516000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6398,8 +6398,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866745259000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6415,8 +6415,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866808765000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6432,8 +6432,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866872589000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6449,8 +6449,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182866, 1367182866936804000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6466,8 +6466,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867026529000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6483,8 +6483,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867062734000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6500,8 +6500,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867128765000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6517,8 +6517,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867191323000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6534,8 +6534,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867256493000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6551,8 +6551,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867320152000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6568,8 +6568,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867409436000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6585,8 +6585,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867468757000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6602,8 +6602,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867531317000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6619,8 +6619,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867594001000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6636,8 +6636,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867655147000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6653,8 +6653,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867716509000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6670,8 +6670,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867777571000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6687,8 +6687,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867838838000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6704,8 +6704,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867901472000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6721,8 +6721,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182867, 1367182867963997000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6738,8 +6738,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868026395000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6755,8 +6755,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868088746000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6772,8 +6772,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868151306000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6789,8 +6789,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868213993000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6806,8 +6806,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868278985000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6823,8 +6823,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868341372000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6840,8 +6840,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868431911000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6857,8 +6857,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868466248000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6874,8 +6874,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868535200000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6891,8 +6891,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868598986000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6908,8 +6908,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868662684000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6925,8 +6925,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868751941000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6942,8 +6942,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868785034000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6959,8 +6959,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868852721000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6976,8 +6976,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868917497000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -6993,8 +6993,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182868, 1367182868981355000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7010,8 +7010,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869190091000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7027,8 +7027,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869200204000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7044,8 +7044,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869206407000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7061,8 +7061,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869243941000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7078,8 +7078,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869306598000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7095,8 +7095,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869367517000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7112,8 +7112,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869428732000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7129,8 +7129,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869491470000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7146,8 +7146,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869556489000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7163,8 +7163,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869620218000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7180,8 +7180,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869684973000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7197,8 +7197,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869748729000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7214,8 +7214,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869838343000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7231,8 +7231,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869874076000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7248,8 +7248,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182869, 1367182869940189000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7265,8 +7265,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870002585000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7282,8 +7282,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870067458000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7299,8 +7299,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870155785000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7316,8 +7316,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870215088000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7333,8 +7333,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870277488000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7350,8 +7350,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870340000000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7367,8 +7367,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870382638000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7384,8 +7384,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870468882000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7401,8 +7401,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870530792000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7418,8 +7418,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870590346000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7435,8 +7435,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870651379000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7452,8 +7452,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870712479000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7469,8 +7469,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870775176000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7486,8 +7486,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870837756000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7503,8 +7503,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870900044000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7520,8 +7520,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182870, 1367182870988137000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7537,8 +7537,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871023876000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7554,8 +7554,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871090293000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7571,8 +7571,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871152707000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7588,8 +7588,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871218857000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7605,8 +7605,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871281219000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7622,8 +7622,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871370615000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7639,8 +7639,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871405267000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7656,8 +7656,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871473941000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7673,8 +7673,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871537662000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7690,8 +7690,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871601312000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7707,8 +7707,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871663832000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7724,8 +7724,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871729086000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7741,8 +7741,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871801422000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7758,8 +7758,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871862685000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7775,8 +7775,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871925082000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7792,8 +7792,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182871, 1367182871987569000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7809,8 +7809,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872050094000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7826,8 +7826,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872112693000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7843,8 +7843,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872176504000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7860,8 +7860,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872238892000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7877,8 +7877,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872303813000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7894,8 +7894,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872366462000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7911,8 +7911,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872431561000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7928,8 +7928,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872520823000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7945,8 +7945,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872555096000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7962,8 +7962,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872623845000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7979,8 +7979,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872687644000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -7996,8 +7996,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872751502000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8013,8 +8013,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872814031000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8030,8 +8030,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872878850000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8047,8 +8047,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182872, 1367182872941292000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8064,8 +8064,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873008218000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8081,8 +8081,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873081392000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8098,8 +8098,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873143883000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8115,8 +8115,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873206328000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8132,8 +8132,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873268830000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8149,8 +8149,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873332006000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8166,8 +8166,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873391344000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8183,8 +8183,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873456411000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8200,8 +8200,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873520082000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8217,8 +8217,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182873, 1367182873583778000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8234,8 +8234,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874439403000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8251,8 +8251,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874442489000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8268,8 +8268,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874448748000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8285,8 +8285,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874454965000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8302,8 +8302,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874461827000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8319,8 +8319,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874464972000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8336,8 +8336,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874469972000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8353,8 +8353,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874480871000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8370,8 +8370,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874480891000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8387,8 +8387,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874480983000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8404,8 +8404,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874481003000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8421,8 +8421,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874481043000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8438,8 +8438,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874482409000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8455,8 +8455,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874484373000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8472,8 +8472,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874543851000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8489,8 +8489,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874605013000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8506,8 +8506,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874667583000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8523,8 +8523,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874730033000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8540,8 +8540,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874796258000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8557,8 +8557,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874885632000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8574,8 +8574,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874920036000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8591,8 +8591,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182874, 1367182874988760000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8608,8 +8608,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875051454000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8625,8 +8625,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875113948000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8642,8 +8642,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875179075000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8659,8 +8659,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875248826000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8676,8 +8676,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875312572000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8693,8 +8693,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875570238000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8710,8 +8710,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875577640000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8727,8 +8727,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875583104000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8744,8 +8744,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875587483000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8761,8 +8761,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875625170000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8778,8 +8778,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875700092000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8795,8 +8795,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875761275000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8812,8 +8812,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875823737000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8829,8 +8829,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875885046000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8846,8 +8846,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182875, 1367182875948994000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8863,8 +8863,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876012664000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8880,8 +8880,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876075042000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8897,8 +8897,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876137545000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8914,8 +8914,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876201464000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8931,8 +8931,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876289604000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8948,8 +8948,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876324104000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8965,8 +8965,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876391287000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8982,8 +8982,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876456286000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -8999,8 +8999,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876520060000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9016,8 +9016,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876584558000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9033,8 +9033,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876647711000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9050,8 +9050,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876711315000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9067,8 +9067,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876775163000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9084,8 +9084,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876840162000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9101,8 +9101,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876906405000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9118,8 +9118,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182876, 1367182876980874000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9135,8 +9135,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877039971000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9152,8 +9152,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877101216000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9169,8 +9169,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877163910000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9186,8 +9186,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877227701000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9203,8 +9203,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877290773000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9220,8 +9220,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877355131000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9237,8 +9237,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877416422000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9254,8 +9254,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877478853000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9271,8 +9271,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877541956000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9288,8 +9288,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877605186000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9305,8 +9305,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877672530000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9322,8 +9322,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877760629000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9339,8 +9339,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877794915000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9356,8 +9356,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877864061000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9373,8 +9373,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182877, 1367182877926351000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9390,8 +9390,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878013836000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9407,8 +9407,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878050117000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9424,8 +9424,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878117590000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9441,8 +9441,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878180283000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9458,8 +9458,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878259068000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9475,8 +9475,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878318891000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9492,8 +9492,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878381208000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9509,8 +9509,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878443860000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9526,8 +9526,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878514063000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9543,8 +9543,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878575265000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9560,8 +9560,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878636346000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9577,8 +9577,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878697583000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9594,8 +9594,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878758902000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9611,8 +9611,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878820186000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9628,8 +9628,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878884041000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9645,8 +9645,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182878, 1367182878973101000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9662,8 +9662,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879007618000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9679,8 +9679,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879076334000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9696,8 +9696,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879138901000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9713,8 +9713,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879203936000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9730,8 +9730,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879266384000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9747,8 +9747,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879331378000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9764,8 +9764,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879393786000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9781,8 +9781,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879461279000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9798,8 +9798,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879536341000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9815,8 +9815,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879597627000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9832,8 +9832,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879660097000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9849,8 +9849,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879721352000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9866,8 +9866,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879782613000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9883,8 +9883,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879844004000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9900,8 +9900,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879906303000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9917,8 +9917,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182879, 1367182879968797000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9934,8 +9934,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880036297000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9951,8 +9951,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880098988000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9968,8 +9968,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880162738000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -9985,8 +9985,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880226352000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10002,8 +10002,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880288812000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10019,8 +10019,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880355101000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10036,8 +10036,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880417655000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10053,8 +10053,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880481504000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10070,8 +10070,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880546363000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10087,8 +10087,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880673826000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10104,8 +10104,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880680002000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10121,8 +10121,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880743950000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10138,8 +10138,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880818956000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10155,8 +10155,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880880045000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10172,8 +10172,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182880, 1367182880941253000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10189,8 +10189,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881002555000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10206,8 +10206,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881063825000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10223,8 +10223,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881128431000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10240,8 +10240,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881187546000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10257,8 +10257,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881250040000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10274,8 +10274,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881312575000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10291,8 +10291,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881376441000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10308,8 +10308,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881438872000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10325,8 +10325,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881503848000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10342,8 +10342,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881566310000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10359,8 +10359,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881633801000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10376,8 +10376,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881695094000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10393,8 +10393,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881759022000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10410,8 +10410,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881822573000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10427,8 +10427,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881886304000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10444,8 +10444,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182881, 1367182881950040000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10461,8 +10461,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882020128000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10478,8 +10478,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882096493000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10495,8 +10495,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882158793000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10512,8 +10512,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882220068000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10529,8 +10529,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882283170000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10546,8 +10546,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882342728000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10563,8 +10563,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882405113000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10580,8 +10580,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882467527000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10597,8 +10597,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882536278000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,
@@ -10614,8 +10614,8 @@ var frames = []*DataFrame{
 		received: time.Unix(1367182882, 1367182882598223000),
 	},
 
-	&DataFrame{
-		DataFrameHeader: DataFrameHeader{
+	&AvatarDataFrame{
+		AvatarHeader: AvatarHeader{
 			FieldSampleRateVersion: 0x3,
 			FieldFrameSize:         0x76,
 			FieldFrameType:         0x1,

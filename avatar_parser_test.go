@@ -5,7 +5,7 @@ import (
 )
 
 func TestSampleRateVersion(t *testing.T) {
-	h := &DataFrameHeader{}
+	h := &AvatarHeader{}
 
 	// test 250
 	h.FieldSampleRateVersion = 0x03
@@ -27,7 +27,7 @@ func TestSampleRateVersion(t *testing.T) {
 }
 
 func TestFrameSize(t *testing.T) {
-	h := &DataFrameHeader{}
+	h := &AvatarHeader{}
 
 	size := h.FrameSize()
 	if size != 0 {
@@ -42,7 +42,7 @@ func TestFrameSize(t *testing.T) {
 }
 
 func TestFrameType(t *testing.T) {
-	h := &DataFrameHeader{}
+	h := &AvatarHeader{}
 
 	h.FieldFrameType = 0x01
 	typ := h.FrameType()
@@ -52,7 +52,7 @@ func TestFrameType(t *testing.T) {
 }
 
 func TestFrameCount(t *testing.T) {
-	h := &DataFrameHeader{}
+	h := &AvatarHeader{}
 
 	h.FieldFrameCount = uint32(0x12345678)
 	count := h.FrameCount()
@@ -62,7 +62,7 @@ func TestFrameCount(t *testing.T) {
 }
 
 func TestChannels(t *testing.T) {
-	h := &DataFrameHeader{}
+	h := &AvatarHeader{}
 
 	// test 250
 	h.FieldChannels = 0x03

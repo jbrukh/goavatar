@@ -67,18 +67,18 @@ func main() {
 	device.Disconnect()
 }
 
-func run(p *gplot.Plotter, out <-chan *DataFrame) {
+func run(p *gplot.Plotter, out <-chan DataFrame) {
 	var (
 		window1 = window.New(*windowSize, WindowMultiple)
 		window2 = window.New(*windowSize, WindowMultiple)
 	)
 
-	var frames []*DataFrame
+	var frames []DataFrame
 	// if dumpFrames is true, we will buffer the data
 	// frames in memory and then dump them to frames.go
 	// at the end
 	if *dumpFrames {
-		frames = make([]*DataFrame, 0)
+		frames = make([]DataFrame, 0)
 		defer func() {
 			var file *os.File
 			var err error
@@ -114,10 +114,10 @@ func run(p *gplot.Plotter, out <-chan *DataFrame) {
 		}
 
 		//log.Printf("Got df: %v", df.String())
-		for _, v := range df.ChannelData(0) {
+		for _, v := range df.Buffer().ChannelData(0) {
 			window1.PushBack(v)
 		}
-		for _, v := range df.ChannelData(1) {
+		for _, v := range df.Buffer().ChannelData(1) {
 			window2.PushBack(v)
 		}
 

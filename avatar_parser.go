@@ -31,153 +31,6 @@ const (
 var AvatarSampleRates = []int{250, 500, 1000}
 
 // ----------------------------------------------------------------- //
-// AvatarEEG Data Frame and Parsing
-// ----------------------------------------------------------------- //
-
-type DataFrameHeader struct {
-	// a header is 1+2+1+4+1+2+2+4+2 = 19 bytes
-	FieldSampleRateVersion byte
-	FieldFrameSize         uint16
-	FieldFrameType         byte
-	FieldFrameCount        uint32
-	FieldChannels          byte
-	FieldSamples           uint16
-	FieldVoltRange         uint16
-	FieldTimestamp         uint32
-	FieldFracSecs          uint16
-}
-
-// DataFrame represents the raw data that is transmitted from the AvatarEEG
-// device. 
-type DataFrame struct {
-	DataFrameHeader
-	data     *SamplingBuffer // processed data, in a multibuffer
-	received time.Time       // time this frame was received locally
-	crc      uint16          // crc of the frame
-}
-
-// String
-func (df *DataFrame) String() string {
-	return fmt.Sprintf("\n%+v\n", *df)
-}
-
-// Return this dataframe as Go code.
-func (df *DataFrame) AsCode() string {
-	f := `&DataFrame{
-		DataFrameHeader:DataFrameHeader{
-			FieldSampleRateVersion:%#v, 
-			FieldFrameSize:%#v, 
-			FieldFrameType:%#v, 
-			FieldFrameCount:%#v, 
-			FieldChannels:%#v, 
-			FieldSamples:%#v, 
-			FieldVoltRange:%#v, 
-			FieldTimestamp:%#v, 
-			FieldFracSecs:%#v,
-		},
-		data:NewSamplingBufferFromSlice(%d, 1, %#v), 
-		crc:%#v, 
-		received:time.Unix(%v, %v),
-	}`
-	return fmt.Sprintf(f,
-		df.FieldSampleRateVersion,
-		df.FieldFrameSize,
-		df.FieldFrameType,
-		df.FieldFrameCount,
-		df.FieldChannels,
-		df.FieldSamples,
-		df.FieldVoltRange,
-		df.FieldTimestamp,
-		df.FieldFracSecs,
-		df.Buffer().Channels(),
-		df.Buffer().data,
-		df.crc,
-		df.received.Unix(),
-		df.received.Nanosecond(),
-	)
-
-}
-
-func (df *DataFrame) Buffer() *SamplingBuffer {
-	return df.data
-}
-
-func (df *DataFrame) ChannelData(channel int) []float64 {
-	return df.data.ChannelData(channel)
-}
-
-// the time this data framed was received locally
-func (df *DataFrame) Received() time.Time {
-	return df.received
-}
-
-// SampleRate: the number of data samples delivered in one
-// second (per channel)
-func (h *DataFrameHeader) SampleRate() (sampleRate int) {
-	sr := int(h.FieldSampleRateVersion >> 6)
-	if sr < 0 || sr > 2 {
-		return 0
-	}
-	return AvatarSampleRates[sr]
-}
-
-// Version
-func (h *DataFrameHeader) Version() int {
-	return int(h.FieldSampleRateVersion & 0x3F)
-}
-
-// FrameSize
-func (h *DataFrameHeader) FrameSize() int {
-	return int(h.FieldFrameSize)
-}
-
-// FrameType
-func (h *DataFrameHeader) FrameType() int {
-	return int(h.FieldFrameType)
-}
-
-// FrameCount
-func (h *DataFrameHeader) FrameCount() int {
-	return int(h.FieldFrameCount)
-}
-
-// HasTriggerChannel
-func (h *DataFrameHeader) HasTriggerChannel() bool {
-	return (h.FieldChannels >> 7) > 0
-}
-
-// Channels (number of, not including trigger)
-func (h *DataFrameHeader) Channels() int {
-	// zero the first bit for the trigger channel
-	return int(h.FieldChannels & 0x7F)
-}
-
-// Samples
-func (h *DataFrameHeader) Samples() int {
-	return int(h.FieldSamples)
-}
-
-// Range returns the range, in mVpp, of each data channel which is dependent on the
-// gain and is 12 by default. This is needed to convert the raw counting data from
-// the analog-to-digital converter. To convert counts to voltage, simply perform:
-//
-//     (value) * range / 1000 / 2^24
-//
-func (h *DataFrameHeader) VoltRange() int {
-	return int(h.FieldVoltRange)
-}
-
-// Time converts the timestamp data into Unix nanosecond time.
-func (h *DataFrameHeader) Time() time.Time {
-	return time.Unix(int64(h.FieldTimestamp), int64(time.Duration(h.FieldFracSecs)*time.Second/AvatarFracSecs))
-}
-
-// Payload size
-func (h *DataFrameHeader) PayloadSize() int {
-	return h.Channels() * h.Samples() * AvatarPointSize
-}
-
-// ----------------------------------------------------------------- //
 // AvatarEEG stream parser
 // ----------------------------------------------------------------- //
 
@@ -204,7 +57,7 @@ func NewAvatarParser(reader io.ReadCloser) *avatarParser {
 // With future versions we may adjust number of samples to optimize
 // Bluetooth performance and may have hardware that supports up to 24
 // channels."
-func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
+func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 	// reset the crc calculation
 	r.crc.Reset()
 
@@ -264,7 +117,7 @@ func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
 		return nil, err
 	}
 
-	header := new(DataFrameHeader)
+	header := new(AvatarHeader)
 	buf := bytes.NewBuffer(frame[:AvatarHeaderSize])
 	err = binary.Read(buf, binary.BigEndian, header)
 	if err != nil {
@@ -305,11 +158,11 @@ func (r *avatarParser) ParseFrame() (dataFrame *DataFrame, err error) {
 	}
 	data.PushSlice(p)
 
-	dataFrame = &DataFrame{
-		DataFrameHeader: *header,
-		data:            data,
-		received:        timeReceived,
-		crc:             crc,
+	dataFrame = &AvatarDataFrame{
+		AvatarHeader: *header,
+		data:         data,
+		received:     timeReceived,
+		crc:          crc,
 	}
 	return
 }

@@ -31,7 +31,7 @@ type Device interface {
 	Disconnect() error
 
 	// Returns the output channel for the device. 
-	Out() <-chan *DataFrame
+	Out() <-chan DataFrame
 
 	// Starts recording the streaming data to a file.
 	Record(token string) (err error)
@@ -71,14 +71,14 @@ type RecorderProvider func(string) Recorder
 
 type Control struct {
 	done chan bool
-	out  chan *DataFrame
+	out  chan DataFrame
 	d    *baseDevice
 }
 
 func newControl(d *baseDevice) *Control {
 	return &Control{
 		done: make(chan bool),
-		out:  make(chan *DataFrame, DataBufferSize),
+		out:  make(chan DataFrame, DataBufferSize),
 		d:    d,
 	}
 }
@@ -92,7 +92,7 @@ func (control *Control) ShouldTerminate() bool {
 	return false
 }
 
-func (control *Control) Send(df *DataFrame) {
+func (control *Control) Send(df DataFrame) {
 	control.out <- df
 	if !control.ShouldTerminate() {
 		if control.d.Recording() {
@@ -222,7 +222,7 @@ func (d *baseDevice) Connected() bool {
 	return d.connected
 }
 
-func (d *baseDevice) Out() <-chan *DataFrame {
+func (d *baseDevice) Out() <-chan DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.control.out

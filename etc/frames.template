@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-var frames = []*DataFrame{
+var frames = []*AvatarDataFrame{
 	{{range .}}
 		{{.AsCode}},
 	{{end}}

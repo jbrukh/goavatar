@@ -17,7 +17,7 @@ var repo = "var/" // TODO: generalize
 // A recorder of dataframes.
 type Recorder interface {
 	Start() error
-	ProcessFrame(*DataFrame) error
+	ProcessFrame(DataFrame) error
 	Stop() (fileName string, err error)
 	Token() string
 }
@@ -50,7 +50,7 @@ func (r *FileRecorder) Start() (err error) {
 	return
 }
 
-func (r *FileRecorder) ProcessFrame(df *DataFrame) (err error) {
+func (r *FileRecorder) ProcessFrame(df DataFrame) (err error) {
 	data := df.Buffer().data
 	//l := len(data)
 

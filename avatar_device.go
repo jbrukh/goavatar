@@ -85,10 +85,10 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 	return nil
 }
 
-func phase(frames []*DataFrame) (avg int64) {
+func phase(frames []*AvatarDataFrame) (avg int64) {
 	diffs := make([]int64, len(frames))
 	for inx, f := range frames {
-		diffs[inx] = f.Received().UnixNano() - f.DataFrameHeader.Time().UnixNano()
+		diffs[inx] = f.Received().UnixNano() - f.Generated().UnixNano()
 	}
 	avg = averageInt64(diffs)
 	log.Printf("time diffs (avg: %d): %v", avg, diffs)

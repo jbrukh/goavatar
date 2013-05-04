@@ -479,7 +479,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 
 		// calculate the latency
 		frames++
-		d := absFloat64(float64(df.Received().UnixNano() - df.Time().UnixNano()/1000000)) // diff between received and stamped time
+		d := absFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano()/1000000)) // diff between received and stamped time
 		mean_diff = float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
 
 		b.Append(df.Buffer())

@@ -17,7 +17,7 @@ func (r *MockRecorder) Start() (err error) {
 	r.started = true
 	return
 }
-func (r *MockRecorder) ProcessFrame(df *DataFrame) (err error) {
+func (r *MockRecorder) ProcessFrame(df DataFrame) (err error) {
 	r.processed = true
 	return
 }
@@ -49,7 +49,7 @@ func newEmptyDevice() *baseDevice {
 	streamFunc := func(c *Control) (err error) {
 		for !c.ShouldTerminate() {
 			time.Sleep(time.Millisecond * 100)
-			c.Send(&DataFrame{})
+			c.Send(&MockFrame{})
 		}
 		c.Close()
 		return
@@ -75,6 +75,33 @@ func newErrorProneDevice() *baseDevice {
 		return fmt.Errorf("too bad")
 	}
 	return b
+}
+
+type MockFrame struct {
+}
+
+func (f *MockFrame) Buffer() (data *SamplingBuffer) {
+	return
+}
+
+func (f *MockFrame) Channels() (c int) {
+	return
+}
+
+func (f *MockFrame) Samples() (s int) {
+	return
+}
+
+func (f *MockFrame) SampleRate() (r int) {
+	return
+}
+
+func (f *MockFrame) Received() (t time.Time) {
+	return
+}
+
+func (f *MockFrame) Generated() (t time.Time) {
+	return
 }
 
 func TestConnectionLogic(t *testing.T) {
@@ -215,11 +242,11 @@ func TestErrorProneStream(t *testing.T) {
 	}
 }
 
-func ensureClosed(t *testing.T, out chan *DataFrame) {
+func ensureClosed(t *testing.T, out chan DataFrame) {
 	defer func() {
 		if r := recover(); r != nil {
 		}
 	}()
-	out <- &DataFrame{}
+	out <- &MockFrame{}
 	t.Errorf("failed to panic when writing to this channel, hence it is still open")
 }
