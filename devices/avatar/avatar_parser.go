@@ -1,10 +1,11 @@
-package goavatar
+package avatar
 
 import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	. "github.com/jbrukh/goavatar"
 	"io"
 	"time"
 )

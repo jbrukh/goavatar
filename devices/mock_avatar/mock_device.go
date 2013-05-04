@@ -1,6 +1,8 @@
-package goavatar
+package mock_avatar
 
 import (
+	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/devices/avatar"
 	"time"
 )
 
@@ -9,7 +11,7 @@ import (
 // ----------------------------------------------------------------- //
 
 type MockDevice struct {
-	baseDevice
+	BaseDevice
 }
 
 // NewDevice creates a new Device. The user can then start
@@ -37,7 +39,7 @@ func NewMockDevice() *MockDevice {
 			if c.ShouldTerminate() {
 				return nil
 			}
-			c.Send(frames[tick%len(frames)])
+			c.Send(MockAvatarFrames[tick%len(MockAvatarFrames)])
 			tick++
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}
@@ -49,7 +51,7 @@ func NewMockDevice() *MockDevice {
 	}
 
 	return &MockDevice{
-		baseDevice: *newBaseDevice(
+		BaseDevice: *NewBaseDevice(
 			"MockAvatarEEG",
 			connFunc,
 			disconnFunc,

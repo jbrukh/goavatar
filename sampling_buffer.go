@@ -111,3 +111,8 @@ func (b *SamplingBuffer) SampleNext(n int) *SamplingBuffer {
 	}
 	return result
 }
+
+// Return the raw data.
+func (b *SamplingBuffer) RawData() []float64 {
+	return b.data
+}

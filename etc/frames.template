@@ -1,10 +1,10 @@
-package goavatar
+package mock_avatar
 
 import (
 	"time"
 )
 
-var frames = []*AvatarDataFrame{
+var MockAvatarFrames = []*AvatarDataFrame{
 	{{range .}}
 		{{.AsCode}},
 	{{end}}

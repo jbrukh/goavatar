@@ -1,7 +1,8 @@
-package goavatar
+package avatar
 
 import (
 	"errors"
+	. "github.com/jbrukh/goavatar"
 	"io"
 	"log"
 	"os"
@@ -23,7 +24,7 @@ var BadCrcErr = errors.New("frame had bad crc")
 // ----------------------------------------------------------------- //
 
 type AvatarDevice struct {
-	baseDevice
+	BaseDevice
 	serialPort string // serial port like /dev/tty.AvatarEEG03009-SPPDev
 }
 
@@ -57,7 +58,7 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 	}
 
 	return &AvatarDevice{
-		baseDevice: *newBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc, recorderProvider),
+		BaseDevice: *NewBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc, recorderProvider),
 		serialPort: serialPort,
 	}
 }
@@ -83,14 +84,4 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 		c.Send(frame)
 	}
 	return nil
-}
-
-func phase(frames []*AvatarDataFrame) (avg int64) {
-	diffs := make([]int64, len(frames))
-	for inx, f := range frames {
-		diffs[inx] = f.Received().UnixNano() - f.Generated().UnixNano()
-	}
-	avg = averageInt64(diffs)
-	log.Printf("time diffs (avg: %d): %v", avg, diffs)
-	return
 }

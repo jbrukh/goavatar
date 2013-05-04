@@ -1,6 +1,7 @@
-package goavatar
+package avatar
 
 import (
+	//. "github.com/jbrukh/goavatar"
 	"testing"
 )
 

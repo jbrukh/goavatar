@@ -37,7 +37,7 @@ func (r *MockRecorder) Reset() {
 	return
 }
 
-func newEmptyDevice() *baseDevice {
+func newEmptyDevice() *BaseDevice {
 	connFunc := func() error {
 		return nil
 	}
@@ -59,7 +59,7 @@ func newEmptyDevice() *baseDevice {
 		return &MockRecorder{}
 	}
 
-	return newBaseDevice(
+	return NewBaseDevice(
 		"UnitTestMockDevice",
 		connFunc,
 		disconnFunc,
@@ -69,7 +69,7 @@ func newEmptyDevice() *baseDevice {
 }
 
 // Returns a device whose stream always has errors.
-func newErrorProneDevice() *baseDevice {
+func newErrorProneDevice() *BaseDevice {
 	b := newEmptyDevice()
 	b.streamFunc = func(c *Control) (err error) {
 		return fmt.Errorf("too bad")

@@ -1,10 +1,11 @@
-package goavatar
+package avatar
 
 import (
 	"time"
+	. "github.com/jbrukh/goavatar"
 )
 
-var frames = []*AvatarDataFrame{
+var MockAvatarFrames = []*AvatarDataFrame{
 
 	&AvatarDataFrame{
 		AvatarHeader: AvatarHeader{

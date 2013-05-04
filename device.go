@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+const DataFrameBufferSize = 1024
+
 // ----------------------------------------------------------------- //
 // Device
 // ----------------------------------------------------------------- //
@@ -72,13 +74,13 @@ type RecorderProvider func(string) Recorder
 type Control struct {
 	done chan bool
 	out  chan DataFrame
-	d    *baseDevice
+	d    *BaseDevice
 }
 
-func newControl(d *baseDevice) *Control {
+func newControl(d *BaseDevice) *Control {
 	return &Control{
 		done: make(chan bool),
-		out:  make(chan DataFrame, DataBufferSize),
+		out:  make(chan DataFrame, DataFrameBufferSize),
 		d:    d,
 	}
 }
@@ -105,15 +107,15 @@ func (control *Control) Close() {
 	close(control.out)
 }
 
-// baseDevice provides the basic framework for devices, including
+// BaseDevice provides the basic framework for devices, including
 // the skeleton implementation that keeps track of connection and
-// recording state and thread-safety. However, the baseDevice provides
+// recording state and thread-safety. However, the BaseDevice provides
 // no logic for streaming data and expects this functionality to
 // be parameterized.
 //
 // In particular, implementors should respect the control channel
 // and should send output data on the output channel.
-type baseDevice struct {
+type BaseDevice struct {
 	name      string
 	lock      sync.Mutex
 	connected bool
@@ -130,9 +132,9 @@ type baseDevice struct {
 
 // Create a new base device that performs connectivity
 // and streaming based on the given function.
-func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc,
-	streamFunc StreamFunc, recorderFunc RecorderProvider) *baseDevice {
-	return &baseDevice{
+func NewBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc,
+	streamFunc StreamFunc, recorderFunc RecorderProvider) *BaseDevice {
+	return &BaseDevice{
 		name:         name,
 		connFunc:     connFunc,
 		disconnFunc:  disconnFunc,
@@ -141,11 +143,11 @@ func newBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc
 	}
 }
 
-func (d *baseDevice) Name() string {
+func (d *BaseDevice) Name() string {
 	return d.name
 }
 
-func (d *baseDevice) Connect() (err error) {
+func (d *BaseDevice) Connect() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -183,11 +185,11 @@ func (d *baseDevice) Connect() (err error) {
 	return nil
 }
 
-func (d *baseDevice) Disconnect() (err error) {
+func (d *BaseDevice) Disconnect() (err error) {
 	return d.disconnect(false)
 }
 
-func (d *baseDevice) disconnect(ignoreDone bool) (err error) {
+func (d *BaseDevice) disconnect(ignoreDone bool) (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -216,19 +218,19 @@ func (d *baseDevice) disconnect(ignoreDone bool) (err error) {
 	return err
 }
 
-func (d *baseDevice) Connected() bool {
+func (d *BaseDevice) Connected() bool {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.connected
 }
 
-func (d *baseDevice) Out() <-chan DataFrame {
+func (d *BaseDevice) Out() <-chan DataFrame {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.control.out
 }
 
-func (d *baseDevice) Record(token string) (err error) {
+func (d *BaseDevice) Record(token string) (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -252,7 +254,7 @@ func (d *baseDevice) Record(token string) (err error) {
 	return
 }
 
-func (d *baseDevice) Stop() (outFile string, err error) {
+func (d *BaseDevice) Stop() (outFile string, err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -269,7 +271,7 @@ func (d *baseDevice) Stop() (outFile string, err error) {
 	return
 }
 
-func (d *baseDevice) Recording() bool {
+func (d *BaseDevice) Recording() bool {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	return d.recording

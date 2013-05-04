@@ -1,7 +1,8 @@
-package goavatar
+package avatar
 
 import (
 	"fmt"
+	. "github.com/jbrukh/goavatar"
 	"time"
 )
 
@@ -65,7 +66,7 @@ func (df *AvatarDataFrame) AsCode() string {
 		df.FieldTimestamp,
 		df.FieldFracSecs,
 		df.Buffer().Channels(),
-		df.Buffer().data,
+		df.Buffer().RawData(),
 		df.crc,
 		df.received.Unix(),
 		df.received.Nanosecond(),
