@@ -132,9 +132,11 @@ type InfoResponse struct {
 // that has not been seen before. The data messages come at a 
 // frequency specified in the initial control messages.
 type DataMessage struct {
-	Data [][]float64 `json:"data"` // the data for each channel, only first n relevant, n == # of channels
-	Ints [][]int64   `json:"ints"` // the data for each channel, as integers
+	Data      [][]float64 `json:"data"`       // the data for each channel, only first n relevant, n == # of channels
+	Ints      [][]int64   `json:"ints"`       // the data for each channel, as integers
+	LatencyMs float64     `json:"latency_ms"` // the running latency
 	//Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
+
 }
 
 //---------------------------------------------------------//
@@ -448,6 +450,10 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 		log.Printf("WARNING: setting default batchSize")
 	}
 
+	// latency calculation
+	frames := 0
+	mean_diff := float64(0)
+
 	// now we need to sample every devicePps/pps points
 	sampleRate := devicePps / pps
 
@@ -471,6 +477,11 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 			return
 		}
 
+		// calculate the latency
+		frames++
+		d := absFloat64(float64(df.Received().UnixNano() - df.Time().UnixNano()/1000000)) // diff between received and stamped time
+		mean_diff = float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
+
 		b.Append(df.Buffer())
 		for b.Size() > absBatchSize {
 			batch := b.SampleNext(absBatchSize)
@@ -478,6 +489,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 			// send it off
 			go func() {
 				msg := new(DataMessage)
+				msg.LatencyMs = absFloat64(mean_diff - d)
 				if integers {
 					msg.Ints = make([][]int64, channels)
 					for i, _ := range msg.Ints {

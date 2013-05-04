@@ -30,3 +30,10 @@ func averageInt64(arr []int64) int64 {
 	}
 	return int64(float64(sumInt64(arr)) / float64(len(arr)))
 }
+
+func absFloat64(f float64) float64 {
+	if f >= 0 {
+		return f
+	}
+	return -f
+}
