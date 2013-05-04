@@ -68,31 +68,6 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 	parser := NewAvatarParser(r)
 	defer c.Close()
-	log.Printf("calibrating...")
-	// calibrate the device
-	frames := make([]*DataFrame, DiagnosticFrames)
-	for i := range frames {
-		if c.ShouldTerminate() {
-			return nil
-		}
-
-		// collect the frames for calibration
-		frame, err := parser.ParseFrame()
-		if err != nil {
-			if err == BadCrcErr {
-				continue // just skip bad frames
-			} else {
-				log.Printf("could not calibrate the device: %v", err)
-				return err
-			}
-		}
-		frames[i] = frame
-	}
-
-	// calibrate -- find the average difference between received time
-	// and generated time on the frame
-	timeDiff := phase(frames)
-	log.Printf("average time diff (ns): %d", timeDiff)
 
 	for {
 		if c.ShouldTerminate() {
