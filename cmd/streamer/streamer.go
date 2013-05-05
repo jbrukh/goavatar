@@ -39,7 +39,7 @@ func init() {
 }
 
 func main() {
-	// set up the plotter	
+	// set up the plotter
 	p, err := gplot.NewPlotter(false)
 	if err != nil {
 		err_string := fmt.Sprintf("** err: %v\n", err)
@@ -54,9 +54,9 @@ func main() {
 	// set up the device
 	var device Device
 	if *mockDevice {
-		device = NewMockDevice()
+		device = NewMockDevice("")
 	} else {
-		device = NewAvatarDevice(*serialPort)
+		device = NewAvatarDevice(*serialPort, "")
 	}
 
 	// connect to it

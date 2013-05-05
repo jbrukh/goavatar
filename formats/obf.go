@@ -16,12 +16,13 @@ import (
 //
 // Octopus Binary Format (OBF)
 //
-// Header (8 bytes):
+// Header (10 bytes):
 //    DataType (1 byte):        		 0x01 = raw device data;
 //    FormatVersion (1 byte):   		 0x01 = version 1
 //    StorageMode (1 byte):     		 0x01 = parallel; 0x02 = sequential
 //    Channels (1 byte):        		 0-255 channels
 //    Samples (int32):          		 number of samples stored
+//    SampleRate (int16):				 the sample rate at which this data was sampled
 //    Values (float64*channels*samples): values in either parallel or sequential format
 //    Timestamps (int64*samples):        timestamps of the values
 //
@@ -73,6 +74,7 @@ type (
 		StorageMode   byte
 		Channels      uint8
 		Samples       uint32
+		SampleRate    uint16
 	}
 
 	OBFParallelBlock struct {
@@ -82,7 +84,7 @@ type (
 )
 
 // Size of the header.
-const OBFHeaderSize = 8
+const OBFHeaderSize = 10
 
 // Fixed locations
 const (
@@ -188,5 +190,10 @@ func (s *OBFCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
 	}
 
 	err = binary.Read(s.file, binary.BigEndian, &ts)
+	return
+}
+
+func (s *OBFCodec) ReadDataFrame() (b *SamplingBuffer, err error) {
+	// TODO
 	return
 }

@@ -4,7 +4,7 @@
 package formats
 
 import (
-	. "github.com/jbrukh/goavatar/devices/avatar"
+	//. "github.com/jbrukh/goavatar/devices/avatar"
 	//"log"
 	"encoding/binary"
 	"os"
@@ -57,7 +57,9 @@ func TestWriteAndHeader(t *testing.T) {
 	}
 
 	// sanity check the header
-	if header.Channels != 2 || header.DataType != DataTypeRaw || header.FormatVersion != FormatVersion1 || header.Samples != 32 {
+	if header.Channels != 2 || header.DataType != DataTypeRaw ||
+		header.FormatVersion != FormatVersion1 || header.Samples != 32 ||
+		header.SampleRate != 250 {
 		t.Errorf("header is shot: %v", header)
 	}
 

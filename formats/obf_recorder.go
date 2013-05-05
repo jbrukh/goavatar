@@ -22,8 +22,10 @@ type OBFRecorder struct {
 	out  chan DataFrame // channel for the worker to process frames
 	cerr chan error     // channel for worker error feedback
 
-	channels int
-	samples  int
+	// diagnostics
+	channels   int
+	samples    int
+	sampleRate int
 }
 
 func NewOBFRecorder(repo string) *OBFRecorder {
@@ -83,7 +85,8 @@ func (r *OBFRecorder) ProcessFrame(df DataFrame) error {
 		return err
 	default:
 		r.out <- df
-		r.channels = df.Channels() // TODO
+		r.channels = df.Channels()     // TODO
+		r.sampleRate = df.SampleRate() // TODO
 		r.samples += df.Samples()
 	}
 	return nil
@@ -114,6 +117,7 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 		StorageMode:   StorageModeParallel,
 		Channels:      uint8(r.channels),
 		Samples:       uint32(r.samples),
+		SampleRate:    uint16(r.sampleRate),
 	}
 
 	log.Printf("writing the header: %v", header)

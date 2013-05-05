@@ -36,7 +36,7 @@ var Multiplier int64 = 10000000000000000
 // Handlers -- for use with net/http HTTP server
 //---------------------------------------------------------//
 
-// ControlHandler provides a request handler for use with Go's HTTP 
+// ControlHandler provides a request handler for use with Go's HTTP
 // server for the control endpoint. To set the handler, call:
 //
 //    http.Handle("/uri", socket.ControlHandler(device, true))
@@ -45,7 +45,7 @@ func ControlHandler(device Device, verbose bool) http.Handler {
 	return websocket.Handler(NewControlSocket(device, verbose))
 }
 
-// DataHandler provides a request handler for use with Go's HTTP 
+// DataHandler provides a request handler for use with Go's HTTP
 // server for the data endpoint. To set the handler, call:
 //
 //    http.Handle("/uri", socket.DataHandler(device, true))
@@ -69,8 +69,6 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 		}
 
 		for {
-			log.Printf("listening for incoming messages")
-
 			msgBytes, msgBase, err := controller.Receive()
 			if err != nil {
 				if err == io.EOF || err.Error() == "EOF" {
@@ -79,7 +77,7 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 				continue
 			}
 
-			log.Printf("received: %s", msgBytes)
+			log.Printf("SOCKET: RECEIVED %s", msgBytes)
 
 			// message types
 			msgType := msgBase.MessageType
@@ -123,7 +121,7 @@ func (s *SocketController) Receive() (msgBytes []byte, msgBase Message, err erro
 	// get the raw bytes
 	err = websocket.Message.Receive(s.conn, &msgBytes)
 	if err != nil {
-		log.Printf("websocket: %v", err)
+		log.Printf("websocket says: %v", err)
 		return
 	}
 
@@ -135,7 +133,7 @@ func (s *SocketController) Receive() (msgBytes []byte, msgBase Message, err erro
 	return
 }
 
-// SendErrorResponse sends error messages; these 
+// SendErrorResponse sends error messages; these
 // are usually for internal server errors.
 func (s *SocketController) SendErrorResponse(id, errStr string) {
 	// create the error message
@@ -157,7 +155,7 @@ func (s *SocketController) SendErrorResponse(id, errStr string) {
 }
 
 func (s *SocketController) SendResponse(r interface{}) {
-	log.Printf("sending response: %+v", r)
+	log.Printf("SOCKET RESPONSE: %+v", r)
 	// send it off
 	err := websocket.JSON.Send(s.conn, r)
 	if err != nil {
@@ -166,7 +164,7 @@ func (s *SocketController) SendResponse(r interface{}) {
 }
 
 func (s *SocketController) ProcessInfoMessage(msgBytes []byte, id string) {
-	log.Printf("INFO")
+	log.Printf("INFO MESSAGE")
 
 	var msg InfoMessage
 	if err := json.Unmarshal(msgBytes, &msg); err != nil {
@@ -184,8 +182,7 @@ func (s *SocketController) ProcessInfoMessage(msgBytes []byte, id string) {
 }
 
 func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
-	log.Printf("CONNECT")
-
+	log.Printf("CONNECT MESSAGE")
 	var msg ConnectMessage
 	if err := json.Unmarshal(msgBytes, &msg); err != nil {
 		s.SendErrorResponse(id, err.Error())
@@ -274,6 +271,7 @@ Respond:
 }
 
 func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
+	log.Printf("RECORD MESSAGE")
 	var msg RecordMessage
 	var err error
 	if err = json.Unmarshal(msgBytes, &msg); err != nil {
@@ -318,6 +316,7 @@ Respond:
 }
 
 func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
+	log.Printf("UPLOAD MESSAGE")
 	var msg UploadMessage
 	var err error
 	if err = json.Unmarshal(msgBytes, &msg); err != nil {
@@ -360,8 +359,10 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 }
 
 func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
+	log.Printf("DEVICE: STREAMING ON")
+	defer log.Printf("DEVICE: STREAMING OFF")
 	out := device.Out()
-	defer device.Disconnect()
+	//defer device.Disconnect()
 
 	// diagnose the situation
 	df, ok := <-out
@@ -392,7 +393,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 	sampleRate := devicePps / pps
 
 	// actual number of data points we must read
-	// in order to obtain a sampled batch of batchSize 
+	// in order to obtain a sampled batch of batchSize
 	absBatchSize := batchSize * sampleRate
 
 	b := NewSamplingBuffer(channels, sampleRate*batchSize*10, sampleRate)
@@ -418,6 +419,12 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 
 		b.Append(df.Buffer())
 		for b.Size() > absBatchSize {
+			select {
+			case <-kill:
+				return
+			default:
+			}
+
 			batch := b.SampleNext(absBatchSize)
 
 			// send it off

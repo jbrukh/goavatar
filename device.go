@@ -39,7 +39,7 @@ type Device interface {
 	// currently connected.
 	Connected() bool
 
-	// Returns the output channel for the device. 
+	// Returns the output channel for the device.
 	Out() <-chan DataFrame
 
 	// Starts recording the streaming data to a file.
@@ -72,7 +72,7 @@ type DisconnectFunc func() error
 // expected to obey the following contract:
 //
 // (1) It shalt not perform any resource cleanup, this is the
-//     job of the DisconnectFunc. It shalt not call 
+//     job of the DisconnectFunc. It shalt not call
 //     device.Disconnect().
 // (2) It shalt obey c.ShouldTerminate() and exit without error.
 // (3) Upon any error, it shall return that error.
@@ -176,6 +176,8 @@ func (d *BaseDevice) Connect() (err error) {
 		return fmt.Errorf("already connected to the device")
 	}
 
+	log.Printf("DEVICE: CONNECT")
+
 	// perform connect
 	if err = d.connFunc(); err != nil {
 		return fmt.Errorf("could not connect to the device: %v", err)
@@ -217,6 +219,8 @@ func (d *BaseDevice) disconnect(ignoreDone bool) (err error) {
 	if !d.connected {
 		return
 	}
+
+	log.Printf("DEVICE: DISCONNECT")
 
 	// when we know the streamer goroutine has
 	// exited, we should skip this step
@@ -262,6 +266,8 @@ func (d *BaseDevice) Record() (err error) {
 		return fmt.Errorf("device is not connected")
 	}
 
+	log.Printf("DEVICE: RECORD")
+
 	if d.recorder = d.recorderFunc(); d.recorder == nil {
 		return fmt.Errorf("no recorder was provided")
 	}
@@ -281,6 +287,8 @@ func (d *BaseDevice) Stop() (outFile string, err error) {
 	if !d.recording {
 		return
 	}
+
+	log.Printf("DEVICE: STOP RECORDING")
 
 	if outFile, err = d.recorder.Stop(); err != nil {
 		log.Printf("could not shut down the recorder: %v", err)

@@ -6,6 +6,7 @@ package avatar
 import (
 	"errors"
 	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/formats"
 	"io"
 	"log"
 	"os"
@@ -31,10 +32,10 @@ type AvatarDevice struct {
 	serialPort string // serial port like /dev/tty.AvatarEEG03009-SPPDev
 }
 
-// NewAvatarDevice creates a new AvatarEEG connection. The user 
-// can then start streaming data by calling Connect() and reading the 
+// NewAvatarDevice creates a new AvatarEEG connection. The user
+// can then start streaming data by calling Connect() and reading the
 // output channel.
-func NewAvatarDevice(serialPort string) *AvatarDevice {
+func NewAvatarDevice(serialPort, repo string) *AvatarDevice {
 	var (
 		reader io.ReadCloser
 	)
@@ -57,7 +58,7 @@ func NewAvatarDevice(serialPort string) *AvatarDevice {
 	}
 
 	recorderProvider := func() Recorder {
-		return new(FileRecorder)
+		return NewOBFRecorder(repo)
 	}
 
 	return &AvatarDevice{

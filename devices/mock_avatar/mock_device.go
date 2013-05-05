@@ -5,7 +5,8 @@ package mock_avatar
 
 import (
 	. "github.com/jbrukh/goavatar"
-	. "github.com/jbrukh/goavatar/devices/avatar"
+	"github.com/jbrukh/goavatar/etc"
+	. "github.com/jbrukh/goavatar/formats"
 	"time"
 )
 
@@ -19,7 +20,7 @@ type MockDevice struct {
 
 // Mock AvatarEEG device that plays pre-recorded frames on
 // repeat.
-func NewMockDevice() *MockDevice {
+func NewMockDevice(repo string) *MockDevice {
 
 	// CONNECT
 	connFunc := func() error {
@@ -41,7 +42,7 @@ func NewMockDevice() *MockDevice {
 			if c.ShouldTerminate() {
 				return nil
 			}
-			c.Send(MockAvatarFrames[tick%len(MockAvatarFrames)])
+			c.Send(etc.MockAvatarFrames[tick%len(etc.MockAvatarFrames)])
 			tick++
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}
@@ -49,7 +50,7 @@ func NewMockDevice() *MockDevice {
 	}
 
 	recorderProvider := func() Recorder {
-		return new(FileRecorder)
+		return NewOBFRecorder(repo)
 	}
 
 	return &MockDevice{

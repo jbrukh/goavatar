@@ -15,6 +15,7 @@ import (
 
 const (
 	DefaultSerialPort = "/dev/tty.AvatarEEG03009-SPPDev"
+	DefaultRepo       = "var"
 	DefaultListenPort = 8000
 	ControlEndpoint   = "/control"
 	DataEndpoint      = "/device"
@@ -26,6 +27,7 @@ var (
 	listenPort *int    = flag.Int("listenPort", DefaultListenPort, "the websocket port on which to listen")
 	verbose    *bool   = flag.Bool("verbose", false, "whether the socket is verbose (shows outgoing data)")
 	integers   *bool   = flag.Bool("integers", false, "whether to return integral data")
+	repo       *string = flag.String("repo", DefaultRepo, "directory where recordings are stored")
 )
 
 func main() {
@@ -34,9 +36,9 @@ func main() {
 
 	// get the device
 	if *mockDevice {
-		device = NewMockDevice()
+		device = NewMockDevice(*repo)
 	} else {
-		device = NewAvatarDevice(*serialPort)
+		device = NewAvatarDevice(*serialPort, *repo)
 	}
 	log.Printf("Device:\t%v", device.Name())
 	log.Printf("Control:\thttp://localhost:%d%s", *listenPort, ControlEndpoint)

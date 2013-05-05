@@ -3,24 +3,37 @@ goavatar
 
 Go parser and websocket server for the AvatarEEG data stream.
 
+Overview
+========
+
+    bin/          scripts for installing and testing
+
+    cmd/
+        obf/      the Octopus Binary Format viewer        (see: obf --help)
+        octopus/  the Octopus Connector websocket server  (see: octopus --help)
+        streamer/ the gplot-based real-time data streamer (see: streamer --help)
+    
+    devices/      devices we currently support (AvatarEEG and MockAvatarEEG)
+
+    etc/          tools for testing
+
+    formats/      codecs and file recorders for OBF
+
+    var/          empty directory for testing files
+
+    .             framework files      
+
 Installation
 ============
 
-To get the repo:
+You will need Go 1.1 and <code>gplot</code> if you want to use the streamer. To get the repo:
 
     $ go get -u github.com/jbrukh/goavatar
 
-Then, to install the Octopus server:
-
-    $ go install github.com/jbrukh/goavatar/cmd/octopus
-
-Make sure the $GOPATH/bin directory is in your PATH and
-
-    $ octopus
-
-To compile, test, and install everything, try:
+To compile, test, and install everything:
 
     $ bin/release.sh
+
 
 Mock Device
 ===========
@@ -142,6 +155,55 @@ Protocol
         //Timestamp int64      `json:"timestamp"` // timestamp corresponding to this data sample
 
     }
+
+OBF Viewer
+==========
+
+    $ time obf var/12fb51e907ea112a | head -40
+    # Octopus Binary Format.
+    #
+    # Copyright (c) 2013. Jake Brukhman/Octopus.
+    # All rights reserved.
+    #
+    # HEADER ----------------------------------
+    # DataType:       1
+    # FormatVersion:  1
+    # StorageMode:    1
+    # Channels:       2
+    # Samples:        1520
+    # SampleRate:     250
+    # ------------------------------------------
+    timestamp,channel1,channel2
+    1345796045054931640,0.50088380277156829834,0.50130996108055114746
+    1345796045058931640,0.50079300999641418457,0.50126963853836059570
+    1345796045062931640,0.50051495432853698730,0.50136803090572357178
+    1345796045066931640,0.50027900934219360352,0.50124102830886840820
+    1345796045070931640,0.50031083822250366211,0.50137455761432647705
+    1345796045074931640,0.50034177303314208984,0.50138631463050842285
+    1345796045078931640,0.50037132203578948975,0.50136722624301910400
+    1345796045082931640,0.50039720535278320312,0.50129100680351257324
+    1345796045086931640,0.50042653083801269531,0.50134509801864624023
+    1345796045090931640,0.50045697391033172607,0.50128161907196044922
+    1345796045094931640,0.50048710405826568604,0.50140835344791412354
+    1345796045098931640,0.50051616132259368896,0.50131402909755706787
+    1345796045102931640,0.50054503977298736572,0.50132882595062255859
+    1345796045106931640,0.50057396292686462402,0.50134214758872985840
+    1345796045110931640,0.50060141086578369141,0.50126892328262329102
+    1345796045114931640,0.50062935054302215576,0.50138886272907257080
+    1345796045118896484,0.50065769255161285400,0.50123070180416107178
+    1345796045122896484,0.50068885087966918945,0.50134089589118957520
+    1345796045126896484,0.50071911513805389404,0.50133928656578063965
+    1345796045130896484,0.50074808299541473389,0.50131858885288238525
+    1345796045134896484,0.50077910721302032471,0.50128304958343505859
+    1345796045138896484,0.50081008672714233398,0.50137670338153839111
+    1345796045142896484,0.50084093213081359863,0.50131501257419586182
+    1345796045146896484,0.50086618959903717041,0.50137008726596832275
+    1345796045150896484,0.50089269876480102539,0.50136709213256835938
+    1345796045154896484,0.50092291831970214844,0.50139266252517700195
+
+    real    0m0.018s
+    user    0m0.013s
+    sys 0m0.005s
 
 License
 =======

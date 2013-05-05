@@ -1,11 +1,11 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package avatar
+package etc
 
 import (
-	"time"
 	. "github.com/jbrukh/goavatar"
+	"time"
 )
 
 var MockAvatarFrames = []*AvatarDataFrame{

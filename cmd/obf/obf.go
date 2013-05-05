@@ -30,6 +30,7 @@ const headerFmt = `# HEADER ----------------------------------
 # StorageMode:    %d
 # Channels:       %d
 # Samples:        %d
+# SampleRate:     %d
 # ------------------------------------------
 `
 
@@ -62,7 +63,8 @@ func main() {
 
 	if !*csv {
 		// format the header
-		fmt.Printf(headerFmt, header.DataType, header.FormatVersion, header.StorageMode, header.Channels, header.Samples)
+		fmt.Printf(headerFmt, header.DataType, header.FormatVersion,
+			header.StorageMode, header.Channels, header.Samples, header.SampleRate)
 	}
 
 	// format the data
