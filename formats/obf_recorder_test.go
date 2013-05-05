@@ -4,7 +4,7 @@
 package formats
 
 import (
-	//. "github.com/jbrukh/goavatar/devices/avatar"
+	"github.com/jbrukh/goavatar/etc"
 	//"log"
 	"encoding/binary"
 	"os"
@@ -21,13 +21,13 @@ func TestWriteAndHeader(t *testing.T) {
 		t.Errorf("error starting: %v", err)
 	}
 
-	frame := MockAvatarFrames[0]
+	frame := etc.MockAvatarFrames[0]
 	err = r.ProcessFrame(frame)
 	if err != nil {
 		t.Errorf("error processing frame: %v", err)
 	}
 
-	err = r.ProcessFrame(MockAvatarFrames[1])
+	err = r.ProcessFrame(etc.MockAvatarFrames[1])
 	if err != nil {
 		t.Errorf("error processing frame: %v", err)
 	}

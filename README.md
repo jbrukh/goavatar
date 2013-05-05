@@ -28,7 +28,7 @@ Installation
 
 You will need Go 1.1 and <code>gplot</code> if you want to use the streamer. To get the repo:
 
-    $ go get -u github.com/jbrukh/goavatar
+    $ go get -u -v github.com/jbrukh/goavatar/...
 
 To compile, test, and install everything:
 

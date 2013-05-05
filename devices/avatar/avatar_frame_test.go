@@ -5,6 +5,7 @@ package avatar
 
 import (
 	//"fmt"
+	"github.com/jbrukh/goavatar/etc"
 	"testing"
 )
 
@@ -81,7 +82,7 @@ func TestChannels(t *testing.T) {
 }
 
 func TestTimestamps(t *testing.T) {
-	df := MockAvatarFrames[0]
+	df := etc.MockAvatarFrames[0]
 	if df.SampleRate() != 250 {
 		t.Errorf("expecting frame to have 250 sample rate, but not the case")
 	}
