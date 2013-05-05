@@ -1,3 +1,6 @@
+//
+// Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
+//
 package formats
 
 import (
@@ -58,7 +61,7 @@ func (r *OBFRecorder) Start() (err error) {
 			if !ok {
 				return
 			}
-			log.Printf("writing frame: %v", df)
+			//log.Printf("writing frame: %v", df)
 			// write the frame, or send back an error
 			if err := r.codec.WriteParallelFrame(df); err != nil {
 				log.Printf("sending err")

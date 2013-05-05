@@ -12,11 +12,15 @@ To get the repo:
 
 Then, to install the Octopus server:
 
-    $ go install github.com/jbrukh/goavatar/octopus
+    $ go install github.com/jbrukh/goavatar/cmd/octopus
 
 Make sure the $GOPATH/bin directory is in your PATH and
 
     $ octopus
+
+To compile, test, and install everything, try:
+
+    $ bin/release.sh
 
 Mock Device
 ===========
