@@ -24,7 +24,7 @@ type Recorder interface {
 	Stop() (id string, err error)
 }
 
-// DEPRECATED -- use OctopusFileRecorder
+// DEPRECATED -- use OPFRecorder
 type FileRecorder struct {
 	file     *os.File
 	m        io.Writer

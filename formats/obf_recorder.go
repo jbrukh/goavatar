@@ -81,7 +81,7 @@ func (r *OBFRecorder) ProcessFrame(df DataFrame) error {
 	select {
 	case err := <-r.cerr:
 		close(r.out)
-		r.rollbackFile()
+		r.RollbackFile()
 		return err
 	default:
 		r.out <- df
@@ -127,7 +127,7 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 	return filepath.Base(r.fileName), nil
 }
 
-func (r *OBFRecorder) rollbackFile() {
+func (r *OBFRecorder) RollbackFile() {
 	fileName := r.file.Name()
 	log.Printf("rolling back %s due to error", fileName)
 	r.file.Close()

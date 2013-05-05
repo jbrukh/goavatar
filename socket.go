@@ -192,12 +192,13 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 	r := new(ConnectResponse)
 	r.MessageType = "connect"
 	r.Id = msg.Id
+	r.Success = false
+	defer s.SendResponse(r)
 
 	// should we disconnect?
 	if !msg.Connect {
 		err := s.device.Disconnect()
 		if err != nil {
-			r.Success = false
 			r.Status = "error"
 			r.Err = err.Error()
 		} else {
@@ -209,7 +210,7 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 			default:
 			}
 		}
-		goto Respond
+		return
 	}
 
 	// should we connect?
@@ -217,22 +218,20 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 
 		// are the parameters sane?
 		if msg.Pps < 1 || msg.Pps > 250 {
-			r.Success = false
 			r.Err = "pps should be between 1 and 250"
-			goto Respond
+			return
 		}
 
 		if msg.BatchSize > msg.Pps {
-			r.Success = false
 			r.Err = "batchSize should not exceed pps"
-			goto Respond
+			return
 		}
 
 		// maybe someone is already using it
 		if s.device.Connected() {
-			r.Success = false
 			r.Status = "busy"
 			r.Err = "device is already connected"
+			return
 		}
 
 		// ok, now we can tell the data endpoint
@@ -252,22 +251,17 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 			// an "armed" state, so we have succeeded
 			r.Success = true
 			r.Status = "armed"
-			goto Respond
+			return
 
 		default:
 			// the kickoff channel is blocked, so some
 			// other request has armed the device for
 			// streaming
-			r.Success = false
 			r.Status = "armed"
 			r.Err = "device is already armed"
-			goto Respond
+			return
 		}
-
 	}
-
-Respond:
-	s.SendResponse(r)
 }
 
 func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
@@ -282,10 +276,11 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.MessageType = "record"
 	r.Id = msg.Id
 	r.Success = false
+	defer s.SendResponse(r)
 
 	if !s.device.Connected() {
 		r.Err = "device is not streaming"
-		goto Respond
+		return
 	}
 
 	if !msg.Record {
@@ -294,25 +289,22 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 			r.Success = true
 			r.ResourceId = outFile
 		}
-		goto Respond
+		return
 	}
 
 	if msg.Record {
 		if s.device.Recording() {
 			r.Err = "already recording"
-			goto Respond
+			return
 		}
 
 		err = s.device.Record()
 		if err != nil {
 			r.Err = err.Error()
-			goto Respond
+			return
 		}
 		r.Success = true
 	}
-
-Respond:
-	s.SendResponse(r)
 }
 
 func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
@@ -328,8 +320,8 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 	r.Id = msg.Id
 	r.Success = false
 
-	//Respond:
-	s.SendResponse(r)
+	defer s.SendResponse(r)
+	// TODO
 }
 
 func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocket.Conn) {
