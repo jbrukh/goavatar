@@ -12,6 +12,7 @@ import (
 )
 
 var humanTime *bool = flag.Bool("humanTime", false, "format timestamps")
+var csv *bool = flag.Bool("csv", false, "output strict CSV")
 
 func init() {
 	flag.Parse()
@@ -33,6 +34,7 @@ const headerFmt = `# HEADER ----------------------------------
 `
 
 func main() {
+	// read the options and args
 	args := flag.Args()
 	if len(args) < 1 {
 		fmt.Println("usage: obf [opts] [file]")
@@ -40,6 +42,7 @@ func main() {
 	}
 	fileName := args[0]
 
+	// open the file to read
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0655)
 	if err != nil {
 		fmt.Printf("could not open file: %v\n", err)
@@ -47,8 +50,9 @@ func main() {
 	}
 	defer file.Close()
 
-	fmt.Println(preludeFmt)
-
+	if !*csv {
+		fmt.Println(preludeFmt)
+	}
 	codec := NewOBFCodec(file)
 	header, err := codec.ReadHeader()
 	if err != nil {
@@ -56,13 +60,15 @@ func main() {
 		return
 	}
 
-	// format the header
-	fmt.Printf(headerFmt, header.DataType, header.FormatVersion, header.StorageMode, header.Channels, header.Samples)
+	if !*csv {
+		// format the header
+		fmt.Printf(headerFmt, header.DataType, header.FormatVersion, header.StorageMode, header.Channels, header.Samples)
+	}
 
 	// format the data
 	fmt.Print("timestamp")
 	for i := 0; i < int(header.Channels); i++ {
-		fmt.Printf(", channel%d", i+1)
+		fmt.Printf(",channel%d", i+1)
 	}
 	fmt.Println()
 
@@ -85,7 +91,7 @@ func main() {
 			fmt.Printf("%v", ts)
 		}
 		for i := 0; i < ch; i++ {
-			fmt.Printf(", %.25f", values[i])
+			fmt.Printf(",%.20f", values[i])
 		}
 		fmt.Println()
 	}

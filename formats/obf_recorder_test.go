@@ -27,6 +27,11 @@ func TestWriteAndHeader(t *testing.T) {
 		t.Errorf("error processing frame: %v", err)
 	}
 
+	err = r.ProcessFrame(MockAvatarFrames[1])
+	if err != nil {
+		t.Errorf("error processing frame: %v", err)
+	}
+
 	id, err := r.Stop()
 	if err != nil {
 		t.Errorf("error stopping: %v", err)
@@ -52,7 +57,7 @@ func TestWriteAndHeader(t *testing.T) {
 	}
 
 	// sanity check the header
-	if header.Channels != 2 || header.DataType != DataTypeRaw || header.FormatVersion != FormatVersion1 || header.Samples != 16 {
+	if header.Channels != 2 || header.DataType != DataTypeRaw || header.FormatVersion != FormatVersion1 || header.Samples != 32 {
 		t.Errorf("header is shot: %v", header)
 	}
 
