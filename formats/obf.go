@@ -193,7 +193,8 @@ func (s *OBFCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
 	return
 }
 
-func (s *OBFCodec) ReadDataFrame() (b *SamplingBuffer, err error) {
+// Convert the entire file into a DataFrame.
+func (s *OBFCodec) ReadDataFrame() (df DataFrame, err error) {
 	// TODO
 	return
 }
