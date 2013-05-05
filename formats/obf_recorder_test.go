@@ -58,10 +58,23 @@ func TestWriteAndHeader(t *testing.T) {
 		t.Errorf("could not seek values: %v", err)
 	}
 
-	var val float64
-	v := frame.Buffer().ParallelData(0)[0]
-	binary.Read(file, binary.BigEndian, &val)
-	if val != v {
-		t.Errorf("values don't match; expected %d but got %d", v, val)
+	ts := frame.Timestamps()
+	for s := 0; s < frame.Samples(); s++ {
+		var (
+			val        float64
+			blockValue = frame.Buffer().ParallelData(s)
+			tVal       int64
+		)
+		for c := 0; c < frame.Channels(); c++ {
+			binary.Read(file, binary.BigEndian, &val)
+			if val != blockValue[c] {
+				t.Errorf("values don't match; expected %d but got %d", blockValue[c], val)
+			}
+		}
+		binary.Read(file, binary.BigEndian, &tVal)
+		if tVal != ts[s] {
+			t.Errorf("timestamps don't match; expected %d but got %d", ts[s], t)
+		}
 	}
+
 }
