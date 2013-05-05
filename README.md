@@ -26,14 +26,15 @@ Overview
 Installation
 ============
 
-You will need Go 1.1 and <code>gplot</code> if you want to use the streamer. To get the repo:
+You will need Go 1.1 and <code>gplot</code> if you want to use the streamer. Make sure your <code>$GOPATH</code> is set. To get the repo:
 
     $ go get -u -v github.com/jbrukh/goavatar/...
 
-To compile, test, and install everything:
+This installs the repo into <code>$GOPATH/src/github.com/jbrukh/goavatar</code>. To compile, test, and install everything:
 
     $ bin/release.sh
 
+Make sure <code>$GOPATH/bin</code> is on your <code>PATH</code>.
 
 Mock Device
 ===========
