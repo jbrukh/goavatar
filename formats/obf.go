@@ -126,7 +126,7 @@ func (s *OBFCodec) SeekSample(n int) (err error) {
 		return fmt.Errorf("no such sample")
 	}
 
-	blockSize := int(s.header.Channels + 1)
+	blockSize := int(s.header.Channels+1) * 8
 	offset := int64(OBFHeaderSize + blockSize*n)
 	_, err = s.file.Seek(offset, os.SEEK_SET)
 	return
@@ -195,6 +195,34 @@ func (s *OBFCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
 
 // Convert the entire file into a DataFrame.
 func (s *OBFCodec) ReadDataFrame() (df DataFrame, err error) {
-	// TODO
+	switch s.header.StorageMode {
+	case StorageModeParallel:
+		var (
+			ch         = int(s.header.Channels)
+			samples    = int(s.header.Samples)
+			sampleRate = int(s.header.SampleRate)
+			buf        = NewSamplingBuffer(ch, samples, 1)
+			timestamps = make([]int64, samples)
+		)
+
+		// for each sample
+		for i := 0; i < samples; i++ {
+			if err = s.SeekSample(i); err != nil {
+				return nil, err
+			}
+			values, ts, err := s.ReadParallelBlock()
+			if err != nil {
+				return nil, err
+			}
+			buf.PushSlice(values)
+			timestamps[i] = ts
+		}
+
+		df = NewGenericDataFrame(buf, ch, samples, sampleRate, timestamps)
+		return
+	case StorageModeSequential:
+	default:
+		return nil, fmt.Errorf("unknown storage mode")
+	}
 	return
 }

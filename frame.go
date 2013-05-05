@@ -23,9 +23,17 @@ type GenericDataFrame struct {
 	channels   int
 	samples    int
 	sampleRate int
-	received   time.Time
-	generated  time.Time
 	timestamps []int64
+}
+
+func NewGenericDataFrame(buffer *SamplingBuffer, channels, samples, sampleRate int, timestamps []int64) *GenericDataFrame {
+	return &GenericDataFrame{
+		buffer:     buffer,
+		channels:   channels,
+		samples:    samples,
+		sampleRate: sampleRate,
+		timestamps: timestamps,
+	}
 }
 
 func (df *GenericDataFrame) Buffer() *SamplingBuffer {
@@ -45,11 +53,11 @@ func (df *GenericDataFrame) SampleRate() int {
 }
 
 func (df *GenericDataFrame) Received() time.Time {
-	return time.Now() // TODO
+	return NanosToTime(df.timestamps[0]) // TODO
 }
 
 func (df *GenericDataFrame) Generated() time.Time {
-	return time.Now() // TODO
+	return NanosToTime(df.timestamps[0])
 }
 
 func (df *GenericDataFrame) Timestamps() []int64 {

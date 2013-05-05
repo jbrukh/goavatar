@@ -8,12 +8,16 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/formats"
+	"github.com/jbrukh/gplot"
 	"os"
 	"time"
 )
 
-var humanTime *bool = flag.Bool("humanTime", false, "format timestamps")
-var csv *bool = flag.Bool("csv", false, "output strict CSV")
+var (
+	humanTime *bool = flag.Bool("humanTime", false, "format timestamps")
+	csv       *bool = flag.Bool("csv", false, "output strict CSV")
+	plot      *bool = flag.Bool("plot", false, "ouput the series on a gplot graph")
+)
 
 func init() {
 	flag.Parse()
@@ -35,6 +39,9 @@ const headerFmt = `# HEADER ----------------------------------
 # ------------------------------------------
 `
 
+//
+// WARNING: this is a work in progress and only supports two channels.
+//
 func main() {
 	// read the options and args
 	args := flag.Args()
@@ -75,7 +82,46 @@ func main() {
 	}
 	fmt.Println()
 
-	ch, samples := int(header.Channels), int(header.Samples)
+	printFrames(codec)
+
+	if *plot {
+		// read the data as a data frame
+		df, err := codec.ReadDataFrame()
+		if err != nil {
+			fmt.Printf("could not read the data as a frame: %v\n", err)
+			return
+		}
+
+		p, err := gplot.NewPlotter(false)
+		if err != nil {
+			fmt.Printf("create the plot: %v\n", err)
+			return
+		}
+		defer p.Close()
+
+		//p.CheckedCmd("set yrange [0.01:0.018]")
+		p.CheckedCmd(fmt.Sprintf("set xrange [0:%v]", df.Samples()))
+		p.CheckedCmd("set terminal aqua size 1430,400")
+
+		ch := df.Channels()
+		buf := df.Buffer()
+		if ch == 1 {
+			p.PlotX(buf.ChannelData(0), "Ch1")
+		} else if ch == 2 {
+			p.Dual(buf.ChannelData(0), buf.ChannelData(1), "Ch1", "Ch2")
+		} else {
+			fmt.Printf("sorry, max 2 channels is currently supported")
+			return
+		}
+	}
+}
+
+func printFrames(codec *OBFCodec) {
+	var (
+		header  = codec.Header()
+		ch      = int(header.Channels)
+		samples = int(header.Samples)
+	)
 	for j := 0; j < samples; j++ {
 		// read each block
 		values, ts, err := codec.ReadParallelBlock()
