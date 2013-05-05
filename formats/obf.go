@@ -74,6 +74,11 @@ type (
 		Channels      uint8
 		Samples       uint32
 	}
+
+	OBFParallelBlock struct {
+		Values    []float64
+		Timestamp int64
+	}
 )
 
 // Size of the header.
@@ -84,6 +89,12 @@ const (
 	OBFHeaderAddr = 0
 	OBFValuesAddr = OBFHeaderSize
 )
+
+func NewOBFCodec(file io.ReadWriteSeeker) *OBFCodec {
+	return &OBFCodec{
+		file: file,
+	}
+}
 
 // Return the header, if it has been read. If not,
 // the nil header will be returned.
@@ -161,5 +172,21 @@ func (s *OBFCodec) WriteParallelFrame(df DataFrame) (err error) {
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
 	err = binary.Write(s.file, binary.BigEndian, buf.Bytes())
 	//log.Printf("finished: %v", err)
+	return
+}
+
+func (s *OBFCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
+	if s.header.StorageMode != StorageModeParallel {
+		return nil, 0, fmt.Errorf("can only seek samples in parallel mode")
+	}
+	ch := int(s.header.Channels)
+	values = make([]float64, ch)
+
+	err = binary.Read(s.file, binary.BigEndian, values)
+	if err != nil {
+		return
+	}
+
+	err = binary.Read(s.file, binary.BigEndian, &ts)
 	return
 }
