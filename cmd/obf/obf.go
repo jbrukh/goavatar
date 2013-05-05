@@ -6,6 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/formats"
 	"os"
 	"time"
@@ -85,9 +86,7 @@ func main() {
 
 		// print the values and timestamp
 		if *humanTime {
-			nsec := ts % 1000000000
-			sec := (ts - nsec) / 1000000000
-			human := time.Unix(sec, nsec).Format(time.RFC3339Nano)
+			human := NanosToTime(ts).Format(time.RFC3339Nano)
 			fmt.Printf("%v", human)
 		} else {
 			fmt.Printf("%v", ts)

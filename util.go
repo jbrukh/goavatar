@@ -3,6 +3,10 @@
 //
 package goavatar
 
+import (
+	"time"
+)
+
 // return the average of an array
 func averageFloat64(arr []float64) float64 {
 	if len(arr) < 1 {
@@ -39,4 +43,10 @@ func absFloat64(f float64) float64 {
 		return f
 	}
 	return -f
+}
+
+func NanosToTime(nanos int64) time.Time {
+	nsec := nanos % 1000000000
+	sec := (nanos - nsec) / 1000000000
+	return time.Unix(sec, nsec)
 }
