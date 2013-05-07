@@ -39,7 +39,7 @@ func NewOBFRecorder(repo string) *OBFRecorder {
 func (r *OBFRecorder) Start() (err error) {
 	// get the file name
 	r.newFileName()
-	log.Printf("opening file for writing: %v", r.fileName)
+	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
 
 	// open the file
 	r.file, err = os.OpenFile(r.fileName, os.O_CREATE|os.O_WRONLY, 0655)
@@ -66,7 +66,6 @@ func (r *OBFRecorder) Start() (err error) {
 			//log.Printf("writing frame: %v", df)
 			// write the frame, or send back an error
 			if err := r.codec.WriteParallelFrame(df); err != nil {
-				log.Printf("sending err")
 				r.cerr <- err
 				return
 			}
@@ -106,7 +105,7 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 	}
 
 	defer func() {
-		log.Printf("closing the file: %v", r.fileName)
+		log.Printf("OBFRecorder: closing the file: %v", r.fileName)
 		r.file.Close()
 	}()
 
@@ -120,7 +119,6 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 		SampleRate:    uint16(r.sampleRate),
 	}
 
-	log.Printf("writing the header: %v", header)
 	if err = r.codec.WriteHeader(header); err != nil {
 		return "", err
 	}
@@ -129,10 +127,10 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 
 func (r *OBFRecorder) RollbackFile() {
 	fileName := r.file.Name()
-	log.Printf("rolling back %s due to error", fileName)
+	log.Printf("OBFRecorder: rolling back %s due to error", fileName)
 	r.file.Close()
 	if err := os.Remove(fileName); err != nil {
-		log.Printf("could not remove the file: %s", fileName)
+		log.Printf("OBFRecorder: could not remove the file: %s", fileName)
 	}
 }
 

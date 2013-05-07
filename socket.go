@@ -62,6 +62,7 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	// return the actual handler function
 	return func(conn *websocket.Conn) {
 		defer conn.Close()
+		defer device.Disconnect()
 		controller := &SocketController{
 			conn:    conn,
 			kickoff: kickoff, // there is only one kickoff channel
@@ -164,8 +165,6 @@ func (s *SocketController) SendResponse(r interface{}) {
 }
 
 func (s *SocketController) ProcessInfoMessage(msgBytes []byte, id string) {
-	log.Printf("INFO MESSAGE")
-
 	var msg InfoMessage
 	if err := json.Unmarshal(msgBytes, &msg); err != nil {
 		s.SendErrorResponse(id, err.Error())
@@ -182,7 +181,6 @@ func (s *SocketController) ProcessInfoMessage(msgBytes []byte, id string) {
 }
 
 func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
-	log.Printf("CONNECT MESSAGE")
 	var msg ConnectMessage
 	if err := json.Unmarshal(msgBytes, &msg); err != nil {
 		s.SendErrorResponse(id, err.Error())
@@ -265,7 +263,6 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 }
 
 func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
-	log.Printf("RECORD MESSAGE")
 	var msg RecordMessage
 	var err error
 	if err = json.Unmarshal(msgBytes, &msg); err != nil {
@@ -308,7 +305,6 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 }
 
 func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
-	log.Printf("UPLOAD MESSAGE")
 	var msg UploadMessage
 	var err error
 	if err = json.Unmarshal(msgBytes, &msg); err != nil {
@@ -352,9 +348,9 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 
 func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 	log.Printf("DEVICE: STREAMING ON")
+	defer device.Disconnect()
 	defer log.Printf("DEVICE: STREAMING OFF")
 	out := device.Out()
-	//defer device.Disconnect()
 
 	// diagnose the situation
 	df, ok := <-out
@@ -420,33 +416,33 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 			batch := b.SampleNext(absBatchSize)
 
 			// send it off
-			go func() {
-				msg := new(DataMessage)
-				msg.LatencyMs = absFloat64(mean_diff - d)
-				if integers {
-					msg.Ints = make([][]int64, channels)
-					for i, _ := range msg.Ints {
-						ch := batch.ChannelData(i)
-						msg.Ints[i] = make([]int64, len(ch))
-						for j, _ := range msg.Ints[i] {
-							msg.Ints[i][j] = int64(ch[j] * float64(Multiplier))
-						}
-					}
-				} else {
-					msg.Data = make([][]float64, channels)
-					for i, _ := range msg.Data {
-						msg.Data[i] = batch.ChannelData(i)
+			//	go func() {
+			msg := new(DataMessage)
+			msg.LatencyMs = absFloat64(mean_diff - d)
+			if integers {
+				msg.Ints = make([][]int64, channels)
+				for i, _ := range msg.Ints {
+					ch := batch.ChannelData(i)
+					msg.Ints[i] = make([]int64, len(ch))
+					for j, _ := range msg.Ints[i] {
+						msg.Ints[i][j] = int64(ch[j] * float64(Multiplier))
 					}
 				}
-				if verbose {
-					log.Printf("sending data msg: %+v", msg)
+			} else {
+				msg.Data = make([][]float64, channels)
+				for i, _ := range msg.Data {
+					msg.Data[i] = batch.ChannelData(i)
 				}
-				err := websocket.JSON.Send(conn, msg)
-				if err != nil {
-					log.Printf("error sending data msg: %v\n", err)
-					kill <- true
-				}
-			}()
+			}
+			if verbose {
+				log.Printf("sending data msg: %+v", msg)
+			}
+			err := websocket.JSON.Send(conn, msg)
+			if err != nil {
+				log.Printf("error sending data msg: %v\n", err)
+				kill <- true
+			}
+			//	}()
 		}
 	}
 }

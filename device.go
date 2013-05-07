@@ -176,7 +176,7 @@ func (d *BaseDevice) Connect() (err error) {
 		return fmt.Errorf("already connected to the device")
 	}
 
-	log.Printf("DEVICE: CONNECT")
+	log.Printf("%s: CONNECT", d.Name())
 
 	// perform connect
 	if err = d.connFunc(); err != nil {
@@ -220,7 +220,7 @@ func (d *BaseDevice) disconnect(ignoreDone bool) (err error) {
 		return
 	}
 
-	log.Printf("DEVICE: DISCONNECT")
+	log.Printf("%s: DISCONNECT", d.Name())
 
 	// when we know the streamer goroutine has
 	// exited, we should skip this step
@@ -231,8 +231,7 @@ func (d *BaseDevice) disconnect(ignoreDone bool) (err error) {
 	// if we are in the process of recording, we
 	// should stop
 	if d.recording {
-		d.recorder.Stop()
-		d.recording = false
+		d.stop()
 	}
 
 	// disconnect
@@ -257,7 +256,10 @@ func (d *BaseDevice) Out() <-chan DataFrame {
 func (d *BaseDevice) Record() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
+	return d.record()
+}
 
+func (d *BaseDevice) record() (err error) {
 	if d.recording {
 		return fmt.Errorf("already recording")
 	}
@@ -266,7 +268,7 @@ func (d *BaseDevice) Record() (err error) {
 		return fmt.Errorf("device is not connected")
 	}
 
-	log.Printf("DEVICE: RECORD")
+	log.Printf("%s: RECORD", d.Name())
 
 	if d.recorder = d.recorderFunc(); d.recorder == nil {
 		return fmt.Errorf("no recorder was provided")
@@ -283,22 +285,25 @@ func (d *BaseDevice) Record() (err error) {
 func (d *BaseDevice) Stop() (outFile string, err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
+	return d.stop()
+}
+
+func (d *BaseDevice) stop() (outFile string, err error) {
+	log.Printf("got to recording...")
 
 	if !d.recording {
 		return
 	}
 
-	log.Printf("DEVICE: STOP RECORDING")
+	log.Printf("%s: STOP RECORDING", d.Name())
 
 	if outFile, err = d.recorder.Stop(); err != nil {
 		log.Printf("could not shut down the recorder: %v", err)
 	}
 	d.recorder = nil
-
 	d.recording = false
 	return
 }
-
 func (d *BaseDevice) Recording() bool {
 	d.lock.Lock()
 	defer d.lock.Unlock()
