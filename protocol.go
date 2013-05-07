@@ -47,6 +47,7 @@ type (
 		MessageType string `json:"message_type"` // should be "upload"
 		Token       string `json:"token"`        // authentication token for upload
 		ResourceId  string `json:"resource_id"`  // id of the resource to upload
+		Endpoint    string `json:"endpoint"`     // domain-qualified endpoint to upload to
 	}
 
 	// Base type for response messages.
@@ -84,7 +85,6 @@ type (
 		MessageType string `json:"message_type"` // will be "upload"
 		Success     bool   `json:"success"`      // whether or not the control message was successful
 		Err         string `json:"err"`          // error text, if any
-		ResourceUrl string `json:"resource_url"` // url of the uploaded resource
 	}
 
 	InfoResponse struct {
