@@ -40,9 +40,9 @@ func main() {
 	} else {
 		device = NewAvatarDevice(*serialPort, *repo)
 	}
-	log.Printf("Device:\t%v", device.Name())
-	log.Printf("Control:\thttp://localhost:%d%s", *listenPort, ControlEndpoint)
-	log.Printf("Data:\thttp://localhost:%d%s", *listenPort, DataEndpoint)
+	fmt.Printf("Device:   %v\n", device.Name())
+	fmt.Printf("Control:  http://localhost:%d%s\n", *listenPort, ControlEndpoint)
+	fmt.Printf("Data:     http://localhost:%d%s\n", *listenPort, DataEndpoint)
 	port := fmt.Sprintf(":%d", *listenPort)
 
 	http.Handle(ControlEndpoint, ControlHandler(device, *verbose))
