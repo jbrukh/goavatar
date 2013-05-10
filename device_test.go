@@ -64,6 +64,7 @@ func newEmptyDevice() *BaseDevice {
 		disconnFunc,
 		streamFunc,
 		recorderProvider,
+		"var",
 	)
 }
 

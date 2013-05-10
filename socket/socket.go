@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 //---------------------------------------------------------//
@@ -316,8 +317,21 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 	r.MessageType = "upload"
 	r.Id = msg.Id
 	r.Success = false
-
 	defer s.SendResponse(r)
+	// perform the upload
+	var (
+		resId    = msg.ResourceId
+		token    = msg.Token
+		endpoint = fmt.Sprintf(UploadEndpoint, resId)
+		file     = filepath.Join(s.device.Repo(), resId)
+	)
+
+	err = UploadOBFFile(file, endpoint, token)
+	if err != nil {
+		r.Err = err.Error()
+		return
+	}
+
 	// TODO
 }
 

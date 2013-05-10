@@ -11,7 +11,7 @@ import (
 
 const UploadEndpoint = "http://localhost:3000/recordings/%s/results"
 
-func UploadOBFFile(file string, endpoint string, token string) (r *http.Response, err error) {
+func UploadOBFFile(file string, endpoint string, token string) (err error) {
 	log.Printf("uploading file %s to endpoint: %s", file, endpoint)
 
 	// Create buffer
