@@ -2,6 +2,7 @@ package socket
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
