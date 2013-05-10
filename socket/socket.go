@@ -318,11 +318,12 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 	r.Id = msg.Id
 	r.Success = false
 	defer s.SendResponse(r)
+
 	// perform the upload
 	var (
 		resId    = msg.ResourceId
 		token    = msg.Token
-		endpoint = fmt.Sprintf(UploadEndpoint, resId)
+		endpoint = msg.Endpoint
 		file     = filepath.Join(s.device.Repo(), resId)
 	)
 
@@ -332,7 +333,6 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 		return
 	}
 
-	// TODO
 }
 
 func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocket.Conn) {
