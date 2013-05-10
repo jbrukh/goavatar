@@ -1,4 +1,4 @@
-package goavatar
+package socket
 
 //---------------------------------------------------------//
 // Messages

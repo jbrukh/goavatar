@@ -9,6 +9,7 @@ import (
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/devices/avatar"
 	. "github.com/jbrukh/goavatar/devices/mock_avatar"
+	. "github.com/jbrukh/goavatar/socket"
 	"log"
 	"net/http"
 )

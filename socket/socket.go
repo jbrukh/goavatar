@@ -1,12 +1,13 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package goavatar
+package socket
 
 import (
 	"code.google.com/p/go.net/websocket"
 	"encoding/json"
 	"fmt"
+	. "github.com/jbrukh/goavatar"
 	"io"
 	"log"
 	"net/http"
@@ -402,7 +403,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 
 		// calculate the latency
 		frames++
-		d := absFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano()/1000000)) // diff between received and stamped time
+		d := AbsFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano()/1000000)) // diff between received and stamped time
 		mean_diff = float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
 
 		b.Append(df.Buffer())
@@ -418,7 +419,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 			// send it off
 			//	go func() {
 			msg := new(DataMessage)
-			msg.LatencyMs = absFloat64(mean_diff - d)
+			msg.LatencyMs = AbsFloat64(mean_diff - d)
 			if integers {
 				msg.Ints = make([][]int64, channels)
 				for i, _ := range msg.Ints {
