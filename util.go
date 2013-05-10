@@ -4,6 +4,8 @@
 package goavatar
 
 import (
+	"fmt"
+	"os"
 	"time"
 )
 
@@ -49,4 +51,18 @@ func NanosToTime(nanos int64) time.Time {
 	nsec := nanos % 1000000000
 	sec := (nanos - nsec) / 1000000000
 	return time.Unix(sec, nsec)
+}
+
+func Uuid() (uuid string, err error) {
+	file, err := os.OpenFile("/dev/urandom", os.O_RDONLY, 0)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	b := make([]byte, 16)
+	if _, err = file.Read(b); err != nil {
+		return
+	}
+	uuid = fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+	return
 }

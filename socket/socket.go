@@ -337,6 +337,7 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 				stream(conn, device, verbose, integers)
 			} else {
 				log.Printf("WARNING: device was already operating")
+				return
 			}
 
 		default:
@@ -348,9 +349,12 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 }
 
 func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
+	// logging
 	log.Printf("DEVICE: STREAMING ON")
-	defer device.Disconnect()
 	defer log.Printf("DEVICE: STREAMING OFF")
+
+	// device stuff
+	defer device.Disconnect()
 	out := device.Out()
 
 	// diagnose the situation
@@ -358,67 +362,71 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 	if !ok {
 		return
 	}
+	var (
+		channels  = df.Channels()
+		devicePps = df.SampleRate()
+	)
 
-	// get the channels
-	channels := df.Channels()
-	devicePps := df.SampleRate()
-
-	// just in case something went wrong
+	// check the parameters
 	if pps < 1 || pps > devicePps {
 		pps = DefaultPps
 		log.Printf("WARNING: setting default PPS")
 	}
-
 	if batchSize > pps || batchSize < 1 {
 		batchSize = DefaultBatchSize
 		log.Printf("WARNING: setting default batchSize")
 	}
 
 	// latency calculation
-	frames := 0
-	mean_diff := float64(0)
+	var (
+		frames       = 0
+		mean_diff    = float64(0)
+		sampleRate   = devicePps / pps        // now we need to sample every devicePps/pps points
+		absBatchSize = batchSize * sampleRate // actual number of data points we must read in order to obtain a sampled batch of batchSize
+		b            = NewSamplingBuffer(channels, sampleRate*batchSize*10, sampleRate)
+		kill         = make(chan bool)
 
-	// now we need to sample every devicePps/pps points
-	sampleRate := devicePps / pps
+		shouldReturn = func() bool {
+			select {
+			case <-kill:
+				return true
+			default:
+			}
+			return false
+		}
+	)
 
-	// actual number of data points we must read
-	// in order to obtain a sampled batch of batchSize
-	absBatchSize := batchSize * sampleRate
-
-	b := NewSamplingBuffer(channels, sampleRate*batchSize*10, sampleRate)
-	kill := make(chan bool)
 	for {
 		// break if there was an error sending
 		// a message over the socket
-		select {
-		case <-kill:
-			return
-		default:
-		}
+		var (
+			df DataFrame
+			ok bool
+		)
 
-		df, ok := <-out
-		if !ok {
+		if df, ok = <-out; !ok || shouldReturn() {
 			return
 		}
 
 		// calculate the latency
 		frames++
-		d := AbsFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano()/1000000)) // diff between received and stamped time
+		d := AbsFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano())) // diff between received and stamped time
 		mean_diff = float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
 
+		// put the frame into our memory buffer
 		b.Append(df.Buffer())
+
+		// while there are batches, return them
 		for b.Size() > absBatchSize {
-			select {
-			case <-kill:
+			if shouldReturn() {
 				return
-			default:
 			}
 
-			batch := b.SampleNext(absBatchSize)
+			var (
+				batch = b.SampleNext(absBatchSize)
+				msg   = new(DataMessage)
+			)
 
-			// send it off
-			//	go func() {
-			msg := new(DataMessage)
 			msg.LatencyMs = AbsFloat64(mean_diff - d)
 			if integers {
 				msg.Ints = make([][]int64, channels)
@@ -443,7 +451,6 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 				log.Printf("error sending data msg: %v\n", err)
 				kill <- true
 			}
-			//	}()
 		}
 	}
 }

@@ -4,12 +4,10 @@
 package formats
 
 import (
-	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 // Recorder that records the Octopus format.
@@ -136,6 +134,16 @@ func (r *OBFRecorder) RollbackFile() {
 
 // return the name of the recording file
 func (r *OBFRecorder) newFileName() {
-	f := fmt.Sprintf("%x", time.Now().UnixNano())
-	r.fileName = filepath.Join(r.repo, f)
+	for {
+		f, _ := Uuid()
+		r.fileName = filepath.Join(r.repo, f)
+
+		// check for clash just in case
+		_, err := os.Stat(r.fileName)
+		if err == nil {
+			continue
+		}
+		break
+	}
+
 }
