@@ -29,7 +29,7 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 	fileField.Write([]byte(file))
 
 	// create file field
-	fw, err := w.CreateFormFile("data", file)
+	fw, err := w.CreateFormFile("result[data]", file)
 	if err != nil {
 		return
 	}
