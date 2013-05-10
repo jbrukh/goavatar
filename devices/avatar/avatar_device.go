@@ -62,7 +62,7 @@ func NewAvatarDevice(serialPort, repo string) *AvatarDevice {
 	}
 
 	return &AvatarDevice{
-		BaseDevice: *NewBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc, recorderProvider),
+		BaseDevice: *NewBaseDevice("AvatarEEG", connFunc, disconnFunc, streamFunc, recorderProvider, repo),
 		serialPort: serialPort,
 	}
 }

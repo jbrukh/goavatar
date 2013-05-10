@@ -60,6 +60,7 @@ func NewMockDevice(repo string) *MockDevice {
 			disconnFunc,
 			streamFunc,
 			recorderProvider,
+			repo,
 		),
 	}
 }

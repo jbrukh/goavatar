@@ -55,6 +55,10 @@ type Device interface {
 	// Recording returns true if and only if the device is currently
 	// recording.
 	Recording() bool
+
+	// Return the path of the directory where recorder files are
+	// stored.
+	Repo() string
 }
 
 // ----------------------------------------------------------------- //
@@ -146,6 +150,7 @@ type BaseDevice struct {
 	recording bool
 	recorder  Recorder
 	control   *Control
+	repo      string
 
 	// low-level ops
 	connFunc     ConnectFunc
@@ -157,18 +162,23 @@ type BaseDevice struct {
 // Create a new base device that performs connectivity
 // and streaming based on the given function.
 func NewBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc,
-	streamFunc StreamFunc, recorderFunc RecorderProvider) *BaseDevice {
+	streamFunc StreamFunc, recorderFunc RecorderProvider, repo string) *BaseDevice {
 	return &BaseDevice{
 		name:         name,
 		connFunc:     connFunc,
 		disconnFunc:  disconnFunc,
 		streamFunc:   streamFunc,
 		recorderFunc: recorderFunc,
+		repo:         repo,
 	}
 }
 
 func (d *BaseDevice) Name() string {
 	return d.name
+}
+
+func (d *BaseDevice) Repo() string {
+	return d.repo
 }
 
 func (d *BaseDevice) Connect() (err error) {
