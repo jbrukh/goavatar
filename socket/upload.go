@@ -27,12 +27,6 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 	}
 	fileField.Write([]byte(file))
 
-	tokenField, err := w.CreateFormField("auth_token")
-	if err != nil {
-		return
-	}
-	tokenField.Write([]byte(token))
-
 	// create file field
 	fw, err := w.CreateFormFile("data", file)
 	if err != nil {
@@ -60,6 +54,7 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 	}
 
 	req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Header.Set("Authorization", token)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
