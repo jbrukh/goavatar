@@ -141,6 +141,7 @@ func (r *OBFRecorder) newFileName() {
 		// check for clash just in case
 		_, err := os.Stat(r.fileName)
 		if err == nil {
+			log.Printf("WARNING: new filename clashed with existing: %s", r.fileName)
 			continue
 		}
 		break
