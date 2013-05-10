@@ -53,8 +53,9 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 		return
 	}
 
+	tokenStr := fmt.Sprintf("auth_token %s", token)
 	req.Header.Set("Content-Type", w.FormDataContentType())
-	req.Header.Set("Authorization", token)
+	req.Header.Set("Authorization", tokenStr)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
