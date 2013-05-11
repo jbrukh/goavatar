@@ -141,8 +141,8 @@ func (control *Control) Close() {
 // no logic for streaming data and expects this functionality to
 // be parameterized.
 //
-// In particular, implementors should respect the control channel
-// and should send output data on the output channel.
+// In particular, implementors should respect the Control object
+// they are passed.
 type BaseDevice struct {
 	name      string
 	lock      sync.Mutex
