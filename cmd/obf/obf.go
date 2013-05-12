@@ -8,7 +8,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/formats"
-	"github.com/jbrukh/gplot"
+	//"github.com/jbrukh/gplot"
 	"os"
 	//"time"
 )

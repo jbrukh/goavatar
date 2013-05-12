@@ -157,7 +157,7 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 			// skip the trigger channel
 			payload = payload[AvatarPointSize:]
 		}
-		p = make([]float64, channels)
+		p := make([]float64, channels)
 		for c := range p {
 			p[c] = consumeDataPoint(payload, float64(header.VoltRange()))
 			payload = payload[AvatarPointSize:]

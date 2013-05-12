@@ -172,16 +172,18 @@ func (s *OBFCodec) ReadHeader() (header *OBFHeader, err error) {
 
 // Writes a data frame in parallel mode, assuming the writer
 // is at the correct location for the frame.
-func (s *OBFCodec) WriteParallelFrame(df DataFrame, firstTs int64) (err error) {
+func (s *OBFCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	var (
-		samples = df.Samples()
-		ts      = df.Timestamps()
+		samples  = b.Size()
+		channels = b.Channels()
 	)
 
 	buf := new(bytes.Buffer)
 	for i := 0; i < samples; i++ {
-		binary.Write(buf, binary.BigEndian, df.Buffer().ParallelData(i))
-		binary.Write(buf, binary.BigEndian, uint32((ts[i]-firstTs)/1000000))
+		io.CopyN(buf, b.Raw(), BlockBufferValueSize*int64(channels))
+		var ts int64
+		binary.Read(b.Raw(), binary.BigEndian, &ts)
+		binary.Write(buf, binary.BigEndian, uint32((ts-firstTs)/1000000))
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())

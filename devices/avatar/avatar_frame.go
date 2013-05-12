@@ -111,11 +111,6 @@ func (df *AvatarDataFrame) Buffer() *BlockBuffer {
 	return df.data
 }
 
-// ChannelData
-func (df *AvatarDataFrame) ChannelData(channel int) []float64 {
-	return df.data.ChannelData(channel)
-}
-
 // the time this data framed was received locally
 func (df *AvatarDataFrame) Received() time.Time {
 	return df.received

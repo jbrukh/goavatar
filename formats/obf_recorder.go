@@ -71,7 +71,7 @@ func (r *OBFRecorder) Start() (err error) {
 
 			//log.Printf("writing frame: %v", df)
 			// write the frame, or send back an error
-			if err := r.codec.WriteParallelFrame(df, firstTs); err != nil {
+			if err := r.codec.WriteParallel(df.Buffer(), firstTs); err != nil {
 				r.cerr <- err
 				return
 			}
