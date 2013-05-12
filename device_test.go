@@ -80,7 +80,7 @@ func newErrorProneDevice() *BaseDevice {
 type MockFrame struct {
 }
 
-func (f *MockFrame) Buffer() (data *SamplingBuffer) {
+func (f *MockFrame) Buffer() (data *BlockBuffer) {
 	return
 }
 

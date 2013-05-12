@@ -31,7 +31,6 @@ var (
 	refreshRate *int    = flag.Int("refreshRate", DefaultRefreshRate, "the number of data points to buffer before refreshing")
 	maxFrames   *int    = flag.Int("maxFrames", DefaultMaxFrames, "maximum frames to read before turning off")
 	mockDevice  *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
-	dumpFrames  *bool   = flag.Bool("dumpFrames", false, "dump frames in Go format to frames.go")
 )
 
 func init() {
@@ -79,32 +78,6 @@ func run(p *gplot.Plotter, out <-chan DataFrame) {
 	)
 
 	var frames []DataFrame
-	// if dumpFrames is true, we will buffer the data
-	// frames in memory and then dump them to frames.go
-	// at the end
-	if *dumpFrames {
-		frames = make([]DataFrame, 0)
-		defer func() {
-			var file *os.File
-			var err error
-			if *dumpFrames {
-				file, err = os.OpenFile(DumpFile,
-					os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-				if err != nil {
-					log.Printf("could not prepare dump file: %v", err)
-					return
-				}
-			}
-			defer file.Close()
-			// now output
-			t := template.Must(template.New("").ParseFiles("etc/frames.template"))
-			if err = t.ExecuteTemplate(file, "frames.template", frames); err != nil {
-				log.Printf("error dumping to template: %v", err)
-			}
-		}()
-
-	}
-
 	for i := 0; i < *maxFrames; i++ {
 		df, ok := <-out
 		if !ok {
