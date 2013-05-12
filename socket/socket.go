@@ -403,14 +403,17 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 		log.Printf("WARNING: setting default batchSize")
 	}
 
-	// latency calculation
+	streamLoop()
+}
+
+func streamLoop() {
 	var (
 		frames       = 0
 		mean_diff    = float64(0)
+		kill         = make(chan bool)
 		pluckRate    = sampleRate / pps      // now we need to sample every sampleRate/pps points
 		absBatchSize = batchSize * pluckRate // actual number of data points we must read in order to obtain a sampled batch of batchSize
 		b            = NewBlockBuffer(channels, sampleRate*batchSize*10)
-		kill         = make(chan bool)
 
 		shouldReturn = func() bool {
 			select {
@@ -421,6 +424,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 			return false
 		}
 	)
+
 	b.PluckRate(pluckRate)
 
 	for {
@@ -437,8 +441,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 
 		// calculate the latency
 		frames++
-		d := AbsFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano())) // diff between received and stamped time
-		mean_diff = float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
+		mean_diff = updateMeanDiff(frames, mean_diff, df)
 
 		// put the frame into our memory buffer
 		b.Append(df.Buffer())
@@ -455,10 +458,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 			)
 
 			msg.LatencyMs = AbsFloat64(mean_diff - d)
-			msg.Data = make([][]float64, channels)
-			for i, _ := range msg.Data {
-				msg.Data[i] = batch.ChannelData(i)
-			}
+			msg.Data = batchToArrays(batch)
 			if verbose {
 				log.Printf("sending data msg: %+v", msg)
 			}
@@ -469,4 +469,17 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 			}
 		}
 	}
+}
+
+func batchToArrays(batch *BlockBuffer) [][]float64 {
+	res := make([][]float64, batch.Channels())
+	for i := range res {
+		res[i] = make([]float64, batch.Size())
+	}
+
+}
+
+func updateMeanDiff(frames int, mean_diff float64, df DataFrame) float64 {
+	d := AbsFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano())) // diff between received and stamped time
+	mean_diff = float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
 }

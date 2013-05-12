@@ -42,6 +42,10 @@ func (b *BlockBuffer) PluckRate(k int) {
 	b.pluckRate = k
 }
 
+func (b *BlockBuffer) Channels() int {
+	return b.channels
+}
+
 // Append a data from a BlockBuffer to the existing BlockBuffer,
 // ignoring the latter's pluck rate. The BlockBuffers must be
 // comparable in the sense of channels.
@@ -86,6 +90,12 @@ func (b *BlockBuffer) DownSample(n int) (bb *BlockBuffer) {
 		b.parity = (b.parity + 1) % b.pluckRate
 	}
 	return
+}
+
+func (b *BlockBuffer) ReadBlock() (v []float64, ts int64) {
+	v = make([]float64, b.channels)
+	binary.Read(buf, binary.BigEndian, &v)
+	binary.Read(buf, binary.BigEndian, &ts)
 }
 
 func (b *BlockBuffer) appendBlocks(buf *bytes.Buffer) {
