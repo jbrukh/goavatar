@@ -89,15 +89,14 @@ type (
 		Endianness    byte
 		Reserved      [20]byte // reserved for extentions
 	}
-
-	OBFParallelBlock struct {
-		Values    []float64
-		Timestamp int64
-	}
 )
 
 // Size of the header.
-const OBFHeaderSize = 31
+const (
+	OBFHeaderSize    = 31
+	OBFTimestampSize = 4
+	OBFValueSize     = 8
+)
 
 // Fixed locations
 const (
@@ -139,7 +138,7 @@ func (s *OBFCodec) SeekSample(n int) (err error) {
 		return fmt.Errorf("no such sample")
 	}
 
-	blockSize := int(s.header.Channels+1) * 8
+	blockSize := int(s.header.Channels)*OBFValueSize + OBFTimestampSize
 	offset := int64(OBFHeaderSize + blockSize*n)
 	_, err = s.file.Seek(offset, os.SEEK_SET)
 	return
@@ -172,7 +171,7 @@ func (s *OBFCodec) ReadHeader() (header *OBFHeader, err error) {
 
 // Writes a data frame in parallel mode, assuming the writer
 // is at the correct location for the frame.
-func (s *OBFCodec) WriteParallelFrame(df DataFrame) (err error) {
+func (s *OBFCodec) WriteParallelFrame(df DataFrame, firstTs int64) (err error) {
 	var (
 		samples = df.Samples()
 		ts      = df.Timestamps()
@@ -181,7 +180,7 @@ func (s *OBFCodec) WriteParallelFrame(df DataFrame) (err error) {
 	buf := new(bytes.Buffer)
 	for i := 0; i < samples; i++ {
 		binary.Write(buf, binary.BigEndian, df.Buffer().ParallelData(i))
-		binary.Write(buf, binary.BigEndian, ts[i])
+		binary.Write(buf, binary.BigEndian, uint32((ts[i]-firstTs)/1000000))
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
@@ -190,7 +189,7 @@ func (s *OBFCodec) WriteParallelFrame(df DataFrame) (err error) {
 	return
 }
 
-func (s *OBFCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
+func (s *OBFCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
 	if s.header.StorageMode != StorageModeParallel {
 		return nil, 0, fmt.Errorf("can only seek samples in parallel mode")
 	}
@@ -207,7 +206,7 @@ func (s *OBFCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
 }
 
 // Convert the entire file into a DataFrame.
-func (s *OBFCodec) ReadDataFrame() (df DataFrame, err error) {
+func (s *OBFCodec) ReadDataFrame() (df *GenericDataFrame, err error) {
 	switch s.header.StorageMode {
 	case StorageModeParallel:
 		var (
@@ -215,7 +214,7 @@ func (s *OBFCodec) ReadDataFrame() (df DataFrame, err error) {
 			samples    = int(s.header.Samples)
 			sampleRate = int(s.header.SampleRate)
 			buf        = NewSamplingBuffer(ch, samples, 1)
-			timestamps = make([]int64, samples)
+			timestamps = make([]uint32, samples)
 		)
 
 		// for each sample

@@ -10,7 +10,7 @@ import (
 	. "github.com/jbrukh/goavatar/formats"
 	"github.com/jbrukh/gplot"
 	"os"
-	"time"
+	//"time"
 )
 
 var (
@@ -134,8 +134,8 @@ func printFrames(codec *OBFCodec) {
 
 		// print the values and timestamp
 		if *humanTime {
-			human := NanosToTime(ts).Format(time.RFC3339Nano)
-			fmt.Printf("%v", human)
+			// human := NanosToTime(ts).Format(time.RFC3339Nano)
+			panic("unsupported right now")
 		} else {
 			fmt.Printf("%v", ts)
 		}

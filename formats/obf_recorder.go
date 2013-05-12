@@ -55,15 +55,23 @@ func (r *OBFRecorder) Start() (err error) {
 	// open up the worker
 	go func() {
 		defer close(r.cerr)
+		var firstTs int64 = 0
 		for {
 			// get the frame or die
 			df, ok := <-r.out
 			if !ok {
 				return
 			}
+
+			// TODO hacky
+			if firstTs == 0 {
+				firstTs = df.Generated().UnixNano()
+				log.Printf("Seeting first at %d", firstTs)
+			}
+
 			//log.Printf("writing frame: %v", df)
 			// write the frame, or send back an error
-			if err := r.codec.WriteParallelFrame(df); err != nil {
+			if err := r.codec.WriteParallelFrame(df, firstTs); err != nil {
 				r.cerr <- err
 				return
 			}
