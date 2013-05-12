@@ -476,7 +476,12 @@ func batchToArrays(batch *BlockBuffer) [][]float64 {
 	for i := range res {
 		res[i] = make([]float64, batch.Size())
 	}
-
+	for s := 0; s < batch.Size(); c++ {
+		v, _ := batch.ReadBlock()
+		for c, value := range v {
+			res[c][s] = value
+		}
+	}
 }
 
 func updateMeanDiff(frames int, mean_diff float64, df DataFrame) float64 {
