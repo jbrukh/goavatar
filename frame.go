@@ -9,24 +9,23 @@ import (
 
 // A generic data frame.
 type DataFrame interface {
-	Buffer() *SamplingBuffer
+	Buffer() *BlockBuffer
 	Channels() int
 	Samples() int
 	SampleRate() int
 	Received() time.Time
 	Generated() time.Time
-	Timestamps() []int64
 }
 
 type GenericDataFrame struct {
-	buffer     *SamplingBuffer
+	buffer     *BlockBuffer
 	channels   int
 	samples    int
 	sampleRate int
 	timestamps []uint32
 }
 
-func NewGenericDataFrame(buffer *SamplingBuffer, channels, samples, sampleRate int, timestamps []uint32) *GenericDataFrame {
+func NewGenericDataFrame(buffer *BlockBuffer, channels, samples, sampleRate int, timestamps []uint32) *GenericDataFrame {
 	return &GenericDataFrame{
 		buffer:     buffer,
 		channels:   channels,
@@ -36,7 +35,7 @@ func NewGenericDataFrame(buffer *SamplingBuffer, channels, samples, sampleRate i
 	}
 }
 
-func (df *GenericDataFrame) Buffer() *SamplingBuffer {
+func (df *GenericDataFrame) Buffer() *BlockBuffer {
 	return df.buffer
 }
 
