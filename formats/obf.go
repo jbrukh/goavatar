@@ -23,12 +23,13 @@ import (
 //    Channels (1 byte):        		 0-255 channels
 //    Samples (int32):          		 number of samples stored
 //    SampleRate (int16):				 the sample rate at which this data was sampled
-// [version 2:
+// [
+// version 2:
 //    Endianness (1 byte):               0x00 = Big; 0x01 = Little
 //    Reserved (20 bytes)
 // ]
 //    Values (float64*channels*samples): values in either parallel or sequential format
-//    Timestamps (int64*samples):        timestamps of the values
+//    Timestamps (int32*samples):        timestamps of the values (unsigned, in ms starting at 0)
 //
 // Define v(j,t) to mean the value of channel j (0 < j <= C) at
 // sample t (0 <= t < S) where C is the number of channels and
