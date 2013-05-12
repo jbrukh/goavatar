@@ -23,6 +23,10 @@ import (
 //    Channels (1 byte):        		 0-255 channels
 //    Samples (int32):          		 number of samples stored
 //    SampleRate (int16):				 the sample rate at which this data was sampled
+// [version 2:
+//    Endianness (1 byte):               0x00 = Big; 0x01 = Little
+//    Reserved (20 bytes)
+// ]
 //    Values (float64*channels*samples): values in either parallel or sequential format
 //    Timestamps (int64*samples):        timestamps of the values
 //
@@ -48,7 +52,14 @@ const (
 
 // FormatVersions
 const (
-	FormatVersion1 = 0x01
+	FormatVersion1 = 0x01 // in this format, we have a 10 byte header
+	FormatVersion2 = 0x02 // in this format, we add a field for Endianness and 20 bytes of padding
+)
+
+// Endianness
+const (
+	BigEndian    = 0x00
+	LittleEndian = 0x01
 )
 
 // StorageModes
@@ -75,6 +86,8 @@ type (
 		Channels      uint8
 		Samples       uint32
 		SampleRate    uint16
+		Endianness    byte
+		Reserved      [20]byte // reserved for extentions
 	}
 
 	OBFParallelBlock struct {
@@ -84,7 +97,7 @@ type (
 )
 
 // Size of the header.
-const OBFHeaderSize = 10
+const OBFHeaderSize = 31
 
 // Fixed locations
 const (

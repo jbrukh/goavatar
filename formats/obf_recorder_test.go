@@ -58,7 +58,7 @@ func TestWriteAndHeader(t *testing.T) {
 
 	// sanity check the header
 	if header.Channels != 2 || header.DataType != DataTypeRaw ||
-		header.FormatVersion != FormatVersion1 || header.Samples != 32 ||
+		header.FormatVersion != FormatVersion2 || header.Samples != 32 ||
 		header.SampleRate != 250 {
 		t.Errorf("header is shot: %v", header)
 	}

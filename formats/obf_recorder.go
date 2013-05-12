@@ -110,7 +110,7 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 	// write the header
 	header := &OBFHeader{
 		DataType:      DataTypeRaw,
-		FormatVersion: FormatVersion1,
+		FormatVersion: FormatVersion2,
 		StorageMode:   StorageModeParallel,
 		Channels:      uint8(r.channels),
 		Samples:       uint32(r.samples),
