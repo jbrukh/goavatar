@@ -52,8 +52,8 @@ func ControlHandler(device Device, verbose bool) http.Handler {
 //
 //    http.Handle("/uri", socket.DataHandler(device, true))
 //
-func DataHandler(device Device, verbose bool, integers bool) http.Handler {
-	return websocket.Handler(NewDataSocket(device, verbose, integers))
+func DataHandler(device Device, verbose bool) http.Handler {
+	return websocket.Handler(NewDataSocket(device, verbose))
 }
 
 //---------------------------------------------------------//
@@ -335,7 +335,7 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 
 }
 
-func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocket.Conn) {
+func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		defer conn.Close()
 
@@ -360,7 +360,7 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 				msg.Success = true
 				msg.Status = "streaming"
 				controller.SendResponse(msg)
-				stream(conn, device, verbose, integers)
+				stream(conn, device, verbose)
 			} else {
 				log.Printf("WARNING: device was already operating")
 				return
@@ -374,7 +374,7 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 	}
 }
 
-func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
+func stream(conn *websocket.Conn, device Device, verbose bool) {
 	// logging
 	log.Printf("DEVICE: STREAMING ON")
 	defer log.Printf("DEVICE: STREAMING OFF")
@@ -389,12 +389,12 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 		return
 	}
 	var (
-		channels  = df.Channels()
-		devicePps = df.SampleRate()
+		channels   = df.Channels()
+		sampleRate = df.SampleRate()
 	)
 
 	// check the parameters
-	if pps < 1 || pps > devicePps {
+	if pps < 1 || pps > sampleRate {
 		pps = DefaultPps
 		log.Printf("WARNING: setting default PPS")
 	}
@@ -407,9 +407,9 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 	var (
 		frames       = 0
 		mean_diff    = float64(0)
-		sampleRate   = devicePps / pps        // now we need to sample every devicePps/pps points
-		absBatchSize = batchSize * sampleRate // actual number of data points we must read in order to obtain a sampled batch of batchSize
-		b            = NewSamplingBuffer(channels, sampleRate*batchSize*10, sampleRate)
+		pluckRate    = sampleRate / pps      // now we need to sample every sampleRate/pps points
+		absBatchSize = batchSize * pluckRate // actual number of data points we must read in order to obtain a sampled batch of batchSize
+		b            = NewBlockBuffer(channels, sampleRate*batchSize*10)
 		kill         = make(chan bool)
 
 		shouldReturn = func() bool {
@@ -421,6 +421,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 			return false
 		}
 	)
+	b.PluckRate(pluckRate)
 
 	for {
 		// break if there was an error sending
@@ -449,25 +450,14 @@ func stream(conn *websocket.Conn, device Device, verbose bool, integers bool) {
 			}
 
 			var (
-				batch = b.SampleNext(absBatchSize)
+				batch = b.DownSample(absBatchSize)
 				msg   = new(DataMessage)
 			)
 
 			msg.LatencyMs = AbsFloat64(mean_diff - d)
-			if integers {
-				msg.Ints = make([][]int64, channels)
-				for i, _ := range msg.Ints {
-					ch := batch.ChannelData(i)
-					msg.Ints[i] = make([]int64, len(ch))
-					for j, _ := range msg.Ints[i] {
-						msg.Ints[i][j] = int64(ch[j] * float64(Multiplier))
-					}
-				}
-			} else {
-				msg.Data = make([][]float64, channels)
-				for i, _ := range msg.Data {
-					msg.Data[i] = batch.ChannelData(i)
-				}
+			msg.Data = make([][]float64, channels)
+			for i, _ := range msg.Data {
+				msg.Data[i] = batch.ChannelData(i)
 			}
 			if verbose {
 				log.Printf("sending data msg: %+v", msg)
