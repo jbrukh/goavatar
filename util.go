@@ -66,3 +66,9 @@ func Uuid() (uuid string, err error) {
 	uuid = fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 	return
 }
+
+// Return the timestamp of the s-th sample given that the duration
+// between timestamps is dur.
+func InterpolateTs(start int64, s int, δ time.Duration) int64 {
+	return start + int64(s)*int64(δ)
+}
