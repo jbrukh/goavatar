@@ -5,7 +5,7 @@ package mock_avatar
 
 import (
 	. "github.com/jbrukh/goavatar"
-	"github.com/jbrukh/goavatar/etc"
+	// "github.com/jbrukh/goavatar/etc"
 	. "github.com/jbrukh/goavatar/formats"
 	"time"
 )
@@ -42,7 +42,7 @@ func NewMockDevice(repo string) *MockDevice {
 			if c.ShouldTerminate() {
 				return nil
 			}
-			c.Send(etc.MockAvatarFrames[tick%len(etc.MockAvatarFrames)])
+			//c.Send(etc.MockAvatarFrames[tick%len(etc.MockAvatarFrames)])
 			tick++
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}

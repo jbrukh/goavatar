@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	//"log"
+	"encoding/binary"
 )
 
 const (
