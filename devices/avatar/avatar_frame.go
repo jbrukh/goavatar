@@ -87,16 +87,6 @@ func (h *AvatarHeader) Generated() time.Time {
 	return time.Unix(int64(h.FieldTimestamp), int64(time.Duration(h.FieldFracSecs)*time.Second/AvatarFracSecs))
 }
 
-func (h *AvatarHeader) Timestamps() []int64 {
-	timestamps := make([]int64, int(h.FieldSamples))
-	ts := h.Generated().UnixNano()
-	δ := 1000000000 / h.SampleRate()
-	for t := range timestamps {
-		timestamps[t] = ts + int64(δ)*int64(t)
-	}
-	return timestamps
-}
-
 // Payload size
 func (h *AvatarHeader) PayloadSize() int {
 	return h.Channels() * h.Samples() * AvatarPointSize

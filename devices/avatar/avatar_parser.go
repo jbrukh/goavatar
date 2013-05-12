@@ -146,8 +146,10 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 		samples    = header.Samples()
 		channels   = header.Channels()
 		hasTrigger = header.HasTriggerChannel()
-		p          = make([]float64, channels*samples)
+		δ          = time.Second / time.Duration(header.SampleRate())
 	)
+
+	data := NewBlockBuffer(channels, samples)
 
 	// write the samples in blocks
 	for j := 0; j < samples; j++ {
@@ -155,13 +157,17 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 			// skip the trigger channel
 			payload = payload[AvatarPointSize:]
 		}
-		for k := 0; k < channels; k++ {
-			p[j*channels+k] = consumeDataPoint(payload, float64(header.VoltRange()))
+		p = make([]float64, channels)
+		for c := range p {
+			p[c] = consumeDataPoint(payload, float64(header.VoltRange()))
 			payload = payload[AvatarPointSize:]
 		}
+
+		// put the block into the buffer
+		ts := InterpolateTs(header.Generated().UnixNano(), j, δ)
+		data.AppendBlock(p, ts)
 	}
 
-	data := NewSamplingBufferFromSlice(channels, 1, p)
 	dataFrame = &AvatarDataFrame{
 		AvatarHeader: *header,
 		data:         data,
