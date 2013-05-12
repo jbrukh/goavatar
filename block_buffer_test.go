@@ -274,6 +274,28 @@ func TestBlockBufferDownSample__NotYet(t *testing.T) {
 	}
 }
 
+func TestBlockBufferAppendBlock__Normal(t *testing.T) {
+	b := NewBlockBuffer(2, 10)
+	if b.Size() != 0 {
+		t.Errorf("wrong size")
+	}
+
+	b.AppendBlock([]float64{1, 2}, 11)
+	if b.Size() != 1 {
+		t.Errorf("wrong size")
+	}
+}
+
+func TestBlockBufferAppendBlock__NotComparable(t *testing.T) {
+	b := NewBlockBuffer(2, 10)
+	if b.Size() != 0 {
+		t.Errorf("wrong size")
+	}
+	testPanic(t, func() {
+		b.AppendBlock([]float64{1, 2, 3}, 11)
+	})
+}
+
 func appendBlock(buf *bytes.Buffer, v []float64, ts int64) {
 	binary.Write(buf, binary.BigEndian, v)
 	binary.Write(buf, binary.BigEndian, ts)

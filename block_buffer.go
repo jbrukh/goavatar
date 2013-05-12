@@ -31,7 +31,7 @@ func NewBlockBuffer(channels, size int) *BlockBuffer {
 		channels:  channels,
 		pluckRate: 1,
 		blockSize: blockSize,
-		buf:       new(bytes.Buffer),
+		buf:       bytes.NewBuffer(make([]byte, 0, size*blockSize)),
 	}
 }
 
@@ -49,6 +49,14 @@ func (b *BlockBuffer) Append(bb *BlockBuffer) {
 		panic("not comparable")
 	}
 	b.appendBlocks(bb.buf)
+}
+
+func (b *BlockBuffer) AppendBlock(v []float64, ts int64) {
+	if len(v) != b.channels {
+		panic("not comparable")
+	}
+	binary.Write(b.buf, binary.BigEndian, v)
+	binary.Write(b.buf, binary.BigEndian, ts)
 }
 
 // The number of samples in this BlockBuffer.
