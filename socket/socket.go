@@ -22,7 +22,7 @@ import (
 // the control and data endpoints; only one
 // connect request can succeed
 var (
-	kickoff   = make(chan bool, 1)
+	kickoff   = make(chan *SocketController, 1)
 	pps       int // points per second
 	batchSize int // batch size
 )
@@ -112,7 +112,7 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 // control messages.
 type SocketController struct {
 	conn    *websocket.Conn
-	kickoff chan bool
+	kickoff chan *SocketController
 	device  Device
 }
 
@@ -203,7 +203,7 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 			r.Err = err.Error()
 		} else {
 			r.Success = true
-			r.Status = "disconnected"
+			r.Status = "disarmed"
 			// also, disarm the device
 			select {
 			case <-s.kickoff:
@@ -238,7 +238,7 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 		// to stream when it is connected
 
 		select {
-		case s.kickoff <- true:
+		case s.kickoff <- s: // send self on the kickoff channel
 			// set the parameters; WARNING: since the
 			// device is already armed at this point, users
 			// should wait for our ConnectResponse before
@@ -341,13 +341,25 @@ func NewDataSocket(device Device, verbose bool, integers bool) func(ws *websocke
 
 		// gate to see if it is armed
 		select {
-		case <-kickoff:
+		case controller := <-kickoff:
+
+			msg := new(ConnectResponse)
+			msg.MessageType = "connect"
+			msg.Success = false
+
 			// we connect and begin to stream
 			if !device.Connected() {
 				err := device.Connect()
 				if err != nil {
 					log.Printf("could not connect: %v", err)
+					msg.Err = fmt.Sprintf("could not connect to the device")
+					msg.Status = "disarmed"
+					controller.SendResponse(msg)
+					return
 				}
+				msg.Success = true
+				msg.Status = "streaming"
+				controller.SendResponse(msg)
 				stream(conn, device, verbose, integers)
 			} else {
 				log.Printf("WARNING: device was already operating")
