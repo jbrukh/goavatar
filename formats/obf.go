@@ -206,36 +206,36 @@ func (s *OBFCodec) ReadParallelBlock() (values []float64, ts uint32, err error) 
 	return
 }
 
-// Convert the entire file into a DataFrame.
-func (s *OBFCodec) ReadDataFrame() (df *GenericDataFrame, err error) {
-	switch s.header.StorageMode {
-	case StorageModeParallel:
-		var (
-			ch         = int(s.header.Channels)
-			samples    = int(s.header.Samples)
-			sampleRate = int(s.header.SampleRate)
-			buf        = NewSamplingBuffer(ch, samples, 1)
-			timestamps = make([]uint32, samples)
-		)
+// // Convert the entire file into a DataFrame.
+// func (s *OBFCodec) ReadDataFrame() (df *GenericDataFrame, err error) {
+// 	switch s.header.StorageMode {
+// 	case StorageModeParallel:
+// 		var (
+// 			ch         = int(s.header.Channels)
+// 			samples    = int(s.header.Samples)
+// 			sampleRate = int(s.header.SampleRate)
+// 			buf        = NewBlockBuffer(ch, samples)
+// 			timestamps = make([]uint32, samples)
+// 		)
 
-		// for each sample
-		for i := 0; i < samples; i++ {
-			if err = s.SeekSample(i); err != nil {
-				return nil, err
-			}
-			values, ts, err := s.ReadParallelBlock()
-			if err != nil {
-				return nil, err
-			}
-			buf.PushSlice(values)
-			timestamps[i] = ts
-		}
+// 		// for each sample
+// 		for i := 0; i < samples; i++ {
+// 			if err = s.SeekSample(i); err != nil {
+// 				return nil, err
+// 			}
+// 			values, ts, err := s.ReadParallelBlock()
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			buf.PushSlice(values)
+// 			timestamps[i] = ts
+// 		}
 
-		df = NewGenericDataFrame(buf, ch, samples, sampleRate, timestamps)
-		return
-	case StorageModeSequential:
-	default:
-		return nil, fmt.Errorf("unknown storage mode")
-	}
-	return
-}
+// 		df = NewGenericDataFrame(buf, ch, samples, sampleRate, timestamps)
+// 		return
+// 	case StorageModeSequential:
+// 	default:
+// 		return nil, fmt.Errorf("unknown storage mode")
+// 	}
+// 	return
+// }

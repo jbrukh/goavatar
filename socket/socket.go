@@ -403,10 +403,11 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 		log.Printf("WARNING: setting default batchSize")
 	}
 
-	streamLoop()
+	streamLoop(channels, sampleRate, out, verbose, conn)
 }
 
-func streamLoop() {
+func streamLoop(channels, sampleRate int, out <-chan DataFrame,
+	verbose bool, conn *websocket.Conn) {
 	var (
 		frames       = 0
 		mean_diff    = float64(0)
@@ -441,7 +442,7 @@ func streamLoop() {
 
 		// calculate the latency
 		frames++
-		mean_diff = updateMeanDiff(frames, mean_diff, df)
+		mean_diff, d := updateMeanDiff(frames, mean_diff, df)
 
 		// put the frame into our memory buffer
 		b.Append(df.Buffer())
@@ -476,15 +477,17 @@ func batchToArrays(batch *BlockBuffer) [][]float64 {
 	for i := range res {
 		res[i] = make([]float64, batch.Size())
 	}
-	for s := 0; s < batch.Size(); c++ {
+	for s := 0; s < batch.Size(); s++ {
 		v, _ := batch.ReadBlock()
 		for c, value := range v {
 			res[c][s] = value
 		}
 	}
+	return res
 }
 
-func updateMeanDiff(frames int, mean_diff float64, df DataFrame) float64 {
+func updateMeanDiff(frames int, mean_diff float64, df DataFrame) (float64, float64) {
 	d := AbsFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano())) // diff between received and stamped time
-	mean_diff = float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
+	diff := float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
+	return diff, d
 }

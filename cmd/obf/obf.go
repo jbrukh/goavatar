@@ -87,34 +87,34 @@ func main() {
 	printFrames(codec)
 
 	if *plot {
-		// read the data as a data frame
-		df, err := codec.ReadDataFrame()
-		if err != nil {
-			fmt.Printf("could not read the data as a frame: %v\n", err)
-			return
-		}
+		// // read the data as a data frame
+		// df, err := codec.ReadDataFrame()
+		// if err != nil {
+		// 	fmt.Printf("could not read the data as a frame: %v\n", err)
+		// 	return
+		// }
 
-		p, err := gplot.NewPlotter(false)
-		if err != nil {
-			fmt.Printf("create the plot: %v\n", err)
-			return
-		}
-		defer p.Close()
+		// p, err := gplot.NewPlotter(false)
+		// if err != nil {
+		// 	fmt.Printf("create the plot: %v\n", err)
+		// 	return
+		// }
+		// defer p.Close()
 
-		//p.CheckedCmd("set yrange [0.01:0.018]")
-		p.CheckedCmd(fmt.Sprintf("set xrange [0:%v]", df.Samples()))
-		p.CheckedCmd("set terminal aqua size 1430,400")
+		// //p.CheckedCmd("set yrange [0.01:0.018]")
+		// p.CheckedCmd(fmt.Sprintf("set xrange [0:%v]", df.Samples()))
+		// p.CheckedCmd("set terminal aqua size 1430,400")
 
-		ch := df.Channels()
-		buf := df.Buffer()
-		if ch == 1 {
-			p.PlotX(buf.ChannelData(0), "Ch1")
-		} else if ch == 2 {
-			p.Dual(buf.ChannelData(0), buf.ChannelData(1), "Ch1", "Ch2")
-		} else {
-			fmt.Printf("sorry, max 2 channels is currently supported")
-			return
-		}
+		// ch := df.Channels()
+		// buf := df.Buffer()
+		// if ch == 1 {
+		// 	p.PlotX(buf.ChannelData(0), "Ch1")
+		// } else if ch == 2 {
+		// 	p.Dual(buf.ChannelData(0), buf.ChannelData(1), "Ch1", "Ch2")
+		// } else {
+		// 	fmt.Printf("sorry, max 2 channels is currently supported")
+		// 	return
+		// }
 	}
 }
 
