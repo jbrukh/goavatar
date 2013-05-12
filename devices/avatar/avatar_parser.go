@@ -165,7 +165,7 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 
 		// put the block into the buffer
 		ts := InterpolateTs(header.Generated().UnixNano(), j, δ)
-		data.AppendBlock(p, ts)
+		data.AppendSample(p, ts)
 	}
 
 	dataFrame = &AvatarDataFrame{

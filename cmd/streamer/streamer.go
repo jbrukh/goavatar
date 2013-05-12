@@ -12,8 +12,6 @@ import (
 	"github.com/jbrukh/gplot"
 	"github.com/jbrukh/window"
 	"log"
-	"os"
-	"text/template"
 )
 
 const (
@@ -77,7 +75,6 @@ func run(p *gplot.Plotter, out <-chan DataFrame) {
 		window2 = window.New(*windowSize, WindowMultiple)
 	)
 
-	var frames []DataFrame
 	for i := 0; i < *maxFrames; i++ {
 		df, ok := <-out
 		if !ok {
@@ -85,18 +82,10 @@ func run(p *gplot.Plotter, out <-chan DataFrame) {
 			return
 		}
 
-		if *dumpFrames {
-			if len(frames) < 1000 {
-				frames = append(frames, df)
-			}
-		}
-
-		//log.Printf("Got df: %v", df.String())
-		for _, v := range df.Buffer().ChannelData(0) {
-			window1.PushBack(v)
-		}
-		for _, v := range df.Buffer().ChannelData(1) {
-			window2.PushBack(v)
+		for s := 0; s < df.Samples(); s++ {
+			v, _ := df.Buffer().NextSample()
+			window1.PushBack(v[0])
+			window2.PushBack(v[1])
 		}
 
 		// now display it

@@ -174,15 +174,13 @@ func (s *OBFCodec) ReadHeader() (header *OBFHeader, err error) {
 // is at the correct location for the frame.
 func (s *OBFCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	var (
-		samples  = b.Size()
-		channels = b.Channels()
+		samples = b.Samples()
 	)
 
 	buf := new(bytes.Buffer)
 	for i := 0; i < samples; i++ {
-		io.CopyN(buf, b.Raw(), BlockBufferValueSize*int64(channels))
-		var ts int64
-		binary.Read(b.Raw(), binary.BigEndian, &ts)
+		v, ts := b.NextSample()
+		binary.Write(buf, binary.BigEndian, v)
 		binary.Write(buf, binary.BigEndian, uint32((ts-firstTs)/1000000))
 	}
 

@@ -105,6 +105,29 @@ func (b *BlockBuffer) NextSample() (v []float64, ts int64) {
 	return
 }
 
+func (b *BlockBuffer) Arrays() ([][]float64, []int64) {
+	var (
+		samples = b.Samples()
+		values  = make([][]float64, b.channels)
+	)
+
+	// allocate
+	for i := range values {
+		values[i] = make([]float64, samples)
+	}
+
+	// restructure
+	for s := 0; s < samples; s++ {
+		v := b.values[s*b.channels : (s+1)*b.channels]
+		for c, value := range v {
+			values[c][s] = value
+		}
+	}
+
+	// return
+	return values, b.Timestamps()
+}
+
 func (b *BlockBuffer) appendBlocks(v []float64, ts []int64) {
 	b.values = append(b.values, v...)
 	b.ts = append(b.ts, ts...)

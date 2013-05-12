@@ -448,7 +448,7 @@ func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 		b.Append(df.Buffer())
 
 		// while there are batches, return them
-		for b.Size() > absBatchSize {
+		for b.Samples() > absBatchSize {
 			if shouldReturn() {
 				return
 			}
@@ -459,7 +459,7 @@ func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 			)
 
 			msg.LatencyMs = AbsFloat64(mean_diff - d)
-			msg.Data = batchToArrays(batch)
+			msg.Data, _ = batch.Arrays()
 			if verbose {
 				log.Printf("sending data msg: %+v", msg)
 			}
@@ -470,20 +470,6 @@ func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 			}
 		}
 	}
-}
-
-func batchToArrays(batch *BlockBuffer) [][]float64 {
-	res := make([][]float64, batch.Channels())
-	for i := range res {
-		res[i] = make([]float64, batch.Size())
-	}
-	for s := 0; s < batch.Size(); s++ {
-		v, _ := batch.ReadBlock()
-		for c, value := range v {
-			res[c][s] = value
-		}
-	}
-	return res
 }
 
 func updateMeanDiff(frames int, mean_diff float64, df DataFrame) (float64, float64) {
