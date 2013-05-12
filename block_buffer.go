@@ -94,8 +94,9 @@ func (b *BlockBuffer) DownSample(n int) (bb *BlockBuffer) {
 
 func (b *BlockBuffer) ReadBlock() (v []float64, ts int64) {
 	v = make([]float64, b.channels)
-	binary.Read(buf, binary.BigEndian, &v)
-	binary.Read(buf, binary.BigEndian, &ts)
+	binary.Read(b.buf, binary.BigEndian, &v)
+	binary.Read(b.buf, binary.BigEndian, &ts)
+	return
 }
 
 func (b *BlockBuffer) appendBlocks(buf *bytes.Buffer) {
