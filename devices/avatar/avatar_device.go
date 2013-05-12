@@ -44,7 +44,6 @@ func NewAvatarDevice(serialPort, repo string) *AvatarDevice {
 	// specified serial port
 	connFunc := func() (err error) {
 		reader, err = os.Open(serialPort)
-		log.Printf("connect err: %v", err)
 		return
 	}
 
