@@ -351,15 +351,17 @@ func (oc *obfCodec) ReadHeader() (err error) {
 // the file starting at the current position.
 func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 	var (
-		samples = oc.samples()
 		v       = oc.block()
-		ts      uint32
+		ts32      uint32
 	)
 	b = oc.buffer()
-	for s := 0; s < samples; s++ {
-		oc.readBlock(v, &ts)
-		b.AppendSample(v, int64(ts))
-	}
+	err = oc.forSamples(func(s int) (err error) {
+		if err = oc.readBlock(v, &ts32); err != nil {
+			return
+		}
+		b.AppendSample(v, toTs(ts32))
+		return
+	});
 	return
 }
 
