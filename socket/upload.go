@@ -1,3 +1,6 @@
+//
+// Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
+//
 package socket
 
 import (
@@ -49,7 +52,7 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 	// close and get the terminating boundary
 	w.Close()
 
-  authenticatedEndpoint := fmt.Sprintf("%s?auth_token=%s", endpoint, token)
+	authenticatedEndpoint := fmt.Sprintf("%s?auth_token=%s", endpoint, token)
 
 	req, err := http.NewRequest("POST", authenticatedEndpoint, buf)
 	if err != nil {
