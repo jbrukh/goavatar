@@ -152,7 +152,7 @@ type (
 	}
 
 	OBFReader interface {
-		ReadHeader() (*OBFHeader, error)
+		ReadHeader() error
 		Header() *OBFHeader
 		ReadParallelBlock() ([]float64, uint32, error)
 		Parallel() (*BlockBuffer, error)
@@ -207,6 +207,12 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 // Reading Operations -- all these operations happen in-place
 // ----------------------------------------------------------------- //
 
+// Read the OBFHeader of this file.
+func (oc *obfCodec) ReadHeader() (err error) {
+	err = binary.Read(oc.file, binary.BigEndian, &oc.header)
+	return
+}
+
 // Return the header, if it has been read. If not,
 // the nil header will be returned.
 func (oc *obfCodec) Header() *OBFHeader {
@@ -222,20 +228,6 @@ func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
 
 	err = binary.Write(oc.file, binary.BigEndian, h)
 	return
-}
-
-// Read the OBFHeader of this file.
-func (oc *obfCodec) ReadHeader() (header *OBFHeader, err error) {
-	if err = oc.SeekHeader(); err != nil {
-		return nil, err
-	}
-
-	err = binary.Read(oc.file, binary.BigEndian, &oc.header)
-	if err != nil {
-		return nil, err
-	}
-
-	return &oc.header, nil
 }
 
 // Writes a data frame in parallel mode, assuming the writer
@@ -276,15 +268,18 @@ func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error)
 
 // Read the entire set of parallel values from the file.
 func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
-	header, err := oc.ReadHeader()
-	if err != nil {
+	if err = oc.SeekHeader(); err != nil {
+		return
+	}
+
+	if err = oc.ReadHeader(); err != nil {
 		return nil, err
 	}
 
 	if err = oc.SeekValues(); err != nil {
 		return
 	}
-
+	header := oc.Header()
 	channels, samples := int(header.Channels), int(header.Samples)
 	b = NewBlockBuffer(channels, samples)
 	v := make([]float64, channels)
