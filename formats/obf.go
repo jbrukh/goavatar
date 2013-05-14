@@ -27,7 +27,7 @@ import (
 // Payload (variable):
 //    Values + Timestamps
 //    (float64*channels*samples
-//    + int64*samples):                  parallel format; blocks of channel
+//    + uint32*samples):                  parallel format; blocks of channel
 //                                       values + timestamps
 //
 // ----------------------------------------------------------------- //
@@ -155,11 +155,11 @@ type (
 
 	OBFReader interface {
 		// TODO: deprecate
-		ReadParallelBlock() ([]float64, uint32, error)
+		ReadParallelBlock() ([]float64, int64, error)
 
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
-		//Sequential() ([][]float64, []uint32, error)
+		//Sequential() ([][]float64, []int64, error)
 	}
 
 	OBFWriter interface {
@@ -301,12 +301,14 @@ func (oc *obfCodec) ReadHeader() (err error) {
 }
 
 // TODO:  deprecate
-func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
+func (oc *obfCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
 	values = oc.block()
 	if err = oc.read(values); err != nil {
 		return
 	}
-	err = oc.read(&ts)
+	var ts32 uint32
+	err = oc.read(&ts32)
+	ts = int64(ts32)*1000000
 	return
 }
 

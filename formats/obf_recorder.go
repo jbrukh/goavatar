@@ -148,7 +148,7 @@ func (r *OBFRecorder) RollbackFile() {
 
 // return the name of the recording file
 func (r *OBFRecorder) newFileName() {
-	for {
+	for i := 0; i < 100; i++ {
 		f, _ := Uuid()
 		r.fileName = filepath.Join(r.repo, f)
 
@@ -158,7 +158,7 @@ func (r *OBFRecorder) newFileName() {
 			log.Printf("WARNING: new filename clashed with existing: %s", r.fileName)
 			continue
 		}
-		break
+		return
 	}
-
+	panic("could not generate filename")
 }
