@@ -12,38 +12,66 @@ import (
 	"os"
 )
 
-//
-// Octopus Binary Format (OBF)
+// -------------------------------------------------------
+// Octopus Binary Format (OBF) Version 1 (Parallel Only)
 //
 // Header (10 bytes):
-//    DataType (1 byte):        		 0x01 = raw device data;
-//    FormatVersion (1 byte):   		 0x01 = version 1
-//    StorageMode (1 byte):     		 0x01 = parallel; 0x02 = sequential
-//    Channels (1 byte):        		 0-255 channels
-//    Samples (int32):          		 number of samples stored
-//    SampleRate (int16):				 the sample rate at which this data was sampled
-// [
-// version 2:
-//    Endianness (1 byte):               0x00 = Big; 0x01 = Little
-//    Reserved (20 bytes)
-// ]
-//    Values (float64*channels*samples): values in either parallel or sequential format
-//    Timestamps (int32*samples):        timestamps of the values (unsigned, in ms starting at 0)
+//    DataType (1 byte):                 0x01 = raw device data;
+//    FormatVersion (1 byte):            0x01 = version 1
+//    StorageMode (1 byte):              0x01 = parallel; 0x02 = sequential
+//    Channels (1 byte):                 0-255 channels
+//    Samples (uint32):                   number of samples stored
+//    SampleRate (uint16):                 the sample rate at which this data was sampled
 //
-// Define v(j,t) to mean the value of channel j (0 < j <= C) at
-// sample t (0 <= t < S) where C is the number of channels and
-// S is the number of samples. Define T(t) to mean the timestamp
-// at time T.
+// Payload (variable):
+//    Values + Timestamps
+//    (float64*channels*samples
+//    + int64*samples):                  parallel format; blocks of channel values + timestamps
+//
+// -------------------------------------------------------
+// Octopus Binary Format (OBF) Version 2 (Combined, 32-bit relative timestamps)
+//
+// Header (31 bytes):
+//    DataType (1 byte):                 0x01 = raw device data;
+//    FormatVersion (1 byte):            0x01 = version 1
+//    StorageMode (1 byte):              0x01 = parallel; 0x02 = sequential; 0x03 = combined
+//    Channels (1 byte):                 0-255 channels
+//    Samples (uint32):                   number of samples stored
+//    SampleRate (uint16):                 the sample rate at which this data was sampled
+//    Endianness (1 byte):               0x00 = Big; 0x01 = Little
+//    Reserved (20 bytes):               reserved for future expansions
+//
+// P-mode Values (variable):
+//    Values + Timestamps
+//    (float64*channels*samples
+//    + uint32*samples):                  parallel format; blocks of channel values +
+//                                        timestamps (in ms starting at 0)
+//
+// S-mode Values (variable):
+//    Values (float64*channels*samples):  sequential format
+//    Timestamps (uint32*samples):        timestamps of the values (unsigned, in ms starting at 0)
+//
+// --------------------------------------------------------
+// Notes on P-mode vs S-mode:
+//
+// Define v(c,s) to mean the value of channel c (0 < c <= C) at
+// sample s (0 <= s < S) where C is the number of channels and
+// S is the number of samples. Define T(s) to mean the timestamp
+// at time of sample s.
 //
 // Then "parallel" mode is:
 //
-//    concat[v(1,t), ..., v(C,t), T(t)] for all t.
+//    concat[v(1,s), ..., v(C,s), T(s)] for all t.
 //
 // For "sequential" mode:
 //
-//    concat[v(j,0), ..., v(j,S-1)] for all j, followed by
-//    [T(t)] for all t.
+//    concat[v(c,0), ..., v(c,S-1)] for all c, followed by
+//    [T(s)] for all s.
 //
+
+// ----------------------------------------------------------------- //
+// FIELD VALUES
+// ----------------------------------------------------------------- //
 
 // DataTypes
 const (
@@ -66,7 +94,33 @@ const (
 const (
 	StorageModeParallel   = 0x01
 	StorageModeSequential = 0x02
+	StorageModeCombined   = 0x03
 )
+
+// ----------------------------------------------------------------- //
+// SIZES
+// ----------------------------------------------------------------- //
+
+//
+// IF YOU ARE MODIFYING THE FORMAT, MAKE SURE
+// TO ADJUST THESE. Sizes of the header and
+// data point sizes.
+//
+const (
+	OBFHeaderSize    = 31
+	OBFTimestampSize = 4
+	OBFValueSize     = 8
+)
+
+// Fixed locations
+const (
+	OBFHeaderAddr = 0
+	OBFValuesAddr = OBFHeaderSize
+)
+
+// ----------------------------------------------------------------- //
+// TYPES
+// ----------------------------------------------------------------- //
 
 type (
 	// OBFCodec will read and write the OBF
@@ -89,19 +143,6 @@ type (
 		Endianness    byte
 		Reserved      [20]byte // reserved for extentions
 	}
-)
-
-// Size of the header.
-const (
-	OBFHeaderSize    = 31
-	OBFTimestampSize = 4
-	OBFValueSize     = 8
-)
-
-// Fixed locations
-const (
-	OBFHeaderAddr = 0
-	OBFValuesAddr = OBFHeaderSize
 )
 
 func NewOBFCodec(file io.ReadWriteSeeker) *OBFCodec {
