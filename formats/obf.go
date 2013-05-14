@@ -149,8 +149,9 @@ type (
 	// obfCodec will read and write the OBF
 	// format on various levels of abstraction.
 	obfCodec struct {
-		file   io.ReadWriteSeeker
-		header OBFHeader
+		file        io.ReadWriteSeeker
+		header      OBFHeader
+		payloadSize int64
 	}
 
 	OBFReader interface {
@@ -164,10 +165,11 @@ type (
 // Create a new obfCodec and read the header. If the header
 // cannot be read an error is returned.
 func newObfCodec(file io.ReadWriteSeeker) (oc *obfCodec, err error) {
-	oc = &obfCodec{
-		file: file,
+	oc = &obfCodec{file: file}
+	if err = oc.ReadHeader(); err != nil {
+		return
 	}
-	err = oc.ReadHeader()
+	oc.pyldSize(int64(oc.header.Samples), int64(oc.header.Channels))
 	return
 }
 
@@ -178,6 +180,11 @@ func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
 // ----------------------------------------------------------------- //
 // Private Methods
 // ----------------------------------------------------------------- //
+
+func (oc *obfCodec) pyldSize(channels, samples int64) {
+	oc.payloadSize = samples * (channels*
+		OBFValueSize + OBFTimestampSize)
+}
 
 // Read a piece of binary data from the underlying stream.
 func (oc *obfCodec) read(i interface{}) error {
@@ -231,13 +238,7 @@ func (oc *obfCodec) SeekParallel() (err error) {
 // Go to the starting position of the sequential values.
 // TODO this will fail silently without having called ReadHeader().
 func (oc *obfCodec) SeekSequential() (err error) {
-	// TODO read payload size on insantiaton
-	var (
-		samples  = int64(oc.header.Samples)
-		channels = int64(oc.header.Channels)
-	)
-	addr := OBFHeaderSize + samples*(channels*OBFValueSize+OBFTimestampSize)
-	_, err = oc.file.Seek(addr, os.SEEK_SET)
+	_, err = oc.file.Seek(OBFHeaderSize+oc.payloadSize, os.SEEK_SET)
 	return
 }
 
