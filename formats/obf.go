@@ -209,8 +209,15 @@ func (oc *obfCodec) SeekParallel() (err error) {
 }
 
 // Go to the starting position of the sequential values.
+// TODO this will fail silently without having called ReadHeader().
 func (oc *obfCodec) SeekSequential() (err error) {
-	_, err = oc.file.Seek(OBFValuesAddr, os.SEEK_SET)
+	// TODO read payload size on insantiaton
+	var (
+		samples  = int64(oc.header.Samples)
+		channels = int64(oc.header.Channels)
+	)
+	addr := OBFHeaderSize + samples*(channels*OBFValueSize+OBFTimestampSize)
+	_, err = oc.file.Seek(addr, os.SEEK_SET)
 	return
 }
 
@@ -226,8 +233,7 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 
 // Read the OBFHeader of this file.
 func (oc *obfCodec) ReadHeader() (err error) {
-	err = binary.Read(oc.file, ByteOrder, &oc.header)
-	return
+	return oc.read(&oc.header)
 }
 
 // Return the header, if it has been read. If not,
@@ -235,6 +241,55 @@ func (oc *obfCodec) ReadHeader() (err error) {
 func (oc *obfCodec) Header() *OBFHeader {
 	return &oc.header
 }
+
+func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
+	if oc.header.StorageMode != StorageModeParallel {
+		return nil, 0, fmt.Errorf("can only seek samples in parallel mode")
+	}
+	ch := int(oc.header.Channels)
+	values = make([]float64, ch)
+
+	err = binary.Read(oc.file, ByteOrder, values)
+	if err != nil {
+		return
+	}
+
+	err = binary.Read(oc.file, ByteOrder, &ts)
+	return
+}
+
+// ----------------------------------------------------------------- //
+// Reading Operations -- these operations seek also
+// ----------------------------------------------------------------- //
+
+// Read the entire set of parallel values from the file.
+func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
+	if err = oc.SeekHeader(); err != nil {
+		return
+	}
+
+	if err = oc.ReadHeader(); err != nil {
+		return nil, err
+	}
+
+	if err = oc.SeekValues(); err != nil {
+		return
+	}
+	header := oc.Header()
+	channels, samples := int(header.Channels), int(header.Samples)
+	b = NewBlockBuffer(channels, samples)
+	v := make([]float64, channels)
+	var ts uint32
+	for s := 0; s < samples; s++ {
+		oc.readBlock(v, &ts)
+		b.AppendSample(v, int64(ts))
+	}
+	return
+}
+
+// ----------------------------------------------------------------- //
+// Writing Operations -- All these operations happen in-place
+// ----------------------------------------------------------------- //
 
 // Write a new header to this file.
 func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
@@ -264,47 +319,6 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
 	err = binary.Write(oc.file, ByteOrder, buf.Bytes())
 	//log.Printf("finished: %v", err)
-	return
-}
-
-func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
-	if oc.header.StorageMode != StorageModeParallel {
-		return nil, 0, fmt.Errorf("can only seek samples in parallel mode")
-	}
-	ch := int(oc.header.Channels)
-	values = make([]float64, ch)
-
-	err = binary.Read(oc.file, ByteOrder, values)
-	if err != nil {
-		return
-	}
-
-	err = binary.Read(oc.file, ByteOrder, &ts)
-	return
-}
-
-// Read the entire set of parallel values from the file.
-func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
-	if err = oc.SeekHeader(); err != nil {
-		return
-	}
-
-	if err = oc.ReadHeader(); err != nil {
-		return nil, err
-	}
-
-	if err = oc.SeekValues(); err != nil {
-		return
-	}
-	header := oc.Header()
-	channels, samples := int(header.Channels), int(header.Samples)
-	b = NewBlockBuffer(channels, samples)
-	v := make([]float64, channels)
-	var ts uint32
-	for s := 0; s < samples; s++ {
-		oc.readBlock(v, &ts)
-		b.AppendSample(v, int64(ts))
-	}
 	return
 }
 
