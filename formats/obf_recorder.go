@@ -58,6 +58,9 @@ func (r *OBFRecorder) Start() (err error) {
 	go func() {
 		defer close(r.cerr)
 		var firstTs int64 = 0
+		tsTransform := func(ts int64) uint32 {
+			return uint32((ts - firstTs) / 1000000)
+		}
 		for {
 			// get the frame or die
 			df, ok := <-r.out
@@ -73,7 +76,7 @@ func (r *OBFRecorder) Start() (err error) {
 
 			//log.Printf("writing frame: %v", df)
 			// write the frame, or send back an error
-			if err := r.codec.WriteParallel(df.Buffer(), firstTs); err != nil {
+			if err := r.codec.WriteParallel(df.Buffer(), tsTransform); err != nil {
 				r.cerr <- err
 				return
 			}
