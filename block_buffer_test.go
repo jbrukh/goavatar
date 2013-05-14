@@ -220,6 +220,22 @@ func TestBlockBufferDownSample__NotYet(t *testing.T) {
 	}
 }
 
+func TestBlockBufferDownSample__TooMany(t *testing.T) {
+	b1 := mockBlockBuffer().DownSample(2)
+	if b1.Samples() != 2 {
+		t.Errorf("wrong downsample size")
+	}
+	b2 := b1.DownSample(3)
+	if b2.Samples() != 2 {
+		t.Errorf("wrong downsample size")
+	}
+	b2.PluckRate(3)
+	b2 = b2.DownSample(2)
+	if b2.Samples() != 1 {
+		t.Errorf("wrong downsample size: %d", b2.Samples())
+	}
+}
+
 func TestBlockBufferAppendSample__Normal(t *testing.T) {
 	b := NewBlockBuffer(2, 10)
 	if b.Samples() != 0 {

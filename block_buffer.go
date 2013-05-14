@@ -3,15 +3,22 @@
 //
 package goavatar
 
-import (
-//"log"
-)
+// ----------------------------------------------------------------- //
+// Constants
+// ----------------------------------------------------------------- //
 
 const (
 	BlockBufferValueSize     = 8
 	BlockBufferTimestampSize = 8
 )
 
+// BlockBuffer is a data structure for holding multi-channel
+// time series. It is backed by slices and is optimized for
+// append operations; it is good for real-time streaming of
+// multi-channel data because the channel data is stored in
+// a "parallel". You can also down-sample the time series in
+// the buffer by setting the "pluck rate" (e.g. down-sampling
+// rate) and calling DownSample().
 type BlockBuffer struct {
 	channels  int // number of channels per sample
 	parity    int // plucking offset
@@ -51,7 +58,8 @@ func (b *BlockBuffer) Samples() int {
 	return len(b.values) / b.channels
 }
 
-// The timestamp array of this BlockBuffer.
+// The timestamp array of this BlockBuffer. Note
+// timestamps are format-agnostic.
 func (b *BlockBuffer) Timestamps() []int64 {
 	return b.ts
 }
@@ -77,12 +85,12 @@ func (b *BlockBuffer) AppendSample(v []float64, ts int64) {
 }
 
 // Get the next n samples and downsamples them according
-// to the downsampling rate.
+// to the down-sampling rate.
 func (b *BlockBuffer) DownSample(n int) (bb *BlockBuffer) {
 	bb = NewBlockBuffer(b.channels, n/b.pluckRate+1)
 	samples := b.Samples()
 	if n > samples {
-		panic("not enough samples")
+		n = samples
 	}
 
 	for s := 0; s < n; s++ {
@@ -108,6 +116,10 @@ func (b *BlockBuffer) NextSample() (v []float64, ts int64) {
 	return
 }
 
+// Arrays transforms the underlying data into "sequential"
+// channel arrays. This operation is O(n) on the number of
+// individual channel data points and timestamps and requires
+// O(2*n) space.
 func (b *BlockBuffer) Arrays() ([][]float64, []int64) {
 	var (
 		samples = b.Samples()

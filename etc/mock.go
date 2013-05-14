@@ -9,6 +9,9 @@ import (
 	"os"
 )
 
+// Read an OBF file as an array of generic
+// data frames. Mostly for use with the mock
+// device.
 func MockDataFrames(fn string) (d []DataFrame, err error) {
 	file, err := os.Open(fn)
 	if err != nil {
@@ -23,8 +26,10 @@ func MockDataFrames(fn string) (d []DataFrame, err error) {
 	}
 
 	for b.Samples() > 0 {
-		bb := b.DownSample(16)
-		df := NewGenericDataFrame(bb, 250)
+		var (
+			bb = b.DownSample(16)
+			df = NewDataFrame(bb, 250)
+		)
 		d = append(d, df)
 	}
 

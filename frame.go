@@ -3,32 +3,30 @@
 //
 package goavatar
 
-import (
-//"time"
-)
-
-// A generic data frame.
+// A generic data frame interface.
 type DataFrame interface {
 	Buffer() *BlockBuffer
 	SampleRate() int
 }
 
-type GenericDataFrame struct {
+// A generic data frame implementation.
+type dataFrame struct {
 	buffer     *BlockBuffer
 	sampleRate int
 }
 
-func NewGenericDataFrame(buffer *BlockBuffer, sampleRate int) *GenericDataFrame {
-	return &GenericDataFrame{
+// Create a new generic DataFrame.
+func NewDataFrame(buffer *BlockBuffer, sampleRate int) DataFrame {
+	return &dataFrame{
 		buffer:     buffer,
 		sampleRate: sampleRate,
 	}
 }
 
-func (df *GenericDataFrame) Buffer() *BlockBuffer {
+func (df *dataFrame) Buffer() *BlockBuffer {
 	return df.buffer
 }
 
-func (df *GenericDataFrame) SampleRate() int {
+func (df *dataFrame) SampleRate() int {
 	return df.sampleRate
 }

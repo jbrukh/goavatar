@@ -95,12 +95,15 @@ type RecorderProvider func() Recorder
 // data and know when to disconnect
 // ----------------------------------------------------------------- //
 
+// Control is a control structure used by client workers
+// that stream data.
 type Control struct {
 	done chan bool
 	out  chan DataFrame
 	d    *BaseDevice
 }
 
+// Create a new Control.
 func newControl(d *BaseDevice) *Control {
 	return &Control{
 		done: make(chan bool),
@@ -109,6 +112,8 @@ func newControl(d *BaseDevice) *Control {
 	}
 }
 
+// ShouldTerminate returns true if and only if the
+// Device is calling for streaming operations to stop.
 func (control *Control) ShouldTerminate() bool {
 	select {
 	case <-control.done:
@@ -118,6 +123,8 @@ func (control *Control) ShouldTerminate() bool {
 	return false
 }
 
+// The client worker should send data frames to the
+// Device by calling this method.
 func (control *Control) Send(df DataFrame) {
 	control.out <- df
 	if !control.ShouldTerminate() {
@@ -127,6 +134,8 @@ func (control *Control) Send(df DataFrame) {
 	}
 }
 
+// The client worker should call this method before
+// exiting.
 func (control *Control) Close() {
 	close(control.out)
 }
@@ -173,10 +182,13 @@ func NewBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc
 	}
 }
 
+// The name of the device.
 func (d *BaseDevice) Name() string {
 	return d.name
 }
 
+// The recording repository directory for
+// this device.
 func (d *BaseDevice) Repo() string {
 	return d.repo
 }
@@ -273,6 +285,8 @@ func (d *BaseDevice) Record() (err error) {
 	return d.record()
 }
 
+// record is the unsynchronized version of Record,
+// used internally.
 func (d *BaseDevice) record() (err error) {
 	if d.recording {
 		return fmt.Errorf("already recording")
@@ -318,6 +332,7 @@ func (d *BaseDevice) stop() (outFile string, err error) {
 	d.recording = false
 	return
 }
+
 func (d *BaseDevice) Recording() bool {
 	d.lock.Lock()
 	defer d.lock.Unlock()
