@@ -6,7 +6,6 @@ package formats
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"io"
 	"os"
@@ -228,6 +227,28 @@ func (oc *obfCodec) writeBlock(v []float64, ts uint32) (err error) {
 	return oc.write(ts)
 }
 
+// Return the last read number of channels.
+func (oc *obfCodec) channels() int {
+	return int(oc.header.Channels)
+}
+
+// Return the last read number of samples.
+func (oc *obfCodec) samples() int {
+	return int(oc.header.Samples)
+}
+
+// Return a new buffer big enough for this
+// OBF file.
+func (oc *obfCodec) buffer() *BlockBuffer {
+	return NewBlockBuffer(oc.channels(), oc.samples())
+}
+
+// Return a slice big enough to hold one block
+// of channel values.
+func (oc *obfCodec) block() []float64 {
+	return make([]float64, oc.channels())
+}
+
 // ----------------------------------------------------------------- //
 // Seeking Operations
 // ----------------------------------------------------------------- //
@@ -277,18 +298,11 @@ func (oc *obfCodec) ReadHeader() (err error) {
 
 // TODO:  deprecate
 func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
-	if oc.header.StorageMode != StorageModeParallel {
-		return nil, 0, fmt.Errorf("can only seek samples in parallel mode")
-	}
-	ch := int(oc.header.Channels)
-	values = make([]float64, ch)
-
-	err = binary.Read(oc.file, ByteOrder, values)
-	if err != nil {
+	values = oc.block()
+	if err = oc.read(values); err != nil {
 		return
 	}
-
-	err = binary.Read(oc.file, ByteOrder, &ts)
+	err = oc.read(&ts)
 	return
 }
 
@@ -307,11 +321,12 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 	if err = oc.SeekValues(); err != nil {
 		return
 	}
-	header := oc.Header()
-	channels, samples := int(header.Channels), int(header.Samples)
-	b = NewBlockBuffer(channels, samples)
-	v := make([]float64, channels)
-	var ts uint32
+	var (
+		samples = oc.samples()
+		v       = oc.block()
+		ts      uint32
+	)
+	b = oc.buffer()
 	for s := 0; s < samples; s++ {
 		oc.readBlock(v, &ts)
 		b.AppendSample(v, int64(ts))
