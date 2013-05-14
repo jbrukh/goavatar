@@ -155,10 +155,20 @@ type (
 	}
 
 	OBFReader interface {
-		ReadHeader() error
-		Header() *OBFHeader
+		// TODO: deprecate
 		ReadParallelBlock() ([]float64, uint32, error)
+
+		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
+		//Sequential() ([][]float64, []uint32, error)
+	}
+
+	OBFWriter interface {
+		SeekHeader() error
+		SeekValues() error
+		SeekParallel() error
+		SeekSequential() error
+		SeekSample(n int) error
 	}
 )
 
@@ -254,15 +264,10 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 
 // Read the OBFHeader of this file.
 func (oc *obfCodec) ReadHeader() (err error) {
-	return oc.read(&oc.header)
+	return oc.read(&oc.header) // TODO check valid header
 }
 
-// Return the header, if it has been read. If not,
-// the nil header will be returned.
-func (oc *obfCodec) Header() *OBFHeader {
-	return &oc.header
-}
-
+// TODO:  deprecate
 func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
 	if oc.header.StorageMode != StorageModeParallel {
 		return nil, 0, fmt.Errorf("can only seek samples in parallel mode")
@@ -283,16 +288,14 @@ func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error)
 // Reading Operations -- these operations seek also
 // ----------------------------------------------------------------- //
 
+// Return the last header that had been read. Notice
+// header is read upon instantiation.
+func (oc *obfCodec) Header() *OBFHeader {
+	return &oc.header
+}
+
 // Read the entire set of parallel values from the file.
 func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
-	if err = oc.SeekHeader(); err != nil {
-		return
-	}
-
-	if err = oc.ReadHeader(); err != nil {
-		return nil, err
-	}
-
 	if err = oc.SeekValues(); err != nil {
 		return
 	}
