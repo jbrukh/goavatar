@@ -9,6 +9,7 @@ import (
 	. "github.com/jbrukh/goavatar"
 	"io"
 	"os"
+	"fmt"
 )
 
 // ----------------------------------------------------------------- //
@@ -159,7 +160,7 @@ type (
 
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
-		Sequential() ([][]float64, []int64, error)
+		 Sequential() ([][]float64, []int64, error)
 	}
 
 	OBFWriter interface {
@@ -241,6 +242,11 @@ func (oc *obfCodec) samples() int {
 	return int(oc.header.Samples)
 }
 
+// Return the storage mode as an integer.
+func (oc *obfCodec) mode() byte {
+	return oc.header.StorageMode
+}
+
 // Return a new buffer big enough for this
 // OBF file.
 func (oc *obfCodec) buffer() *BlockBuffer {
@@ -303,6 +309,9 @@ func (oc *obfCodec) SeekValues() (err error) {
 
 // Go to the starting position of the parallel values.
 func (oc *obfCodec) SeekParallel() (err error) {
+	if oc.mode() == StorageModeSequential {
+		return fmt.Errorf("no parallel values available in this mode")
+	}
 	_, err = oc.file.Seek(OBFValuesAddr, os.SEEK_SET)
 	return
 }
@@ -310,12 +319,18 @@ func (oc *obfCodec) SeekParallel() (err error) {
 // Go to the starting position of the sequential values.
 // TODO this will fail silently without having called ReadHeader().
 func (oc *obfCodec) SeekSequential() (err error) {
+	if oc.mode() == StorageModeParallel {
+		return fmt.Errorf("no sequential values available in this mode")
+	}
 	_, err = oc.file.Seek(OBFHeaderSize+oc.payloadSize, os.SEEK_SET)
 	return
 }
 
 // Seek the n-th sample.
 func (oc *obfCodec) SeekSample(n int) (err error) {
+	if oc.mode() == StorageModeSequential {
+		return fmt.Errorf("no parallel values available in this mode")
+	}
 	panic("implement")
 	return
 }
