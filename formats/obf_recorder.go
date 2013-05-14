@@ -127,6 +127,9 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 		SampleRate:    uint16(r.sampleRate),
 	}
 
+	if err = r.codec.SeekHeader(); err != nil {
+		return "", err
+	}
 	if err = r.codec.WriteHeader(header); err != nil {
 		return "", err
 	}

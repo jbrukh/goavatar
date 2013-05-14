@@ -168,6 +168,9 @@ type (
 		SeekParallel() error
 		SeekSequential() error
 		SeekSample(n int) error
+
+		WriteHeader(*OBFHeader) error
+		WriteParallel(*BlockBuffer, int64) error
 	}
 )
 
@@ -340,10 +343,6 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 
 // Write a new header to this file.
 func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
-	// go to the start of the file
-	if err = oc.SeekHeader(); err != nil {
-		return err
-	}
 	return oc.write(h)
 }
 
