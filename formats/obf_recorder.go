@@ -45,9 +45,7 @@ func (r *OBFRecorder) Start() (err error) {
 		return
 	}
 
-	if r.codec, err = newObfCodec(r.file); err != nil {
-		return
-	}
+	r.codec = newObfCodec(r.file)
 
 	// make space for the header
 	if err = r.codec.SeekValues(); err != nil {

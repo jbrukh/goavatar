@@ -174,19 +174,20 @@ type (
 	}
 )
 
-// Create a new obfCodec and read the header. If the header
+// Create a new obfCodec.
+func newObfCodec(file io.ReadWriteSeeker) (oc *obfCodec) {
+	return &obfCodec{file: file}
+}
+
+// Create a new OBFReader and read the header. If the header
 // cannot be read an error is returned.
-func newObfCodec(file io.ReadWriteSeeker) (oc *obfCodec, err error) {
-	oc = &obfCodec{file: file}
+func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
+	oc := newObfCodec(file)
 	if err = oc.ReadHeader(); err != nil {
 		return
 	}
-	oc.pyldSize(int64(oc.header.Samples), int64(oc.header.Channels))
-	return
-}
-
-func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
-	return newObfCodec(file)
+	oc.pyldSize(int64(oc.samples()), int64(oc.channels()))
+	return oc, nil
 }
 
 // ----------------------------------------------------------------- //
