@@ -160,7 +160,7 @@ type (
 
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
-		 Sequential() ([][]float64, []int64, error)
+		Sequential() ([][]float64, []int64, error)
 	}
 
 	OBFWriter interface {
@@ -432,6 +432,7 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 	return oc.ReadParallel()
 }
 
+// Read the entire set of sequential values from the file.
 func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
 	if err = oc.SeekSequential(); err != nil {
 		return
@@ -464,5 +465,4 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
 	return oc.write(buf.Bytes())
-	//log.Printf("finished: %v", err)
 }
