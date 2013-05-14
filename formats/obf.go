@@ -161,13 +161,17 @@ type (
 	}
 )
 
-func newObfCodec(file io.ReadWriteSeeker) *obfCodec {
-	return &obfCodec{
+// Create a new obfCodec and read the header. If the header
+// cannot be read an error is returned.
+func newObfCodec(file io.ReadWriteSeeker) (oc *obfCodec, err error) {
+	oc = &obfCodec{
 		file: file,
 	}
+	err = oc.ReadHeader()
+	return
 }
 
-func NewOBFReader(file io.ReadWriteSeeker) OBFReader {
+func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
 	return newObfCodec(file)
 }
 
@@ -185,7 +189,6 @@ func (oc *obfCodec) read(i interface{}) error {
 func (oc *obfCodec) write(i interface{}) error {
 	return binary.Write(oc.file, ByteOrder, i)
 }
-
 
 // Read a block in place.
 func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
@@ -327,7 +330,7 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	buf := new(bytes.Buffer)
 	for i := 0; i < samples; i++ {
 		v, ts := b.NextSample()
-		oc.writeBlock(v, uint32((ts-firstTs)/1000000)
+		oc.writeBlock(v, uint32((ts-firstTs)/1000000))
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())

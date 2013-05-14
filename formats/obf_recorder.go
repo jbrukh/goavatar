@@ -42,10 +42,12 @@ func (r *OBFRecorder) Start() (err error) {
 	// open the file
 	r.file, err = os.OpenFile(r.fileName, os.O_CREATE|os.O_WRONLY, 0655)
 	if err != nil {
-		return err
+		return
 	}
 
-	r.codec = newObfCodec(r.file)
+	if r.codec, err = newObfCodec(r.file); err != nil {
+		return
+	}
 
 	// make space for the header
 	if err = r.codec.SeekValues(); err != nil {

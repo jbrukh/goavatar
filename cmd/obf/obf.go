@@ -65,9 +65,9 @@ func main() {
 		fmt.Println(preludeFmt)
 	}
 
-	codec := NewOBFReader(file)
-	if err = codec.ReadHeader(); err != nil {
-		fmt.Printf("could not read the header: %v\n", err)
+	codec, err := NewOBFReader(file)
+	if err != nil {
+		fmt.Printf("could not read the header")
 		return
 	}
 	header := codec.Header()
