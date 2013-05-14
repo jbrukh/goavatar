@@ -159,7 +159,7 @@ type (
 
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
-		//Sequential() ([][]float64, []int64, error)
+		Sequential() ([][]float64, []int64, error)
 	}
 
 	OBFWriter interface {
@@ -253,6 +253,38 @@ func (oc *obfCodec) block() []float64 {
 	return make([]float64, oc.channels())
 }
 
+func (oc *obfCodec) channel() []float64 {
+	return make([]float64, oc.samples())
+}
+
+func (oc *obfCodec) timestamps() []int64 {
+	return make([]int64, oc.samples())
+}
+
+func toTs(ts uint32) int64 {
+	return int64(ts)*1000000
+}
+
+func (oc *obfCodec) forChannels(f func(c int) error) error {
+	channels := oc.channels()
+	for c := 0; c < channels; c++ {
+		if err := f(c); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (oc *obfCodec) forSamples(f func(s int) error) error {
+	samples := oc.samples()
+	for s := 0; s < samples; s++ {
+		if err := f(s); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ----------------------------------------------------------------- //
 // Seeking Operations
 // ----------------------------------------------------------------- //
@@ -300,6 +332,50 @@ func (oc *obfCodec) ReadHeader() (err error) {
 	return oc.validate()
 }
 
+// Read the entire set of parallel values from
+// the file starting at the current position.
+func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
+	var (
+		samples = oc.samples()
+		v       = oc.block()
+		ts      uint32
+	)
+	b = oc.buffer()
+	for s := 0; s < samples; s++ {
+		oc.readBlock(v, &ts)
+		b.AppendSample(v, int64(ts))
+	}
+	return
+}
+
+func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
+	// allocate channel slices
+	v = make([][]float64, oc.channels())
+
+	// read in all the channels sequentially
+	err = oc.forChannels(func(c int) (err error) {
+		v[c] = oc.channel()
+		return oc.read(v[c])
+	})
+	if err != nil {
+		return
+	}
+
+	// allocate the timestamps
+	ts = oc.timestamps()
+
+	// read and convert all the timestamps
+	err = oc.forSamples(func(s int) (err error){
+		var ts32 uint32
+		if err = oc.read(&ts32); err != nil {
+			return
+		}
+		ts[s] = toTs(ts32)
+		return
+	})
+	return
+}
+
 // TODO:  deprecate
 func (oc *obfCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
 	values = oc.block()
@@ -308,12 +384,13 @@ func (oc *obfCodec) ReadParallelBlock() (values []float64, ts int64, err error) 
 	}
 	var ts32 uint32
 	err = oc.read(&ts32)
-	ts = int64(ts32)*1000000
+	ts = toTs(ts32)
 	return
 }
 
 // ----------------------------------------------------------------- //
-// Reading Operations -- these operations seek also
+// Reading Operations -- these operations seek and do validation, 
+// so are more user-facing and safer
 // ----------------------------------------------------------------- //
 
 // Return the last header that had been read. Notice
@@ -327,18 +404,16 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 	if err = oc.SeekValues(); err != nil {
 		return
 	}
-	var (
-		samples = oc.samples()
-		v       = oc.block()
-		ts      uint32
-	)
-	b = oc.buffer()
-	for s := 0; s < samples; s++ {
-		oc.readBlock(v, &ts)
-		b.AppendSample(v, int64(ts))
-	}
-	return
+	return oc.ReadParallel()
 }
+
+func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
+	if err = oc.SeekSequential(); err != nil {
+		return
+	}
+	return oc.ReadSequential()
+}
+
 
 // ----------------------------------------------------------------- //
 // Writing Operations -- All these operations happen in-place
