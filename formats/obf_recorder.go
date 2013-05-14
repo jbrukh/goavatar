@@ -15,7 +15,7 @@ type OBFRecorder struct {
 	repo     string    // repository where file is being recorded to
 	fileName string    // name of the file/resource id
 	file     *os.File  // the file we're writing
-	codec    *OBFCodec // codec for the OBF format
+	codec    *obfCodec // codec for the OBF format
 
 	out  chan DataFrame // channel for the worker to process frames
 	cerr chan error     // channel for worker error feedback
@@ -45,7 +45,7 @@ func (r *OBFRecorder) Start() (err error) {
 		return err
 	}
 
-	r.codec = &OBFCodec{file: r.file}
+	r.codec = newObfCodec(r.file)
 
 	// make space for the header
 	if err = r.codec.SeekValues(); err != nil {

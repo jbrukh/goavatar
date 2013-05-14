@@ -12,46 +12,53 @@ import (
 	"os"
 )
 
-// -------------------------------------------------------
-// Octopus Binary Format (OBF) Version 1 (Parallel Only)
+// ----------------------------------------------------------------- //
+// Octopus Binary Format (OBF) Version 1
+// (Parallel Only)
 //
 // Header (10 bytes):
 //    DataType (1 byte):                 0x01 = raw device data;
 //    FormatVersion (1 byte):            0x01 = version 1
 //    StorageMode (1 byte):              0x01 = parallel; 0x02 = sequential
 //    Channels (1 byte):                 0-255 channels
-//    Samples (uint32):                   number of samples stored
-//    SampleRate (uint16):                 the sample rate at which this data was sampled
+//    Samples (uint32):                  number of samples stored
+//    SampleRate (uint16):               the sample rate at which this
+//                                       data was sampled
 //
 // Payload (variable):
 //    Values + Timestamps
 //    (float64*channels*samples
-//    + int64*samples):                  parallel format; blocks of channel values + timestamps
+//    + int64*samples):                  parallel format; blocks of channel
+//                                       values + timestamps
 //
-// -------------------------------------------------------
-// Octopus Binary Format (OBF) Version 2 (Combined, 32-bit relative timestamps)
+// ----------------------------------------------------------------- //
+// Octopus Binary Format (OBF) Version 2
+// (Combined, 32-bit relative timestamps)
 //
 // Header (31 bytes):
 //    DataType (1 byte):                 0x01 = raw device data;
 //    FormatVersion (1 byte):            0x01 = version 1
-//    StorageMode (1 byte):              0x01 = parallel; 0x02 = sequential; 0x03 = combined
+//    StorageMode (1 byte):              0x01 = parallel; 0x02 = sequential;
+//                                       0x03 = combined
 //    Channels (1 byte):                 0-255 channels
-//    Samples (uint32):                   number of samples stored
-//    SampleRate (uint16):                 the sample rate at which this data was sampled
+//    Samples (uint32):                  number of samples stored
+//    SampleRate (uint16):               the sample rate at which this
+//                                       data was sampled
 //    Endianness (1 byte):               0x00 = Big; 0x01 = Little
 //    Reserved (20 bytes):               reserved for future expansions
 //
 // P-mode Values (variable):
 //    Values + Timestamps
 //    (float64*channels*samples
-//    + uint32*samples):                  parallel format; blocks of channel values +
-//                                        timestamps (in ms starting at 0)
+//    + uint32*samples):                  parallel format; blocks of channel
+//                                        values + timestamps (in ms starting at 0)
 //
 // S-mode Values (variable):
 //    Values (float64*channels*samples):  sequential format
-//    Timestamps (uint32*samples):        timestamps of the values (unsigned, in ms starting at 0)
+//    Timestamps (uint32*samples):        timestamps of the values (unsigned,
+//                                        in ms starting at 0)
 //
-// --------------------------------------------------------
+// ----------------------------------------------------------------- //
 // Notes on P-mode vs S-mode:
 //
 // Define v(c,s) to mean the value of channel c (0 < c <= C) at
@@ -123,13 +130,6 @@ const (
 // ----------------------------------------------------------------- //
 
 type (
-	// OBFCodec will read and write the OBF
-	// format on various levels of abstraction.
-	OBFCodec struct {
-		file   io.ReadWriteSeeker
-		header OBFHeader
-	}
-
 	// The OBF Header, which keeps track
 	// of versioning information as well
 	// as the size of the data.
@@ -143,76 +143,104 @@ type (
 		Endianness    byte
 		Reserved      [20]byte // reserved for extentions
 	}
+
+	// obfCodec will read and write the OBF
+	// format on various levels of abstraction.
+	obfCodec struct {
+		file   io.ReadWriteSeeker
+		header OBFHeader
+	}
+
+	OBFReader interface {
+		ReadHeader() (*OBFHeader, error)
+		Header() *OBFHeader
+		ReadParallelBlock() ([]float64, uint32, error)
+		Parallel() (*BlockBuffer, error)
+	}
 )
 
-func NewOBFCodec(file io.ReadWriteSeeker) *OBFCodec {
-	return &OBFCodec{
+func newObfCodec(file io.ReadWriteSeeker) *obfCodec {
+	return &obfCodec{
 		file: file,
 	}
 }
 
-// Return the header, if it has been read. If not,
-// the nil header will be returned.
-func (s *OBFCodec) Header() *OBFHeader {
-	return &s.header
+func NewOBFReader(file io.ReadWriteSeeker) OBFReader {
+	return newObfCodec(file)
 }
 
+// ----------------------------------------------------------------- //
+// Seeking Operations
+// ----------------------------------------------------------------- //
+
 // Go to the starting position of the header.
-func (s *OBFCodec) SeekHeader() (err error) {
-	_, err = s.file.Seek(OBFHeaderAddr, os.SEEK_SET)
+func (oc *obfCodec) SeekHeader() (err error) {
+	_, err = oc.file.Seek(OBFHeaderAddr, os.SEEK_SET)
 	return
 }
 
 // Go to the starting position of the values.
-func (s *OBFCodec) SeekValues() (err error) {
-	_, err = s.file.Seek(int64(OBFValuesAddr), os.SEEK_SET)
+func (oc *obfCodec) SeekValues() (err error) {
+	_, err = oc.file.Seek(OBFValuesAddr, os.SEEK_SET)
 	return
 }
 
-// In StorageMode parallel, we can seek to individual
-// samples.
-func (s *OBFCodec) SeekSample(n int) (err error) {
-	if s.header.StorageMode != StorageModeParallel {
-		return fmt.Errorf("can only seek samples in parallel mode")
-	}
-	if n > int(s.header.Samples)-1 || n < 0 {
-		return fmt.Errorf("no such sample")
-	}
-
-	blockSize := int(s.header.Channels)*OBFValueSize + OBFTimestampSize
-	offset := int64(OBFHeaderSize + blockSize*n)
-	_, err = s.file.Seek(offset, os.SEEK_SET)
+// Go to the starting position of the parallel values.
+func (oc *obfCodec) SeekParallel() (err error) {
+	_, err = oc.file.Seek(OBFValuesAddr, os.SEEK_SET)
 	return
+}
+
+// Go to the starting position of the sequential values.
+func (oc *obfCodec) SeekSequential() (err error) {
+	_, err = oc.file.Seek(OBFValuesAddr, os.SEEK_SET)
+	return
+}
+
+// Seek the n-th sample.
+func (oc *obfCodec) SeekSample(n int) (err error) {
+	panic("implement")
+	return
+}
+
+// ----------------------------------------------------------------- //
+// Reading Operations -- all these operations happen in-place
+// ----------------------------------------------------------------- //
+
+// Return the header, if it has been read. If not,
+// the nil header will be returned.
+func (oc *obfCodec) Header() *OBFHeader {
+	return &oc.header
 }
 
 // Write a new header to this file.
-func (s *OBFCodec) WriteHeader(h *OBFHeader) (err error) {
+func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
 	// go to the start of the file
-	if err = s.SeekHeader(); err != nil {
+	if err = oc.SeekHeader(); err != nil {
 		return err
 	}
 
-	err = binary.Write(s.file, binary.BigEndian, h)
+	err = binary.Write(oc.file, binary.BigEndian, h)
 	return
 }
 
 // Read the OBFHeader of this file.
-func (s *OBFCodec) ReadHeader() (header *OBFHeader, err error) {
-	if err = s.SeekHeader(); err != nil {
+func (oc *obfCodec) ReadHeader() (header *OBFHeader, err error) {
+	if err = oc.SeekHeader(); err != nil {
 		return nil, err
 	}
 
-	err = binary.Read(s.file, binary.BigEndian, &s.header)
+	err = binary.Read(oc.file, binary.BigEndian, &oc.header)
 	if err != nil {
 		return nil, err
 	}
 
-	return &s.header, nil
+	return &oc.header, nil
 }
 
 // Writes a data frame in parallel mode, assuming the writer
 // is at the correct location for the frame.
-func (s *OBFCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
+func (oc *obfCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	var (
 		samples = b.Samples()
 	)
@@ -225,35 +253,35 @@ func (s *OBFCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
-	err = binary.Write(s.file, binary.BigEndian, buf.Bytes())
+	err = binary.Write(oc.file, binary.BigEndian, buf.Bytes())
 	//log.Printf("finished: %v", err)
 	return
 }
 
-func (s *OBFCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
-	if s.header.StorageMode != StorageModeParallel {
+func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error) {
+	if oc.header.StorageMode != StorageModeParallel {
 		return nil, 0, fmt.Errorf("can only seek samples in parallel mode")
 	}
-	ch := int(s.header.Channels)
+	ch := int(oc.header.Channels)
 	values = make([]float64, ch)
 
-	err = binary.Read(s.file, binary.BigEndian, values)
+	err = binary.Read(oc.file, binary.BigEndian, values)
 	if err != nil {
 		return
 	}
 
-	err = binary.Read(s.file, binary.BigEndian, &ts)
+	err = binary.Read(oc.file, binary.BigEndian, &ts)
 	return
 }
 
 // Read the entire set of parallel values from the file.
-func (codec *OBFCodec) Parallel() (b *BlockBuffer, err error) {
-	header, err := codec.ReadHeader()
+func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
+	header, err := oc.ReadHeader()
 	if err != nil {
 		return nil, err
 	}
 
-	if err = codec.SeekValues(); err != nil {
+	if err = oc.SeekValues(); err != nil {
 		return
 	}
 
@@ -262,52 +290,18 @@ func (codec *OBFCodec) Parallel() (b *BlockBuffer, err error) {
 	v := make([]float64, channels)
 	var ts uint32
 	for s := 0; s < samples; s++ {
-		codec.readBlock(v, &ts)
+		oc.readBlock(v, &ts)
 		b.AppendSample(v, int64(ts))
 	}
 	return
 }
 
-func (s *OBFCodec) readBlock(v []float64, ts *uint32) (err error) {
-	if err = binary.Read(s.file, binary.BigEndian, v); err != nil {
+func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
+	if err = binary.Read(oc.file, binary.BigEndian, v); err != nil {
 		return
 	}
-	if err = binary.Read(s.file, binary.BigEndian, ts); err != nil {
+	if err = binary.Read(oc.file, binary.BigEndian, ts); err != nil {
 		return
 	}
 	return nil
 }
-
-// // Convert the entire file into a DataFrame.
-// func (s *OBFCodec) ReadDataFrame() (df *GenericDataFrame, err error) {
-// 	switch s.header.StorageMode {
-// 	case StorageModeParallel:
-// 		var (
-// 			ch         = int(s.header.Channels)
-// 			samples    = int(s.header.Samples)
-// 			sampleRate = int(s.header.SampleRate)
-// 			buf        = NewBlockBuffer(ch, samples)
-// 			timestamps = make([]uint32, samples)
-// 		)
-
-// 		// for each sample
-// 		for i := 0; i < samples; i++ {
-// 			if err = s.SeekSample(i); err != nil {
-// 				return nil, err
-// 			}
-// 			values, ts, err := s.ReadParallelBlock()
-// 			if err != nil {
-// 				return nil, err
-// 			}
-// 			buf.PushSlice(values)
-// 			timestamps[i] = ts
-// 		}
-
-// 		df = NewGenericDataFrame(buf, ch, samples, sampleRate, timestamps)
-// 		return
-// 	case StorageModeSequential:
-// 	default:
-// 		return nil, fmt.Errorf("unknown storage mode")
-// 	}
-// 	return
-// }

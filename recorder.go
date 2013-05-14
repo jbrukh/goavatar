@@ -9,7 +9,7 @@ import (
 
 var hash = sha1.New()
 
-// A recorder of dataframes.
+// A real-time recorder of dataframes.
 type Recorder interface {
 	Start() error
 	ProcessFrame(DataFrame) error

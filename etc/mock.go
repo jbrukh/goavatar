@@ -19,7 +19,7 @@ func MockDataFrames(fn string) (d []DataFrame, err error) {
 	}
 	defer file.Close()
 
-	codec := NewOBFCodec(file)
+	codec := NewOBFReader(file)
 	b, err := codec.Parallel()
 	if err != nil {
 		return

@@ -64,7 +64,7 @@ func main() {
 	if !*csv {
 		fmt.Println(preludeFmt)
 	}
-	codec := NewOBFCodec(file)
+	codec := NewOBFReader(file)
 	header, err := codec.ReadHeader()
 	if err != nil {
 		fmt.Printf("could not read the header: %v\n", err)
@@ -118,7 +118,7 @@ func main() {
 	}
 }
 
-func printFrames(codec *OBFCodec) {
+func printFrames(codec OBFReader) {
 	var (
 		header  = codec.Header()
 		ch      = int(header.Channels)
