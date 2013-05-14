@@ -186,12 +186,21 @@ func (oc *obfCodec) write(i interface{}) error {
 	return binary.Write(oc.file, ByteOrder, i)
 }
 
+
 // Read a block in place.
 func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
 	if err = oc.read(v); err != nil {
 		return
 	}
 	return oc.read(ts)
+}
+
+// Write a block in place.
+func (oc *obfCodec) writeBlock(v []float64, ts uint32) (err error) {
+	if err = oc.write(v); err != nil {
+		return
+	}
+	return oc.write(ts)
 }
 
 // ----------------------------------------------------------------- //
@@ -305,9 +314,7 @@ func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
 	if err = oc.SeekHeader(); err != nil {
 		return err
 	}
-
-	err = binary.Write(oc.file, ByteOrder, h)
-	return
+	return oc.write(h)
 }
 
 // Writes a data frame in parallel mode, assuming the writer
@@ -320,12 +327,11 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	buf := new(bytes.Buffer)
 	for i := 0; i < samples; i++ {
 		v, ts := b.NextSample()
-		binary.Write(buf, ByteOrder, v)
-		binary.Write(buf, ByteOrder, uint32((ts-firstTs)/1000000))
+		oc.writeBlock(v, uint32((ts-firstTs)/1000000)
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
-	err = binary.Write(oc.file, ByteOrder, buf.Bytes())
+	return oc.write(buf.Bytes())
 	//log.Printf("finished: %v", err)
 	return
 }
