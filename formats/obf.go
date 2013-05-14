@@ -195,6 +195,10 @@ func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
 // Private Methods
 // ----------------------------------------------------------------- //
 
+func toTs(ts uint32) int64 {
+	return int64(ts)*1000000
+}
+
 func (oc *obfCodec) pyldSize(channels, samples int64) {
 	oc.payloadSize = samples * (channels*
 		OBFValueSize + OBFTimestampSize)
@@ -213,7 +217,11 @@ func (oc *obfCodec) read(i interface{}) error {
 // Write a piece of binary data to the underlying stream,
 // in place.
 func (oc *obfCodec) write(i interface{}) error {
-	return binary.Write(oc.file, ByteOrder, i)
+	return oc.writeTo(oc.file, i)
+}
+
+func (oc *obfCodec) writeTo(w io.Writer, i interface{}) error {
+	return binary.Write(w, ByteOrder, i)
 }
 
 // Read a block in place.
@@ -226,10 +234,14 @@ func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
 
 // Write a block in place.
 func (oc *obfCodec) writeBlock(v []float64, ts uint32) (err error) {
-	if err = oc.write(v); err != nil {
+	return oc.writeBlockTo(oc.file, v, ts)
+}
+
+func (oc *obfCodec) writeBlockTo(w io.Writer, v []float64, ts uint32) (err error){
+	if err = oc.writeTo(w, v); err != nil {
 		return
 	}
-	return oc.write(ts)
+	return oc.writeTo(w, ts)
 }
 
 // Return the last read number of channels.
@@ -265,10 +277,6 @@ func (oc *obfCodec) channel() []float64 {
 
 func (oc *obfCodec) timestamps() []int64 {
 	return make([]int64, oc.samples())
-}
-
-func toTs(ts uint32) int64 {
-	return int64(ts)*1000000
 }
 
 func (oc *obfCodec) forChannels(f func(c int) error) error {
@@ -444,18 +452,17 @@ func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
 // Writes a data frame in parallel mode, assuming the writer
 // is at the correct location for the frame.
 func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
-	var (
-		samples = b.Samples()
-	)
-
+	// write parallel samples to a buffer
 	buf := new(bytes.Buffer)
-	for i := 0; i < samples; i++ {
+	err = oc.forSamples(func(s int) (err error) {
 		v, ts := b.NextSample()
-		oc.writeBlock(v, tsTransform(ts))
+		return oc.writeBlockTo(buf, v, tsTransform(ts))
+	})
+	if err != nil {
+		return
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
 	return oc.write(buf.Bytes())
 	//log.Printf("finished: %v", err)
-	return
 }
