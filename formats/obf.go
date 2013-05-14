@@ -186,6 +186,14 @@ func (oc *obfCodec) write(i interface{}) error {
 	return binary.Write(oc.file, ByteOrder, i)
 }
 
+// Read a block in place.
+func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
+	if err = oc.read(v); err != nil {
+		return
+	}
+	return oc.read(ts)
+}
+
 // ----------------------------------------------------------------- //
 // Seeking Operations
 // ----------------------------------------------------------------- //
@@ -320,14 +328,4 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	err = binary.Write(oc.file, ByteOrder, buf.Bytes())
 	//log.Printf("finished: %v", err)
 	return
-}
-
-func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
-	if err = binary.Read(oc.file, ByteOrder, v); err != nil {
-		return
-	}
-	if err = binary.Read(oc.file, ByteOrder, ts); err != nil {
-		return
-	}
-	return nil
 }
