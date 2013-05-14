@@ -196,6 +196,11 @@ func (oc *obfCodec) pyldSize(channels, samples int64) {
 		OBFValueSize + OBFTimestampSize)
 }
 
+// Validate the last header that has been read.
+func (oc *obfCodec) validate() (err error) {
+	return // TODO TODO TODO
+}
+
 // Read a piece of binary data from the underlying stream.
 func (oc *obfCodec) read(i interface{}) error {
 	return binary.Read(oc.file, ByteOrder, i)
@@ -264,7 +269,10 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 
 // Read the OBFHeader of this file.
 func (oc *obfCodec) ReadHeader() (err error) {
-	return oc.read(&oc.header) // TODO check valid header
+	if err = oc.read(&oc.header); err != nil {
+		return
+	}
+	return oc.validate()
 }
 
 // TODO:  deprecate
