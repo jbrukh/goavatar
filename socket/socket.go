@@ -389,7 +389,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 		return
 	}
 	var (
-		channels   = df.Channels()
+		channels   = df.Buffer().Channels()
 		sampleRate = df.SampleRate()
 	)
 
@@ -409,8 +409,6 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 	verbose bool, conn *websocket.Conn) {
 	var (
-		frames       = 0
-		mean_diff    = float64(0)
 		kill         = make(chan bool)
 		pluckRate    = sampleRate / pps      // now we need to sample every sampleRate/pps points
 		absBatchSize = batchSize * pluckRate // actual number of data points we must read in order to obtain a sampled batch of batchSize
@@ -440,10 +438,6 @@ func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 			return
 		}
 
-		// calculate the latency
-		frames++
-		mean_diff, d := updateMeanDiff(frames, mean_diff, df)
-
 		// put the frame into our memory buffer
 		b.Append(df.Buffer())
 
@@ -458,7 +452,6 @@ func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 				msg   = new(DataMessage)
 			)
 
-			msg.LatencyMs = AbsFloat64(mean_diff - d)
 			msg.Data, _ = batch.Arrays()
 			if verbose {
 				log.Printf("sending data msg: %+v", msg)
@@ -470,10 +463,4 @@ func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 			}
 		}
 	}
-}
-
-func updateMeanDiff(frames int, mean_diff float64, df DataFrame) (float64, float64) {
-	d := AbsFloat64(float64(df.Received().UnixNano() - df.Generated().UnixNano())) // diff between received and stamped time
-	diff := float64(frames)/float64(frames+1)*mean_diff + d/float64(frames+1)
-	return diff, d
 }

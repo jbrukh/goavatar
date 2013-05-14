@@ -21,6 +21,7 @@ const (
 	DefaultMaxFrames   = 10000
 	WindowMultiple     = 10
 	DumpFile           = "frames.go"
+	DefaultMockFile    = "etc/ee6d09f8-1df6-5bac-deee-c18a28407190"
 )
 
 var (
@@ -29,6 +30,7 @@ var (
 	refreshRate *int    = flag.Int("refreshRate", DefaultRefreshRate, "the number of data points to buffer before refreshing")
 	maxFrames   *int    = flag.Int("maxFrames", DefaultMaxFrames, "maximum frames to read before turning off")
 	mockDevice  *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
+	mockFile    *string = flag.String("mockFile", DefaultMockFile, "OBF file to play back in the mock device")
 )
 
 func init() {
@@ -51,7 +53,7 @@ func main() {
 	// set up the device
 	var device Device
 	if *mockDevice {
-		device = NewMockDevice("")
+		device = NewMockDevice("", *mockFile)
 	} else {
 		device = NewAvatarDevice(*serialPort, "")
 	}
@@ -82,7 +84,7 @@ func run(p *gplot.Plotter, out <-chan DataFrame) {
 			return
 		}
 
-		for s := 0; s < df.Samples(); s++ {
+		for s := 0; s < df.Buffer().Samples(); s++ {
 			v, _ := df.Buffer().NextSample()
 			window1.PushBack(v[0])
 			window2.PushBack(v[1])

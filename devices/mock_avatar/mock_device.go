@@ -5,8 +5,9 @@ package mock_avatar
 
 import (
 	. "github.com/jbrukh/goavatar"
-	// "github.com/jbrukh/goavatar/etc"
+	. "github.com/jbrukh/goavatar/etc"
 	. "github.com/jbrukh/goavatar/formats"
+	"log"
 	"time"
 )
 
@@ -19,13 +20,16 @@ type MockDevice struct {
 }
 
 // Mock AvatarEEG device that plays pre-recorded frames on
-// repeat.
-func NewMockDevice(repo string) *MockDevice {
-
+// repeat. The frames are specified as an OBF file.
+func NewMockDevice(repo string, obfFile string) *MockDevice {
+	var frames []DataFrame
 	// CONNECT
-	connFunc := func() error {
-		// simulate startup time
-		time.Sleep(time.Second * 1)
+	connFunc := func() (err error) {
+		log.Printf("loading up mock data from: %s", obfFile)
+		frames, err = MockDataFrames(obfFile)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 
@@ -42,7 +46,7 @@ func NewMockDevice(repo string) *MockDevice {
 			if c.ShouldTerminate() {
 				return nil
 			}
-			//c.Send(etc.MockAvatarFrames[tick%len(etc.MockAvatarFrames)])
+			c.Send(frames[tick%len(frames)])
 			tick++
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}

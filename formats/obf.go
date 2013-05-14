@@ -9,7 +9,6 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"io"
-	//"log"
 	"os"
 )
 
@@ -204,6 +203,38 @@ func (s *OBFCodec) ReadParallelBlock() (values []float64, ts uint32, err error) 
 
 	err = binary.Read(s.file, binary.BigEndian, &ts)
 	return
+}
+
+// Read the entire set of parallel values from the file.
+func (codec *OBFCodec) Parallel() (b *BlockBuffer, err error) {
+	header, err := codec.ReadHeader()
+	if err != nil {
+		return nil, err
+	}
+
+	if err = codec.SeekValues(); err != nil {
+		return
+	}
+
+	channels, samples := int(header.Channels), int(header.Samples)
+	b = NewBlockBuffer(channels, samples)
+	v := make([]float64, channels)
+	var ts uint32
+	for s := 0; s < samples; s++ {
+		codec.readBlock(v, &ts)
+		b.AppendSample(v, int64(ts))
+	}
+	return
+}
+
+func (s *OBFCodec) readBlock(v []float64, ts *uint32) (err error) {
+	if err = binary.Read(s.file, binary.BigEndian, v); err != nil {
+		return
+	}
+	if err = binary.Read(s.file, binary.BigEndian, ts); err != nil {
+		return
+	}
+	return nil
 }
 
 // // Convert the entire file into a DataFrame.

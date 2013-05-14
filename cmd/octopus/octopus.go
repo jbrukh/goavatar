@@ -20,6 +20,7 @@ const (
 	DefaultListenPort = 8000
 	ControlEndpoint   = "/control"
 	DataEndpoint      = "/device"
+	DefaultMockFile   = "etc/ee6d09f8-1df6-5bac-deee-c18a28407190"
 )
 
 var (
@@ -28,6 +29,7 @@ var (
 	listenPort *int    = flag.Int("listenPort", DefaultListenPort, "the websocket port on which to listen")
 	verbose    *bool   = flag.Bool("verbose", false, "whether the socket is verbose (shows outgoing data)")
 	repo       *string = flag.String("repo", DefaultRepo, "directory where recordings are stored")
+	mockFile   *string = flag.String("mockFile", DefaultMockFile, "OBF file to play back in the mock device")
 )
 
 func main() {
@@ -36,7 +38,7 @@ func main() {
 
 	// get the device
 	if *mockDevice {
-		device = NewMockDevice(*repo)
+		device = NewMockDevice(*repo, *mockFile)
 	} else {
 		device = NewAvatarDevice(*serialPort, *repo)
 	}

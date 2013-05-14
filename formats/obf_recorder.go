@@ -65,7 +65,7 @@ func (r *OBFRecorder) Start() (err error) {
 
 			// TODO hacky
 			if firstTs == 0 {
-				firstTs = df.Generated().UnixNano()
+				firstTs = df.Buffer().Timestamps()[0]
 				log.Printf("Seeting first at %d", firstTs)
 			}
 
@@ -90,9 +90,9 @@ func (r *OBFRecorder) ProcessFrame(df DataFrame) error {
 		return err
 	default:
 		r.out <- df
-		r.channels = df.Channels()     // TODO
-		r.sampleRate = df.SampleRate() // TODO
-		r.samples += df.Samples()
+		r.channels = df.Buffer().Channels() // TODO
+		r.sampleRate = df.SampleRate()      // TODO
+		r.samples += df.Buffer().Samples()
 	}
 	return nil
 }
