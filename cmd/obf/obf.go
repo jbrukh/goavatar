@@ -64,6 +64,7 @@ func main() {
 	if !*csv {
 		fmt.Println(preludeFmt)
 	}
+
 	codec := NewOBFReader(file)
 	if err = codec.ReadHeader(); err != nil {
 		fmt.Printf("could not read the header: %v\n", err)

@@ -125,6 +125,8 @@ const (
 	OBFValuesAddr = OBFHeaderSize
 )
 
+var ByteOrder = binary.BigEndian
+
 // ----------------------------------------------------------------- //
 // TYPES
 // ----------------------------------------------------------------- //
@@ -170,6 +172,21 @@ func NewOBFReader(file io.ReadWriteSeeker) OBFReader {
 }
 
 // ----------------------------------------------------------------- //
+// Private Methods
+// ----------------------------------------------------------------- //
+
+// Read a piece of binary data from the underlying stream.
+func (oc *obfCodec) read(i interface{}) error {
+	return binary.Read(oc.file, ByteOrder, i)
+}
+
+// Write a piece of binary data to the underlying stream,
+// in place.
+func (oc *obfCodec) write(i interface{}) error {
+	return binary.Write(oc.file, ByteOrder, i)
+}
+
+// ----------------------------------------------------------------- //
 // Seeking Operations
 // ----------------------------------------------------------------- //
 
@@ -209,7 +226,7 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 
 // Read the OBFHeader of this file.
 func (oc *obfCodec) ReadHeader() (err error) {
-	err = binary.Read(oc.file, binary.BigEndian, &oc.header)
+	err = binary.Read(oc.file, ByteOrder, &oc.header)
 	return
 }
 
@@ -226,7 +243,7 @@ func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
 		return err
 	}
 
-	err = binary.Write(oc.file, binary.BigEndian, h)
+	err = binary.Write(oc.file, ByteOrder, h)
 	return
 }
 
@@ -240,12 +257,12 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, firstTs int64) (err error) {
 	buf := new(bytes.Buffer)
 	for i := 0; i < samples; i++ {
 		v, ts := b.NextSample()
-		binary.Write(buf, binary.BigEndian, v)
-		binary.Write(buf, binary.BigEndian, uint32((ts-firstTs)/1000000))
+		binary.Write(buf, ByteOrder, v)
+		binary.Write(buf, ByteOrder, uint32((ts-firstTs)/1000000))
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
-	err = binary.Write(oc.file, binary.BigEndian, buf.Bytes())
+	err = binary.Write(oc.file, ByteOrder, buf.Bytes())
 	//log.Printf("finished: %v", err)
 	return
 }
@@ -257,12 +274,12 @@ func (oc *obfCodec) ReadParallelBlock() (values []float64, ts uint32, err error)
 	ch := int(oc.header.Channels)
 	values = make([]float64, ch)
 
-	err = binary.Read(oc.file, binary.BigEndian, values)
+	err = binary.Read(oc.file, ByteOrder, values)
 	if err != nil {
 		return
 	}
 
-	err = binary.Read(oc.file, binary.BigEndian, &ts)
+	err = binary.Read(oc.file, ByteOrder, &ts)
 	return
 }
 
@@ -292,10 +309,10 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 }
 
 func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
-	if err = binary.Read(oc.file, binary.BigEndian, v); err != nil {
+	if err = binary.Read(oc.file, ByteOrder, v); err != nil {
 		return
 	}
-	if err = binary.Read(oc.file, binary.BigEndian, ts); err != nil {
+	if err = binary.Read(oc.file, ByteOrder, ts); err != nil {
 		return
 	}
 	return nil
