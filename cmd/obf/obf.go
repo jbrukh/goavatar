@@ -17,6 +17,7 @@ var (
 	humanTime *bool = flag.Bool("humanTime", false, "format timestamps")
 	csv       *bool = flag.Bool("csv", false, "output strict CSV")
 	plot      *bool = flag.Bool("plot", false, "ouput the series on a gplot graph")
+	seq       *bool = flag.Bool("seq", false, "read sequential data, if available")
 )
 
 func init() {
@@ -85,11 +86,22 @@ func main() {
 	}
 	fmt.Println()
 
-	printFrames(codec)
-
+	if *seq {
+		v, ts, err := codec.Sequential()
+		if err != nil {
+			fmt.Printf("could not read sequential data: %v", err)
+			return
+		}
+		for _, channel := range v {
+			fmt.Printf("%v\n", channel)
+		}
+		fmt.Printf("%v\n", ts)
+	} else {
+		printFrames(codec)
+	}
 	if *plot {
 		// read the data as a data frame
-		b, err := codec.Parallel()
+		channels, ts, err := codec.Sequential()
 		if err != nil {
 			fmt.Printf("could not read the data as a frame: %v\n", err)
 			return
@@ -103,15 +115,14 @@ func main() {
 		defer p.Close()
 
 		//p.CheckedCmd("set yrange [0.01:0.018]")
-		p.CheckedCmd(fmt.Sprintf("set xrange [0:%v]", b.Samples()))
+		p.CheckedCmd(fmt.Sprintf("set xrange [0:%v]", len(ts)))
 		p.CheckedCmd("set terminal aqua size 1430,400")
 
-		ch := b.Channels()
-		arr, _ := b.Arrays()
+		ch := len(channels)
 		if ch == 1 {
-			p.PlotX(arr[0], "Ch1")
+			p.PlotX(channels[0], "Ch1")
 		} else if ch == 2 {
-			p.Dual(arr[0], arr[1], "Ch1", "Ch2")
+			p.Dual(channels[0], channels[1], "Ch1", "Ch2")
 		} else {
 			fmt.Printf("sorry, max 2 channels is currently supported")
 			return

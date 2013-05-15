@@ -188,7 +188,6 @@ func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
 	if err = oc.ReadHeader(); err != nil {
 		return
 	}
-	oc.pyldSize(int64(oc.samples()), int64(oc.channels()))
 	return oc, nil
 }
 
@@ -365,6 +364,7 @@ func (oc *obfCodec) ReadHeader() (err error) {
 	if err = oc.read(&oc.header); err != nil {
 		return
 	}
+	oc.pyldSize(int64(oc.samples()), int64(oc.channels()))
 	return oc.validate()
 }
 

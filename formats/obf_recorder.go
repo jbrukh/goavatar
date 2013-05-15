@@ -49,8 +49,11 @@ func (r *OBFRecorder) Start() (err error) {
 func worker(r *OBFRecorder) {
 	defer close(r.cerr)
 	var (
-		tsTransform func(ts int64) uint32
-		first       = true
+		tsFirst     int64
+		tsTransform = func(ts int64) uint32 {
+			log.Printf("diffing %d", tsFirst)
+			return toTs32Diff(ts, tsFirst)
+		}
 	)
 	for {
 		// get the frame or die
@@ -59,13 +62,8 @@ func worker(r *OBFRecorder) {
 			return
 		}
 
-		if first {
-			first = false
-			// a transform that subtracts the first
-			// timestamp, converts to millis, and uint32
-			tsTransform = func(ts int64) uint32 {
-				return toTs32Diff(ts, df.Buffer().Timestamps()[0])
-			}
+		if tsFirst == 0 {
+			tsFirst = df.Buffer().Timestamps()[0]
 		}
 
 		//log.Printf("writing frame: %v", df)
@@ -158,6 +156,10 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	// read the parallel frames from the buffer as a BlockBuffer
 	b, err := r.codec.Parallel()
 	if err != nil {
+		return "", err
+	}
+
+	if err = r.codec.SeekSequential(); err != nil {
 		return "", err
 	}
 
