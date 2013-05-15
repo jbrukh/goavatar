@@ -6,6 +6,7 @@ package etc
 import (
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/formats"
+	"log"
 	"os"
 )
 
@@ -37,5 +38,6 @@ func MockDataFrames(fn string) (d []DataFrame, err error) {
 		d = append(d, df)
 	}
 
+	log.Printf("loaded mock data with %d data frames", len(d))
 	return d, nil
 }

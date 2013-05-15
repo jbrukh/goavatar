@@ -7,7 +7,7 @@ import (
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/etc"
 	. "github.com/jbrukh/goavatar/formats"
-	"log"
+	//"log"
 	"time"
 )
 
@@ -25,7 +25,6 @@ func NewMockDevice(repo string, obfFile string) *MockDevice {
 	var frames []DataFrame
 	// CONNECT
 	connFunc := func() (err error) {
-		log.Printf("loading up mock data from: %s", obfFile)
 		frames, err = MockDataFrames(obfFile)
 		if err != nil {
 			return err
@@ -46,20 +45,21 @@ func NewMockDevice(repo string, obfFile string) *MockDevice {
 			if c.ShouldTerminate() {
 				return nil
 			}
-
 			// overwrite timestamps so the
 			// test recording doesn't repeat timestamps
 			var (
 				now   = time.Now().UnixNano()
-				frame = frames[tick%len(frames)]
+				frame = frames[tick]
 				δ     = time.Millisecond * 4
 			)
 			frame.Buffer().TransformTs(func(s int, ts int64) int64 {
 				return InterpolateTs(now, s, δ)
 			})
 
+			//arr, _ := frame.Buffer().Arrays()
+			//log.Printf("sending frame %d: %v", tick, arr)
 			c.Send(frame)
-			tick++
+			tick = (tick + 1) % len(frames)
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}
 		return nil

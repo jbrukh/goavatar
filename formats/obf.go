@@ -458,7 +458,7 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32
 	samples := b.Samples()
 
 	for s := 0; s < samples; s++ {
-		v, ts := b.NextSample()
+		v, ts := b.Sample(s)
 		if err = oc.writeBlockTo(buf, v, tsTransform(ts)); err != nil {
 			return
 		}

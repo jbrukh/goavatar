@@ -122,6 +122,12 @@ func (b *BlockBuffer) NextSample() (v []float64, ts int64) {
 	return
 }
 
+func (b *BlockBuffer) Sample(s int) (v []float64, ts int64) {
+	v = b.values[s*b.channels : (s+1)*b.channels]
+	ts = b.ts[s]
+	return
+}
+
 // Arrays transforms the underlying data into "sequential"
 // channel arrays. This operation is O(n) on the number of
 // individual channel data points and timestamps and requires
