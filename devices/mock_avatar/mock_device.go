@@ -46,7 +46,19 @@ func NewMockDevice(repo string, obfFile string) *MockDevice {
 			if c.ShouldTerminate() {
 				return nil
 			}
-			c.Send(frames[tick%len(frames)])
+
+			// overwrite timestamps so the
+			// test recording doesn't repeat timestamps
+			var (
+				now   = time.Now().UnixNano()
+				frame = frames[tick%len(frames)]
+				δ     = time.Millisecond * 4
+			)
+			frame.Buffer().TransformTs(func(s int, ts int64) int64 {
+				return InterpolateTs(now, s, δ)
+			})
+
+			c.Send(frame)
 			tick++
 			time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 		}

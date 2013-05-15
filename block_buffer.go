@@ -64,6 +64,12 @@ func (b *BlockBuffer) Timestamps() []int64 {
 	return b.ts
 }
 
+func (b *BlockBuffer) TransformTs(f func(s int, ts int64) int64) {
+	for s, ts := range b.ts {
+		b.ts[s] = f(s, ts)
+	}
+}
+
 // Append a data from a BlockBuffer to the existing BlockBuffer,
 // ignoring the latter's pluck rate. The BlockBuffers must be
 // comparable in the sense of channels.
