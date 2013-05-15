@@ -6,12 +6,15 @@ package formats
 import (
 	"bytes"
 	. "github.com/jbrukh/goavatar"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 )
 
 // Recorder that records the Octopus format.
+// Warning: calling Start() twice may have unintended
+// consequences.
 type OBFRecorder struct {
 	repo     string    // repository where file is being recorded to
 	fileName string    // name of the file/resource id
@@ -37,54 +40,38 @@ func NewOBFRecorder(repo string) *OBFRecorder {
 }
 
 func (r *OBFRecorder) Start() (err error) {
-	// get the file name
-	r.newFileName()
-	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
-
-	// open the file
-	r.file, err = os.OpenFile(r.fileName, os.O_CREATE|os.O_WRONLY, 0655)
-	if err != nil {
-		return
-	}
-
-	r.codec = newObfCodec(r.file)
-
-	// make space for the header
-	if err = r.codec.SeekValues(); err != nil {
-		return
-	}
+	// buffer the data in this buffer
 	r.buf = new(bytes.Buffer)
-
-	// open up the worker
-	go func() {
-		defer close(r.cerr)
-		var firstTs int64 = 0
-		tsTransform := func(ts int64) uint32 {
-			//log.Printf("transforming %d with %d into %d", ts, firstTs, uint32((ts-firstTs)/1000000))
-			return uint32((ts - firstTs) / 1000000)
-		}
-		for {
-			// get the frame or die
-			df, ok := <-r.out
-			if !ok {
-				return
-			}
-
-			// TODO hacky
-			if firstTs == 0 {
-				firstTs = df.Buffer().Timestamps()[0]
-			}
-
-			//log.Printf("writing frame: %v", df)
-			// write the frame, or send back an error
-			if err := r.codec.WriteParallel(df.Buffer(), tsTransform); err != nil {
-				r.cerr <- err
-				return
-			}
-		}
-	}()
-
+	go worker(r)
 	return
+}
+
+func worker(r *OBFRecorder) {
+	defer close(r.cerr)
+	var firstTs int64 = 0
+	tsTransform := func(ts int64) uint32 {
+		//log.Printf("transforming %d with %d into %d", ts, firstTs, uint32((ts-firstTs)/1000000))
+		return uint32((ts - firstTs) / 1000000)
+	}
+	for {
+		// get the frame or die
+		df, ok := <-r.out
+		if !ok {
+			return
+		}
+
+		// TODO hacky
+		if firstTs == 0 {
+			firstTs = df.Buffer().Timestamps()[0]
+		}
+
+		//log.Printf("writing frame: %v", df)
+		// write the frame, or send back an error
+		if err := WriteParallelTo(r.buf, df.Buffer(), tsTransform); err != nil {
+			r.cerr <- err
+			return
+		}
+	}
 }
 
 // Process each incoming frame, if there is an error
@@ -93,6 +80,7 @@ func (r *OBFRecorder) ProcessFrame(df DataFrame) error {
 	case err := <-r.cerr:
 		close(r.out)
 		r.RollbackFile()
+		log.Printf("error while processing frame for recording: %v", err)
 		return err
 	default:
 		r.out <- df
@@ -106,7 +94,11 @@ func (r *OBFRecorder) ProcessFrame(df DataFrame) error {
 func (r *OBFRecorder) Stop() (id string, err error) {
 
 	// close the worker
-	close(r.out)
+	select {
+	case <-r.out:
+	default:
+		close(r.out) // close the worker
+	}
 
 	// at this point, the worker may still be operating
 	// on the file, therefore we should make sure the worker
@@ -116,10 +108,26 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 		return "", err
 	}
 
+	// at this point, the worker is surely exited, so it
+	// safe to read from the buffer
+
 	defer func() {
 		log.Printf("OBFRecorder: closing the file: %v", r.fileName)
 		r.file.Close()
 	}()
+
+	// get the file name
+	r.newFileName()
+	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
+
+	// open the file
+	r.file, err = os.OpenFile(r.fileName, os.O_CREATE|os.O_RDWR, 0655)
+	if err != nil {
+		return
+	}
+
+	// get the codec
+	r.codec = newObfCodec(r.file)
 
 	// write the header
 	header := &OBFHeader{
@@ -130,13 +138,23 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 		Samples:       uint32(r.samples),
 		SampleRate:    uint16(r.sampleRate),
 	}
-
-	if err = r.codec.SeekHeader(); err != nil {
-		return "", err
-	}
 	if err = r.codec.WriteHeader(header); err != nil {
 		return "", err
 	}
+
+	// write the parallel frames from the buffer
+	if _, err = io.Copy(r.file, r.buf); err != nil {
+		return "", err
+	}
+
+	// read the parallel frames from the buffer as a BlockBuffer
+	_, err = r.codec.Parallel()
+	if err != nil {
+		return "", err
+	}
+
+	//if err = r.codec.WriteSequential()
+
 	return filepath.Base(r.fileName), nil
 }
 

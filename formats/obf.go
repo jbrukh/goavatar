@@ -431,7 +431,13 @@ func (oc *obfCodec) Header() *OBFHeader {
 
 // Read the entire set of parallel values from the file.
 func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
-	if err = oc.SeekValues(); err != nil {
+	if err = oc.SeekHeader(); err != nil {
+		return
+	}
+	if err = oc.ReadHeader(); err != nil {
+		return
+	}
+	if err = oc.SeekParallel(); err != nil {
 		return
 	}
 	return oc.ReadParallel()
@@ -439,6 +445,12 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 
 // Read the entire set of sequential values from the file.
 func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
+	if err = oc.SeekHeader(); err != nil {
+		return
+	}
+	if err = oc.ReadHeader(); err != nil {
+		return
+	}
 	if err = oc.SeekSequential(); err != nil {
 		return
 	}
