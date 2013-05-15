@@ -57,6 +57,7 @@ func (r *OBFRecorder) Start() (err error) {
 		defer close(r.cerr)
 		var firstTs int64 = 0
 		tsTransform := func(ts int64) uint32 {
+			//log.Printf("transforming %d with %d into %d", ts, firstTs, uint32((ts-firstTs)/1000000))
 			return uint32((ts - firstTs) / 1000000)
 		}
 		for {
@@ -69,7 +70,6 @@ func (r *OBFRecorder) Start() (err error) {
 			// TODO hacky
 			if firstTs == 0 {
 				firstTs = df.Buffer().Timestamps()[0]
-				log.Printf("Seeting first at %d", firstTs)
 			}
 
 			//log.Printf("writing frame: %v", df)

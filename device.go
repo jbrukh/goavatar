@@ -317,8 +317,6 @@ func (d *BaseDevice) Stop() (outFile string, err error) {
 }
 
 func (d *BaseDevice) stop() (outFile string, err error) {
-	log.Printf("got to recording...")
-
 	if !d.recording {
 		return
 	}

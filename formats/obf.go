@@ -6,10 +6,11 @@ package formats
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"io"
+	//"log"
 	"os"
-	"fmt"
 )
 
 // ----------------------------------------------------------------- //
@@ -196,7 +197,7 @@ func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
 // ----------------------------------------------------------------- //
 
 func toTs(ts uint32) int64 {
-	return int64(ts)*1000000
+	return int64(ts) * 1000000
 }
 
 func (oc *obfCodec) pyldSize(channels, samples int64) {
@@ -237,7 +238,7 @@ func (oc *obfCodec) writeBlock(v []float64, ts uint32) (err error) {
 	return oc.writeBlockTo(oc.file, v, ts)
 }
 
-func (oc *obfCodec) writeBlockTo(w io.Writer, v []float64, ts uint32) (err error){
+func (oc *obfCodec) writeBlockTo(w io.Writer, v []float64, ts uint32) (err error) {
 	if err = oc.writeTo(w, v); err != nil {
 		return
 	}
@@ -359,8 +360,8 @@ func (oc *obfCodec) ReadHeader() (err error) {
 // the file starting at the current position.
 func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 	var (
-		v       = oc.block()
-		ts32      uint32
+		v    = oc.block()
+		ts32 uint32
 	)
 	b = oc.buffer()
 	err = oc.forSamples(func(s int) (err error) {
@@ -369,7 +370,7 @@ func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 		}
 		b.AppendSample(v, toTs(ts32))
 		return
-	});
+	})
 	return
 }
 
@@ -390,7 +391,7 @@ func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
 	ts = oc.timestamps()
 
 	// read and convert all the timestamps
-	err = oc.forSamples(func(s int) (err error){
+	err = oc.forSamples(func(s int) (err error) {
 		var ts32 uint32
 		if err = oc.read(&ts32); err != nil {
 			return
@@ -414,7 +415,7 @@ func (oc *obfCodec) ReadParallelBlock() (values []float64, ts int64, err error) 
 }
 
 // ----------------------------------------------------------------- //
-// Reading Operations -- these operations seek and do validation, 
+// Reading Operations -- these operations seek and do validation,
 // so are more user-facing and safer
 // ----------------------------------------------------------------- //
 
@@ -440,7 +441,6 @@ func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
 	return oc.ReadSequential()
 }
 
-
 // ----------------------------------------------------------------- //
 // Writing Operations -- All these operations happen in-place
 // ----------------------------------------------------------------- //
@@ -455,12 +455,13 @@ func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
 func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
 	// write parallel samples to a buffer
 	buf := new(bytes.Buffer)
-	err = oc.forSamples(func(s int) (err error) {
+	samples := b.Samples()
+
+	for s := 0; s < samples; s++ {
 		v, ts := b.NextSample()
-		return oc.writeBlockTo(buf, v, tsTransform(ts))
-	})
-	if err != nil {
-		return
+		if err = oc.writeBlockTo(buf, v, tsTransform(ts)); err != nil {
+			return
+		}
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())

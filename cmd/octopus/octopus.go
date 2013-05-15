@@ -20,7 +20,7 @@ const (
 	DefaultListenPort = 8000
 	ControlEndpoint   = "/control"
 	DataEndpoint      = "/device"
-	DefaultMockFile   = "etc/ee6d09f8-1df6-5bac-deee-c18a28407190"
+	DefaultMockFile   = "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
 )
 
 var (
