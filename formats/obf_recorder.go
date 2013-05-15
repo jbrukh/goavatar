@@ -48,11 +48,10 @@ func (r *OBFRecorder) Start() (err error) {
 
 func worker(r *OBFRecorder) {
 	defer close(r.cerr)
-	var firstTs int64 = 0
-	tsTransform := func(ts int64) uint32 {
-		//log.Printf("transforming %d with %d into %d", ts, firstTs, uint32((ts-firstTs)/1000000))
-		return uint32((ts - firstTs) / 1000000)
-	}
+	var (
+		tsTransform func(ts int64) uint32
+		first       = true
+	)
 	for {
 		// get the frame or die
 		df, ok := <-r.out
@@ -60,9 +59,13 @@ func worker(r *OBFRecorder) {
 			return
 		}
 
-		// TODO hacky
-		if firstTs == 0 {
-			firstTs = df.Buffer().Timestamps()[0]
+		if first {
+			first = false
+			// a transform that subtracts the first
+			// timestamp, converts to millis, and uint32
+			tsTransform = func(ts int64) uint32 {
+				return toTs32Diff(ts, df.Buffer().Timestamps()[0])
+			}
 		}
 
 		//log.Printf("writing frame: %v", df)
@@ -113,9 +116,14 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 
 	defer func() {
 		log.Printf("OBFRecorder: closing the file: %v", r.fileName)
+		// TODO: if err, rollback
 		r.file.Close()
 	}()
 
+	return r.commit()
+}
+
+func (r *OBFRecorder) commit() (id string, err error) {
 	// get the file name
 	r.newFileName()
 	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
@@ -133,7 +141,7 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 	header := &OBFHeader{
 		DataType:      DataTypeRaw,
 		FormatVersion: FormatVersion2,
-		StorageMode:   StorageModeParallel,
+		StorageMode:   StorageModeCombined,
 		Channels:      uint8(r.channels),
 		Samples:       uint32(r.samples),
 		SampleRate:    uint16(r.sampleRate),
@@ -148,14 +156,17 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 	}
 
 	// read the parallel frames from the buffer as a BlockBuffer
-	_, err = r.codec.Parallel()
+	b, err := r.codec.Parallel()
 	if err != nil {
 		return "", err
 	}
 
-	//if err = r.codec.WriteSequential()
+	if err = r.codec.WriteSequential(b, toTs32); err != nil {
+		return "", err
+	}
 
-	return filepath.Base(r.fileName), nil
+	id = filepath.Base(r.fileName)
+	return
 }
 
 func (r *OBFRecorder) RollbackFile() {

@@ -196,8 +196,16 @@ func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
 // Helper Methods
 // ----------------------------------------------------------------- //
 
-func toTs(ts uint32) int64 {
+func toTs64(ts uint32) int64 {
 	return int64(ts) * 1000000
+}
+
+func toTs32(ts int64) uint32 {
+	return uint32(ts / 1000000)
+}
+
+func toTs32Diff(ts int64, diff int64) uint32 {
+	return toTs32(ts - diff)
 }
 
 func writeTo(w io.Writer, i interface{}) error {
@@ -372,7 +380,7 @@ func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 		if err = oc.readBlock(v, &ts32); err != nil {
 			return
 		}
-		b.AppendSample(v, toTs(ts32))
+		b.AppendSample(v, toTs64(ts32))
 		return
 	})
 	return
@@ -400,7 +408,7 @@ func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
 		if err = oc.read(&ts32); err != nil {
 			return
 		}
-		ts[s] = toTs(ts32)
+		ts[s] = toTs64(ts32)
 		return
 	})
 	return
@@ -414,7 +422,7 @@ func (oc *obfCodec) ReadParallelBlock() (values []float64, ts int64, err error) 
 	}
 	var ts32 uint32
 	err = oc.read(&ts32)
-	ts = toTs(ts32)
+	ts = toTs64(ts32)
 	return
 }
 
@@ -486,4 +494,22 @@ func WriteParallelTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint32
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
 	return writeTo(w, buf.Bytes())
+}
+
+func (oc *obfCodec) WriteSequential(b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
+	return WriteSequentialTo(oc.file, b, tsTransform)
+}
+
+func WriteSequentialTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
+	arr, ts64 := b.Arrays()
+	for _, channel := range arr {
+		if err = writeTo(w, channel); err != nil {
+			return
+		}
+	}
+	ts32 := make([]uint32, len(ts64))
+	for i, tv := range ts64 {
+		ts32[i] = tsTransform(tv)
+	}
+	return writeTo(w, ts32)
 }
