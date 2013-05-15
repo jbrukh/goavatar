@@ -457,6 +457,10 @@ func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
 // Writes a data frame in parallel mode, assuming the writer
 // is at the correct location for the frame.
 func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
+	return WriteParallelTo(oc.file, b, tsTransform)
+}
+
+func WriteParallelTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
 	// write parallel samples to a buffer
 	buf := new(bytes.Buffer)
 	samples := b.Samples()
@@ -469,5 +473,5 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
-	return oc.write(buf.Bytes())
+	return writeTo(w, buf.Bytes())
 }
