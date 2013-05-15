@@ -204,3 +204,45 @@ func Test__SeekSequential(t *testing.T) {
 		}
 	})
 }
+
+func Test__Seeking(t *testing.T) {
+	testWithCodec(t, func(t *testing.T, oc *obfCodec) {
+		assertNoErrors(t,
+			func() error {
+				return oc.SeekHeader()
+			},
+			func() error {
+				return oc.SeekValues()
+			},
+			func() error {
+				return oc.SeekSequential()
+			},
+			func() error {
+				return oc.SeekParallel()
+			},
+			func() error {
+				return oc.SeekHeader()
+			},
+		)
+	})
+}
+
+func assertNoErrors(t *testing.T, fs ...func() error) {
+	for i, f := range fs {
+		if err := f(); err != nil {
+			t.Fatalf("the %d-th function failed", i)
+		}
+	}
+}
+
+func Test__MarshallUnmarshall(t *testing.T) {
+	const fn = "../etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
+	file, err := os.Open(fn)
+	if err != nil {
+		t.Fatalf("could not open test file: %v", fn)
+	}
+	defer file.Close()
+	//oc := newObfCodec(file)
+
+	// TODO TODO TODO
+}
