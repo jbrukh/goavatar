@@ -4,6 +4,7 @@
 package formats
 
 import (
+	"bytes"
 	. "github.com/jbrukh/goavatar"
 	"log"
 	"os"
@@ -24,6 +25,7 @@ type OBFRecorder struct {
 	channels   int
 	samples    int
 	sampleRate int
+	buf        *bytes.Buffer
 }
 
 func NewOBFRecorder(repo string) *OBFRecorder {
@@ -51,6 +53,7 @@ func (r *OBFRecorder) Start() (err error) {
 	if err = r.codec.SeekValues(); err != nil {
 		return
 	}
+	r.buf = new(bytes.Buffer)
 
 	// open up the worker
 	go func() {

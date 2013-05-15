@@ -193,12 +193,27 @@ func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
 }
 
 // ----------------------------------------------------------------- //
-// Private Methods
+// Helper Methods
 // ----------------------------------------------------------------- //
 
 func toTs(ts uint32) int64 {
 	return int64(ts) * 1000000
 }
+
+func writeTo(w io.Writer, i interface{}) error {
+	return binary.Write(w, ByteOrder, i)
+}
+
+func writeBlockTo(w io.Writer, v []float64, ts uint32) (err error) {
+	if err = writeTo(w, v); err != nil {
+		return
+	}
+	return writeTo(w, ts)
+}
+
+// ----------------------------------------------------------------- //
+// Private Methods
+// ----------------------------------------------------------------- //
 
 func (oc *obfCodec) pyldSize(channels, samples int64) {
 	oc.payloadSize = samples * (channels*
@@ -218,11 +233,7 @@ func (oc *obfCodec) read(i interface{}) error {
 // Write a piece of binary data to the underlying stream,
 // in place.
 func (oc *obfCodec) write(i interface{}) error {
-	return oc.writeTo(oc.file, i)
-}
-
-func (oc *obfCodec) writeTo(w io.Writer, i interface{}) error {
-	return binary.Write(w, ByteOrder, i)
+	return writeTo(oc.file, i)
 }
 
 // Read a block in place.
@@ -235,14 +246,7 @@ func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
 
 // Write a block in place.
 func (oc *obfCodec) writeBlock(v []float64, ts uint32) (err error) {
-	return oc.writeBlockTo(oc.file, v, ts)
-}
-
-func (oc *obfCodec) writeBlockTo(w io.Writer, v []float64, ts uint32) (err error) {
-	if err = oc.writeTo(w, v); err != nil {
-		return
-	}
-	return oc.writeTo(w, ts)
+	return writeBlockTo(oc.file, v, ts)
 }
 
 // Return the last read number of channels.
@@ -459,7 +463,7 @@ func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32
 
 	for s := 0; s < samples; s++ {
 		v, ts := b.Sample(s)
-		if err = oc.writeBlockTo(buf, v, tsTransform(ts)); err != nil {
+		if err = writeBlockTo(buf, v, tsTransform(ts)); err != nil {
 			return
 		}
 	}
