@@ -32,7 +32,7 @@ func MockDataFrames(fn string) (d []DataFrame, err error) {
 
 	for b.Samples() > 0 {
 		var (
-			bb = b.DownSample(16)
+			bb = b.PopDownSample(16)
 			df = NewDataFrame(bb, 250)
 		)
 		d = append(d, df)

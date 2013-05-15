@@ -21,7 +21,7 @@ const (
 	DefaultMaxFrames   = 10000
 	WindowMultiple     = 10
 	DumpFile           = "frames.go"
-	DefaultMockFile    = "etc/ee6d09f8-1df6-5bac-deee-c18a28407190"
+	DefaultMockFile    = "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
 )
 
 var (
@@ -53,7 +53,7 @@ func main() {
 	// set up the device
 	var device Device
 	if *mockDevice {
-		device = NewMockDevice("", *mockFile)
+		device = NewMockDevice("", *mockFile, 2)
 	} else {
 		device = NewAvatarDevice(*serialPort, "")
 	}
@@ -85,7 +85,7 @@ func run(p *gplot.Plotter, out <-chan DataFrame) {
 		}
 
 		for s := 0; s < df.Buffer().Samples(); s++ {
-			v, _ := df.Buffer().NextSample()
+			v, _ := df.Buffer().PopSample()
 			window1.PushBack(v[0])
 			window2.PushBack(v[1])
 		}

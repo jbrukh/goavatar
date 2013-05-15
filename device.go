@@ -29,6 +29,10 @@ type Device interface {
 	// Name of the device.
 	Name() string
 
+	// Return the path of the directory where recorder files are
+	// stored.
+	Repo() string
+
 	// Connect to the device and return the output channel.
 	// Connecting to a device that is already connected is
 	// an error.
@@ -55,40 +59,45 @@ type Device interface {
 	// Recording returns true if and only if the device is currently
 	// recording.
 	Recording() bool
-
-	// Return the path of the directory where recorder files are
-	// stored.
-	Repo() string
 }
 
 // ----------------------------------------------------------------- //
 // Subscriptions
 // ----------------------------------------------------------------- //
 
-// ConnectFunc performs the low-level operation to connect
-// to the device. This usually means opening the port of the
-// device for reading.
-type ConnectFunc func() error
+// Device implementation interface.
+type DeviceImpl interface {
+	// Performs the low-level operation to connect
+	// to the device. This usually means opening the port of the
+	// device for reading.
+	Engage() error
 
-// DisconnectFunc perfoms the low-level operation to disconnect
-// from the device. This usually means closing the port of the
-// device.
-type DisconnectFunc func() error
+	// Perfoms the low-level operation to disconnect
+	// from the device. This usually means closing the port of the
+	// device.
+	Disengage() error
 
-// StreamFunc performs the operation of reading the stream and
-// writing data frames to the output channel. This function is
-// expected to obey the following contract:
-//
-// (1) It shalt not perform any resource cleanup, this is the
-//     job of the DisconnectFunc. It shalt not call
-//     device.Disconnect().
-// (2) It shalt obey c.ShouldTerminate() and exit without error.
-// (3) Upon any error, it shall return that error.
-//
-type StreamFunc func(c *Control) error
+	// performs the operation of reading the stream and
+	// writing data frames to the output channel. This function is
+	// expected to obey the following contract:
+	//
+	// (1) It shalt not perform any resource cleanup, this is the
+	//     job of the DisconnectFunc. It shalt not call
+	//     device.Disconnect().
+	// (2) It shalt obey c.ShouldTerminate() and exit without error.
+	// (3) Upon any error, it shall return that error.
+	//
+	Stream(*Control) error
 
-// RecorderProvider produces a recorder for the given file
-type RecorderProvider func() Recorder
+	// Produces a recorder.
+	ProvideRecorder() Recorder
+
+	// The name of the device.
+	Name() string
+
+	// The directory where recordings are stored.
+	Repo() string
+}
 
 // ----------------------------------------------------------------- //
 // Device Control -- used by implementation providers to report
@@ -153,44 +162,31 @@ func (control *Control) Close() {
 // In particular, implementors should respect the Control object
 // they are passed.
 type BaseDevice struct {
-	name      string
-	lock      sync.Mutex
-	connected bool
-	recording bool
-	recorder  Recorder
-	control   *Control
-	repo      string
-
-	// low-level ops
-	connFunc     ConnectFunc
-	disconnFunc  DisconnectFunc
-	streamFunc   StreamFunc
-	recorderFunc RecorderProvider
+	lock       sync.Mutex
+	connected  bool
+	recording  bool
+	recorder   Recorder
+	control    *Control
+	deviceImpl DeviceImpl
 }
 
-// Create a new base device that performs connectivity
-// and streaming based on the given function.
-func NewBaseDevice(name string, connFunc ConnectFunc, disconnFunc DisconnectFunc,
-	streamFunc StreamFunc, recorderFunc RecorderProvider, repo string) *BaseDevice {
+// Create a new device based on some given
+// device implementation.
+func NewDevice(deviceImpl DeviceImpl) Device {
 	return &BaseDevice{
-		name:         name,
-		connFunc:     connFunc,
-		disconnFunc:  disconnFunc,
-		streamFunc:   streamFunc,
-		recorderFunc: recorderFunc,
-		repo:         repo,
+		deviceImpl: deviceImpl,
 	}
 }
 
 // The name of the device.
 func (d *BaseDevice) Name() string {
-	return d.name
+	return d.deviceImpl.Name()
 }
 
 // The recording repository directory for
 // this device.
 func (d *BaseDevice) Repo() string {
-	return d.repo
+	return d.deviceImpl.Repo()
 }
 
 func (d *BaseDevice) Connect() (err error) {
@@ -205,7 +201,7 @@ func (d *BaseDevice) Connect() (err error) {
 	log.Printf("%s: CONNECT", d.Name())
 
 	// perform connect
-	if err = d.connFunc(); err != nil {
+	if err = d.deviceImpl.Engage(); err != nil {
 		return fmt.Errorf("could not connect to the device: %v", err)
 	}
 
@@ -215,7 +211,7 @@ func (d *BaseDevice) Connect() (err error) {
 	// begin to stream
 	go func() {
 		// run the streamer and listen for errors
-		if err := d.streamFunc(d.control); err != nil {
+		if err := d.deviceImpl.Stream(d.control); err != nil {
 			log.Printf("error in streamer: %v", err)
 		}
 
@@ -261,7 +257,7 @@ func (d *BaseDevice) disconnect(ignoreDone bool) (err error) {
 	}
 
 	// disconnect
-	err = d.disconnFunc()
+	err = d.deviceImpl.Disengage()
 	d.connected = false
 
 	return err
@@ -298,7 +294,7 @@ func (d *BaseDevice) record() (err error) {
 
 	log.Printf("%s: RECORD", d.Name())
 
-	if d.recorder = d.recorderFunc(); d.recorder == nil {
+	if d.recorder = d.deviceImpl.ProvideRecorder(); d.recorder == nil {
 		return fmt.Errorf("no recorder was provided")
 	}
 

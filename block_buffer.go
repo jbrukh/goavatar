@@ -64,6 +64,8 @@ func (b *BlockBuffer) Timestamps() []int64 {
 	return b.ts
 }
 
+// Transform the slice of timeframes associated with
+// this buffer with a transform function.
 func (b *BlockBuffer) TransformTs(f func(s int, ts int64) int64) {
 	for s, ts := range b.ts {
 		b.ts[s] = f(s, ts)
@@ -90,9 +92,14 @@ func (b *BlockBuffer) AppendSample(v []float64, ts int64) {
 	b.appendBlocks(v, []int64{ts})
 }
 
-// Get the next n samples and downsamples them according
-// to the down-sampling rate.
-func (b *BlockBuffer) DownSample(n int) (bb *BlockBuffer) {
+// Pops and returns the next n samples and downsamples
+// them according to the down-sampling rate. By default
+// the down-sampling rate is 1, so this should just
+// subset the buffer.
+func (b *BlockBuffer) PopDownSample(n int) (bb *BlockBuffer) {
+	if n < 0 {
+		panic("n must be nonnegative")
+	}
 	bb = NewBlockBuffer(b.channels, n/b.pluckRate+1)
 	samples := b.Samples()
 	if n > samples {
@@ -101,10 +108,10 @@ func (b *BlockBuffer) DownSample(n int) (bb *BlockBuffer) {
 
 	for s := 0; s < n; s++ {
 		if b.parity == 0 {
-			v, ts := b.NextSample()
+			v, ts := b.PopSample()
 			bb.AppendSample(v, ts)
 		} else {
-			b.NextSample()
+			b.PopSample()
 		}
 
 		// increment the parity
@@ -113,7 +120,8 @@ func (b *BlockBuffer) DownSample(n int) (bb *BlockBuffer) {
 	return
 }
 
-func (b *BlockBuffer) NextSample() (v []float64, ts int64) {
+// Pops and returns the next sample from the buffer.
+func (b *BlockBuffer) PopSample() (v []float64, ts int64) {
 	v = b.values[:b.channels]
 	ts = b.ts[0]
 	// get rid of the leading values
@@ -122,6 +130,8 @@ func (b *BlockBuffer) NextSample() (v []float64, ts int64) {
 	return
 }
 
+// Returns the s-th sample from the buffer. Going out of
+// bounds will cause a panic.
 func (b *BlockBuffer) Sample(s int) (v []float64, ts int64) {
 	v = b.values[s*b.channels : (s+1)*b.channels]
 	ts = b.ts[s]

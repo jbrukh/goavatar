@@ -449,7 +449,7 @@ func streamLoop(channels, sampleRate int, out <-chan DataFrame,
 			}
 
 			var (
-				batch = b.DownSample(absBatchSize)
+				batch = b.PopDownSample(absBatchSize)
 				msg   = new(DataMessage)
 			)
 

@@ -36,45 +36,58 @@ func (r *MockRecorder) Reset() {
 	return
 }
 
-func newEmptyDevice() *BaseDevice {
-	connFunc := func() error {
-		return nil
-	}
+type emptyDevice struct {
+	name string
+	repo string
+	errProne bool // will produce errors in stream (for testing)
+}
 
-	disconnFunc := func() error {
-		return nil // do nothing
-	}
+func (ed *emptyDevice) Name() string {
+	return ed.name
+}
 
-	streamFunc := func(c *Control) (err error) {
-		for !c.ShouldTerminate() {
-			time.Sleep(time.Millisecond * 100)
-			c.Send(&MockFrame{})
-		}
-		c.Close()
-		return
-	}
+func (ed *emptyDevice) Repo() string {
+	return ed.repo
+}
 
-	recorderProvider := func() Recorder {
-		return &MockRecorder{}
-	}
+func (ed *emptyDevice) Engage() error {
+	return nil
+}
 
-	return NewBaseDevice(
-		"UnitTestMockDevice",
-		connFunc,
-		disconnFunc,
-		streamFunc,
-		recorderProvider,
-		"var",
-	)
+func (ed *emptyDevice) Disengage() error {
+	return nil
+}
+
+func (ed *emptyDevice) Stream(c *Control) (err error) {
+	if ed.errProne {
+		return fmt.Errorf("errProne device is error prone")
+	}
+	for !c.ShouldTerminate() {
+		time.Sleep(time.Millisecond * 100)
+		c.Send(&MockFrame{})
+	}
+	c.Close()
+	return
+}
+
+func (ed *emptyDevice) ProvideRecorder() Recorder {
+	return &MockRecorder{}	
+}
+
+func newEmptyDevice() Device {
+	return NewDevice(&emptyDevice{
+		name: "EmptyDevice",
+		repo: "var",
+	})
 }
 
 // Returns a device whose stream always has errors.
-func newErrorProneDevice() *BaseDevice {
-	b := newEmptyDevice()
-	b.streamFunc = func(c *Control) (err error) {
-		return fmt.Errorf("too bad")
-	}
-	return b
+func newErrorProneDevice() Device {
+	return NewDevice(&emptyDevice{
+		name: "ErrorProneDevice",
+		repo: "var",
+		errProne: true,
+	})
 }
 
 type MockFrame struct {
@@ -142,8 +155,9 @@ func TestConnectionLogic(t *testing.T) {
 
 func TestCleanupLogic(t *testing.T) {
 	d := newEmptyDevice()
-	if d.control != nil {
-		t.Errorf("has an out channel for some reason")
+	bd := d.(*BaseDevice)
+	if bd.control != nil {
+		t.Errorf("has recorder/control for some reason")
 	}
 
 	err := d.Connect()
@@ -151,7 +165,7 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	if d.control.out == nil {
+	if bd.control.out == nil {
 		t.Errorf("didn't create out channel")
 	}
 
@@ -160,7 +174,7 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to disconnect")
 	}
 
-	ensureClosed(t, d.control.out)
+	ensureClosed(t, bd.control.out)
 }
 
 func TestRecord(t *testing.T) {
@@ -175,7 +189,7 @@ func TestRecord(t *testing.T) {
 		t.Errorf("failed to start recording, or wrong status")
 	}
 
-	r := d.recorder.(*MockRecorder)
+	r := d.(*BaseDevice).recorder.(*MockRecorder)
 	if !r.started {
 		t.Errorf("mock recorder didn't start")
 	}

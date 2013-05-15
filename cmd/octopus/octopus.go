@@ -15,12 +15,13 @@ import (
 )
 
 const (
-	DefaultSerialPort = "/dev/tty.AvatarEEG03009-SPPDev"
-	DefaultRepo       = "var"
-	DefaultListenPort = 8000
-	ControlEndpoint   = "/control"
-	DataEndpoint      = "/device"
-	DefaultMockFile   = "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
+	DefaultSerialPort 	= "/dev/tty.AvatarEEG03009-SPPDev"
+	DefaultRepo       	= "var"
+	DefaultListenPort 	= 8000
+	ControlEndpoint   	= "/control"
+	DataEndpoint      	= "/device"
+	DefaultMockFile   	= "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
+	DefaultMockChannels = 2	
 )
 
 var (
@@ -30,6 +31,7 @@ var (
 	verbose    *bool   = flag.Bool("verbose", false, "whether the socket is verbose (shows outgoing data)")
 	repo       *string = flag.String("repo", DefaultRepo, "directory where recordings are stored")
 	mockFile   *string = flag.String("mockFile", DefaultMockFile, "OBF file to play back in the mock device")
+	mockChannels *int  = flag.Int("mockChannels", DefaultMockChannels, "the number of channels to mock in the mock device")
 )
 
 func main() {
@@ -38,7 +40,7 @@ func main() {
 
 	// get the device
 	if *mockDevice {
-		device = NewMockDevice(*repo, *mockFile)
+		device = NewMockDevice(*repo, *mockFile, *mockChannels)
 	} else {
 		device = NewAvatarDevice(*serialPort, *repo)
 	}
