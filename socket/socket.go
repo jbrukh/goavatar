@@ -332,6 +332,7 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 		r.Err = err.Error()
 		return
 	}
+	r.Success = true
 
 }
 
