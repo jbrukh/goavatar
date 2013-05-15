@@ -1,15 +1,15 @@
 package formats
 
 import (
-	"testing"
+	"encoding/binary"
 	"io"
 	"os"
-	"encoding/binary"
+	"testing"
 )
 
-const(
-	mockChannels = 4
-	mockSamples = 10
+const (
+	mockChannels   = 4
+	mockSamples    = 10
 	mockSampleRate = 250
 )
 
@@ -87,8 +87,8 @@ func writeMockData(w io.Writer) (err error) {
 }
 
 func assertMockHeader(t *testing.T, h *OBFHeader) {
-	if h.DataType != DataTypeRaw || h.FormatVersion != FormatVersion2 || h.StorageMode != StorageModeCombined  {
-		t.Errorf("bad metadata for header: %v, %v, %v; expected: %v, %v, %v", 
+	if h.DataType != DataTypeRaw || h.FormatVersion != FormatVersion2 || h.StorageMode != StorageModeCombined {
+		t.Errorf("bad metadata for header: %v, %v, %v; expected: %v, %v, %v",
 			h.DataType, h.FormatVersion, h.StorageMode, DataTypeRaw, FormatVersion2, StorageModeCombined)
 	}
 	if h.Samples != mockSamples || h.Channels != mockChannels || h.SampleRate != mockSampleRate {
@@ -100,8 +100,6 @@ func mockFile(t *testing.T) (file *os.File, err error) {
 	return newTestFile(fn)
 }
 
-
-
 func testWithCodec(t *testing.T, tf func(t *testing.T, oc *obfCodec)) {
 	f, err := mockFile(t)
 	if err != nil {
@@ -111,7 +109,6 @@ func testWithCodec(t *testing.T, tf func(t *testing.T, oc *obfCodec)) {
 	oc := newObfCodec(f)
 	tf(t, oc)
 }
-
 
 func Test__ReadHeader(t *testing.T) {
 	var err error
@@ -123,7 +120,7 @@ func Test__ReadHeader(t *testing.T) {
 
 		// check the header
 		h := oc.Header()
-		assertMockHeader(t, h)	
+		assertMockHeader(t, h)
 	})
 }
 
@@ -179,7 +176,31 @@ func Test__SeekValues(t *testing.T) {
 	})
 }
 
+func Test__SeekSequential(t *testing.T) {
+	var err error
+	testWithCodec(t, func(t *testing.T, oc *obfCodec) {
+		// seek back to the values
+		if err = oc.SeekSequential(); err != nil {
+			t.Fatalf("could not seek to the values")
+		}
 
+		channels, ts, err := oc.ReadSequential()
+		if err != nil {
+			t.Fatalf("could not read sequential")
+		}
 
+		for _, channel := range channels {
+			for i, v := range channel {
+				if v != float64(i) {
+					t.Fatalf("wrong channel value")
+				}
+			}
+		}
 
-
+		for i, ts64 := range ts {
+			if ts64 != int64(i) {
+				t.Fatalf("wrong timestamp value")
+			}
+		}
+	})
+}
