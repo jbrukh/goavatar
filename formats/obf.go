@@ -364,7 +364,7 @@ func (oc *obfCodec) ReadHeader() (err error) {
 	if err = oc.read(&oc.header); err != nil {
 		return
 	}
-	oc.pyldSize(int64(oc.samples()), int64(oc.channels()))
+	oc.pyldSize(int64(oc.channels()), int64(oc.samples()))
 	return oc.validate()
 }
 

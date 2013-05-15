@@ -72,6 +72,7 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 		return
 	}
 
-	io.Copy(os.Stderr, res.Body) // replace this with status check
+	io.Copy(os.Stdout, res.Body) // replace this with status check
+	fmt.Println()
 	return
 }
