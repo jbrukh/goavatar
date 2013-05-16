@@ -51,7 +51,6 @@ func worker(r *OBFRecorder) {
 	var (
 		tsFirst     int64
 		tsTransform = func(ts int64) uint32 {
-			log.Printf("diffing %d", tsFirst)
 			return toTs32Diff(ts, tsFirst)
 		}
 	)
