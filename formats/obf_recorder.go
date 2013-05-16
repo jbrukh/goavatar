@@ -152,19 +152,19 @@ func (r *OBFRecorder) commit() (id string, err error) {
 		return "", err
 	}
 
-	// read the parallel frames from the buffer as a BlockBuffer
-	// b, err := r.codec.Parallel()
-	// if err != nil {
-	// 	return "", err
-	// }
+	//read the parallel frames from the buffer as a BlockBuffer
+	b, err := r.codec.Parallel()
+	if err != nil {
+		return "", err
+	}
 
-	// if err = r.codec.SeekSequential(); err != nil {
-	// 	return "", err
-	// }
+	if err = r.codec.SeekSequential(); err != nil {
+		return "", err
+	}
 
-	// if err = r.codec.WriteSequential(b, toTs32); err != nil {
-	// 	return "", err
-	// }
+	if err = r.codec.WriteSequential(b, toTs32); err != nil {
+		return "", err
+	}
 
 	id = filepath.Base(r.fileName)
 	return
