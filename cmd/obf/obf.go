@@ -43,7 +43,7 @@ const headerFmt = `# HEADER ----------------------------------
 `
 
 //
-// WARNING: this is a work in progress and only supports two channels.
+// WARNING: this is a work in progress and only supports two channels for graphing.
 //
 func main() {
 	// read the options and args
@@ -79,13 +79,6 @@ func main() {
 			header.StorageMode, header.Channels, header.Samples, header.SampleRate, header.Endianness, header.Reserved)
 	}
 
-	// format the data
-	fmt.Print("timestamp")
-	for i := 0; i < int(header.Channels); i++ {
-		fmt.Printf(",channel%d", i+1)
-	}
-	fmt.Println()
-
 	if *seq {
 		v, ts, err := codec.Sequential()
 		if err != nil {
@@ -97,7 +90,7 @@ func main() {
 		}
 		fmt.Printf("%v\n", ts)
 	} else {
-		printFrames(codec)
+		printParallel(codec)
 	}
 	if *plot {
 		// read the data as a data frame
@@ -130,12 +123,17 @@ func main() {
 	}
 }
 
-func printFrames(codec OBFReader) {
+func printParallel(codec OBFReader) {
 	var (
 		header  = codec.Header()
 		ch      = int(header.Channels)
 		samples = int(header.Samples)
 	)
+	fmt.Print("timestamp")
+	for i := 0; i < int(header.Channels); i++ {
+		fmt.Printf(",channel%d", i+1)
+	}
+	fmt.Println()
 	for j := 0; j < samples; j++ {
 		// read each block
 		values, ts, err := codec.ReadParallelBlock()
