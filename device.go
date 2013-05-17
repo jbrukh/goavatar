@@ -33,6 +33,9 @@ type Device interface {
 	// stored.
 	Repo() string
 
+	// Obtain the device information
+	Info() *DeviceInfo
+
 	// Engage to the device and return the output channel.
 	// Engageing to a device that is already engaged is
 	// an error.
@@ -77,19 +80,22 @@ type DeviceImpl interface {
 	// device.
 	Disengage() error
 
-	// performs the operation of reading the stream and
+	// Performs the operation of reading the stream and
 	// writing data frames to the output channel. This function is
-	// expected to obey the following contract:
+	// expected to obey the following contract with the Control:
 	//
-	// (1) It shalt not perform any resource cleanup, this is the
-	//     job of the DisengageFunc. It shalt not call
-	//     device.Disengage().
-	// (2) It shalt obey c.ShouldTerminate() and exit without error.
-	// (3) Upon any error, it shall return that error.
+	// (1) The first possible call shalt be to SendInfo(), or else
+	//     the device Engage() function will wait indefinitely.
+	// (2) It shalt not perform any resource cleanup, this is the
+	//     job of Disengage(). It shalt NOT try to disengage the device.
+	// (3) It shalt obey c.ShouldTerminate() and exit without error.
+	// (4) Upon any error, it shalt return that error.
 	//
+	// Note returning DeviceInfo in this way is a hardware limitation.
 	Stream(*Control) error
 
-	// Produces a recorder.
+	// Produces a recorder. This recorder will record a single recording
+	// to a single file, or fail, and be destroyed.
 	ProvideRecorder() Recorder
 
 	// The name of the device.
@@ -109,6 +115,7 @@ type DeviceImpl interface {
 type Control struct {
 	done chan bool
 	out  chan DataFrame
+	info chan *DeviceInfo
 	d    *BaseDevice
 }
 
@@ -117,6 +124,7 @@ func newControl(d *BaseDevice) *Control {
 	return &Control{
 		done: make(chan bool),
 		out:  make(chan DataFrame, DataFrameBufferSize),
+		info: make(chan *DeviceInfo, 1),
 		d:    d,
 	}
 }
@@ -136,32 +144,31 @@ func (control *Control) ShouldTerminate() bool {
 // Device by calling this method.
 func (control *Control) Send(df DataFrame) {
 	control.out <- df
-
-	// now we have to be careful; some other thread
-	// may have called Disengage, and so that thread
-	// is waiting on control.done; meanwhile the
-	// streamer thread is about to check Recording()
-	// which could cause deadlock.
-
-	// so we allow this streamer thread to skip over
-	// done and yet resend it back to the thread's
-	// d.ShouldTerminate() check.
-	select {
-	case v, ok := <-control.done:
-		if ok {
-			control.done <- v // pass on the value
-		}
-	default:
-		if control.d.Recording() {
-			control.d.recorder.ProcessFrame(df)
-		}
+	if control.d.Recording() {
+		control.d.recorder.ProcessFrame(df)
 	}
+}
+
+// The client must send DeviceInfo before sending
+// data.
+func (control *Control) SendInfo(info *DeviceInfo) {
+	control.info <- info
 }
 
 // The client worker should call this method before
 // exiting.
 func (control *Control) Close() {
 	close(control.out)
+}
+
+// ----------------------------------------------------------------- //
+// Device Info -- basic info about the device that should
+// be ascertained on every connect.
+// ----------------------------------------------------------------- //
+
+type DeviceInfo struct {
+	Channels   int // how many channels are streaming
+	SampleRate int // what is the sample rate of the device
 }
 
 // ----------------------------------------------------------------- //
@@ -175,14 +182,16 @@ func (control *Control) Close() {
 // be parameterized.
 //
 // In particular, implementors should respect the Control object
-// they are passed.
+// they are passed. See the contract of Stream() function above.
 type BaseDevice struct {
 	lock       sync.Mutex
+	rlock      sync.Mutex
 	engaged    bool
 	recording  bool
 	recorder   Recorder
 	control    *Control
 	deviceImpl DeviceImpl
+	info       *DeviceInfo
 }
 
 // Create a new device based on some given
@@ -202,6 +211,12 @@ func (d *BaseDevice) Name() string {
 // this device.
 func (d *BaseDevice) Repo() string {
 	return d.deviceImpl.Repo()
+}
+
+func (d *BaseDevice) Info() *DeviceInfo {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.info
 }
 
 func (d *BaseDevice) Engage() (err error) {
@@ -239,6 +254,12 @@ func (d *BaseDevice) Engage() (err error) {
 
 	}()
 
+	// listen for info
+	info := <-d.control.info
+
+	d.info = info
+	log.Printf("DEVICE INFO: %+v", info)
+
 	// mark engaged
 	d.engaged = true
 	return nil
@@ -265,16 +286,17 @@ func (d *BaseDevice) disengage(ignoreDone bool) (err error) {
 		d.control.done <- true
 	}
 
+	d.rlock.Lock()
 	// if we are in the process of recording, we
 	// should stop
 	if d.recording {
 		d.stop()
 	}
+	d.rlock.Unlock()
 
 	// disengage
 	err = d.deviceImpl.Disengage()
 	d.engaged = false
-
 	return err
 }
 
@@ -291,8 +313,8 @@ func (d *BaseDevice) Out() <-chan DataFrame {
 }
 
 func (d *BaseDevice) Record() (err error) {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.rlock.Lock()
+	defer d.rlock.Unlock()
 	return d.record()
 }
 
@@ -322,8 +344,8 @@ func (d *BaseDevice) record() (err error) {
 }
 
 func (d *BaseDevice) Stop() (outFile string, err error) {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.rlock.Lock()
+	defer d.rlock.Unlock()
 	return d.stop()
 }
 
@@ -343,7 +365,7 @@ func (d *BaseDevice) stop() (outFile string, err error) {
 }
 
 func (d *BaseDevice) Recording() bool {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.rlock.Lock()
+	defer d.rlock.Unlock()
 	return d.recording
 }

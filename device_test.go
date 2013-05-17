@@ -4,7 +4,6 @@
 package goavatar
 
 import (
-	//"log"
 	"fmt"
 	"testing"
 	"time"
@@ -59,11 +58,16 @@ func (ed *emptyDevice) Disengage() error {
 }
 
 func (ed *emptyDevice) Stream(c *Control) (err error) {
+	c.SendInfo(&DeviceInfo{
+		Channels:   2,
+		SampleRate: 250,
+	})
 	if ed.errProne {
 		return fmt.Errorf("errProne device is error prone")
 	}
 	for !c.ShouldTerminate() {
-		time.Sleep(time.Millisecond * 100)
+
+		time.Sleep(time.Millisecond * 10)
 		c.Send(&MockFrame{})
 	}
 	c.Close()
@@ -153,6 +157,19 @@ func TestEngageionLogic(t *testing.T) {
 	}
 }
 
+func TestControl(t *testing.T) {
+	d := newEmptyDevice()
+	c := newControl(d.(*BaseDevice))
+
+	go func() {
+		time.Sleep(time.Second)
+		for !c.ShouldTerminate() {
+			time.Sleep(5 * time.Second)
+		}
+	}()
+	c.done <- true
+}
+
 func TestCleanupLogic(t *testing.T) {
 	d := newEmptyDevice()
 	bd := d.(*BaseDevice)
@@ -175,6 +192,7 @@ func TestCleanupLogic(t *testing.T) {
 	}
 
 	ensureClosed(t, bd.control.out)
+	//time.Sleep(10 * time.Second)
 }
 
 func TestRecord(t *testing.T) {

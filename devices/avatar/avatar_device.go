@@ -88,12 +88,25 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 	parser := NewAvatarParser(r)
 	defer c.Close()
 
+	// first send the device info; the Avatar keeps its
+	// info on its frames, so we will parse the first frame
+	frame, err := parser.ParseFrame()
+	if err != nil {
+		log.Printf("error parsing frame: %v", err)
+		return err
+	}
+	info := &DeviceInfo{
+		Channels:   frame.Channels(),
+		SampleRate: frame.SampleRate(),
+	}
+	c.SendInfo(info)
+
 	for {
 		if c.ShouldTerminate() {
 			return nil
 		}
 
-		frame, err := parser.ParseFrame()
+		frame, err = parser.ParseFrame()
 		if err != nil {
 			log.Printf("error parsing frame: %v", err)
 			return err
