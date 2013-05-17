@@ -37,8 +37,8 @@ func (r *MockRecorder) Reset() {
 }
 
 type emptyDevice struct {
-	name string
-	repo string
+	name     string
+	repo     string
 	errProne bool // will produce errors in stream (for testing)
 }
 
@@ -59,6 +59,10 @@ func (ed *emptyDevice) Disengage() error {
 }
 
 func (ed *emptyDevice) Stream(c *Control) (err error) {
+	c.SendInfo(&DeviceInfo{
+		Channels:   2,
+		SampleRate: 250,
+	})
 	if ed.errProne {
 		return fmt.Errorf("errProne device is error prone")
 	}
@@ -71,7 +75,7 @@ func (ed *emptyDevice) Stream(c *Control) (err error) {
 }
 
 func (ed *emptyDevice) ProvideRecorder() Recorder {
-	return &MockRecorder{}	
+	return &MockRecorder{}
 }
 
 func newEmptyDevice() Device {
@@ -84,8 +88,8 @@ func newEmptyDevice() Device {
 // Returns a device whose stream always has errors.
 func newErrorProneDevice() Device {
 	return NewDevice(&emptyDevice{
-		name: "ErrorProneDevice",
-		repo: "var",
+		name:     "ErrorProneDevice",
+		repo:     "var",
 		errProne: true,
 	})
 }

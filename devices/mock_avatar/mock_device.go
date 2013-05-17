@@ -53,6 +53,13 @@ func (ad *MockDevice) Disengage() (err error) {
 func (ad *MockDevice) Stream(c *Control) (err error) {
 	defer c.Close()
 	tick := 0
+
+	// send device info
+	c.SendInfo(&DeviceInfo{
+		Channels:   ad.channels,
+		SampleRate: 250,
+	})
+
 	for {
 		if c.ShouldTerminate() {
 			return nil
