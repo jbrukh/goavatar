@@ -6,6 +6,7 @@ package socket
 import (
 	"bytes"
 	"fmt"
+	. "github.com/jbrukh/goavatar"
 	"io"
 	"log"
 	"mime/multipart"
@@ -15,7 +16,7 @@ import (
 
 const UploadEndpoint = "http://localhost:3000/recordings/%s/results"
 
-func UploadOBFFile(file string, endpoint string, token string) (err error) {
+func UploadOBFFile(device Device, file string, endpoint string, token string) (err error) {
 	log.Printf("uploading file %s to endpoint: %s", file, endpoint)
 
 	// Create buffer
@@ -30,6 +31,13 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 		return
 	}
 	fileField.Write([]byte(file))
+
+	// note the file name
+	deviceNameField, err := w.CreateFormField("device_name")
+	if err != nil {
+		return
+	}
+	deviceNameField.Write([]byte(device.Name()))
 
 	// create file field
 	fw, err := w.CreateFormFile("result[data]", file)

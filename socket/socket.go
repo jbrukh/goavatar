@@ -96,7 +96,7 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 				controller.ProcessRecordMessage(msgBytes, msgBase.Id)
 
 			case "upload":
-				controller.ProcessUploadMessage(msgBytes, msgBase.Id)
+				controller.ProcessUploadMessage(device, msgBytes, msgBase.Id)
 
 			default:
 				errStr := fmt.Sprintf("unknown message type: '%s'", msgType)
@@ -306,7 +306,7 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 	}
 }
 
-func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
+func (s *SocketController) ProcessUploadMessage(device Device, msgBytes []byte, id string) {
 	var msg UploadMessage
 	var err error
 	if err = json.Unmarshal(msgBytes, &msg); err != nil {
@@ -327,7 +327,7 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 		file     = filepath.Join(s.device.Repo(), resId)
 	)
 
-	err = UploadOBFFile(file, endpoint, token)
+	err = UploadOBFFile(device, file, endpoint, token)
 	if err != nil {
 		r.Err = err.Error()
 		return
