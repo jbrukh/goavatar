@@ -3,6 +3,10 @@
 //
 package goavatar
 
+import (
+	"fmt"
+)
+
 // ----------------------------------------------------------------- //
 // Constants
 // ----------------------------------------------------------------- //
@@ -32,7 +36,8 @@ type BlockBuffer struct {
 // number of channels and the given sample size.
 func NewBlockBuffer(channels, samples int) *BlockBuffer {
 	if channels < 0 || samples < 1 {
-		panic("bad parameters")
+		str := fmt.Sprintf("bad parameters: channels (%d); samples (%d)", channels, samples)
+		panic(str)
 	}
 	return &BlockBuffer{
 		channels:  channels,

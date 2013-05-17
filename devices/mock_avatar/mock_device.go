@@ -106,8 +106,9 @@ func (ad *MockDevice) transformBuffer(b *BlockBuffer) (bb *BlockBuffer) {
 	bb = b
 	if ad.channels != b.Channels() {
 		bb = NewBlockBuffer(ad.channels, b.Samples())
-		for b.Samples() > 0 {
-			v, t := b.PopSample()
+		samples := b.Samples()
+		for s := 0; s < samples; s++ {
+			v, t := b.Sample(s)
 			vv := make([]float64, ad.channels)
 			for i := range vv {
 				vv[i] = v[i%len(v)]
