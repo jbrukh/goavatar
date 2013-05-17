@@ -352,7 +352,6 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 		return fmt.Errorf("no parallel values available in this mode")
 	}
 	panic("implement")
-	return
 }
 
 // ----------------------------------------------------------------- //

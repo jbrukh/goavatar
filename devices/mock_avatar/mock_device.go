@@ -16,10 +16,10 @@ import (
 // ----------------------------------------------------------------- //
 
 type MockDevice struct {
-	frames  []DataFrame
-	name    string
-	repo    string
-	obfFile string
+	frames   []DataFrame
+	name     string
+	repo     string
+	obfFile  string
 	channels int
 }
 
@@ -31,9 +31,9 @@ func NewMockDevice(repo string, obfFile string, channels int) Device {
 		channels = 1
 	}
 	return NewDevice(&MockDevice{
-		name:    "MockAvatarEEG",
-		repo:    repo,
-		obfFile: obfFile,
+		name:     "MockAvatarEEG",
+		repo:     repo,
+		obfFile:  obfFile,
 		channels: channels,
 	})
 }
@@ -64,7 +64,6 @@ func (ad *MockDevice) Stream(c *Control) (err error) {
 		tick = (tick + 1) % len(ad.frames)
 		time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 	}
-	return nil
 }
 
 func (ad *MockDevice) ProvideRecorder() Recorder {
@@ -90,7 +89,7 @@ func (ad *MockDevice) getFrame(tick int) DataFrame {
 	var (
 		now   = time.Now().UnixNano()
 		frame = ad.frames[tick]
-		b 	  = frame.Buffer()
+		b     = frame.Buffer()
 		δ     = time.Millisecond * 4
 	)
 	bb := ad.transformBuffer(b)

@@ -219,7 +219,7 @@ func (d *BaseDevice) Connect() (err error) {
 		// since we know the streamer has exited we will
 		// not send the done signal
 		if err := d.disconnect(true); err != nil {
-			log.Printf("error on disconnect: $v", err)
+			log.Printf("error on disconnect: %v", err)
 		}
 
 	}()

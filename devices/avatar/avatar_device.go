@@ -101,5 +101,4 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 
 		c.Send(frame)
 	}
-	return nil
 }

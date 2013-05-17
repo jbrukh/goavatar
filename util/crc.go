@@ -33,10 +33,11 @@ func (w *CrcWriter) Write(p []byte) (n int, err error) {
 }
 
 // Write a byte to the CrcWriter.
-func (w *CrcWriter) WriteByte(b byte) {
+func (w *CrcWriter) WriteByte(b byte) error {
 	w.crc = (w.crc >> 8) | ((w.crc & 0xFF) << 8)
 	w.crc ^= uint16(b)
 	w.crc ^= (w.crc & 0xFF) >> 4
 	w.crc ^= (w.crc << 12) & 0xFFFF
 	w.crc ^= (w.crc & 0xFF) << 5
+	return nil
 }
