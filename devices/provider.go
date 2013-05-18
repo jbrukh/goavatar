@@ -3,6 +3,16 @@ package devices
 import (
 	"flag"
 	"fmt"
+	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/devices/avatar"
+	. "github.com/jbrukh/goavatar/devices/mock_avatar"
+)
+
+const (
+	DefaultSerialPort   = "/dev/tty.AvatarEEG03009-SPPDev"
+	DefaultRepo         = "var"
+	DefaultMockFile     = "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
+	DefaultMockChannels = 2
 )
 
 var (
@@ -13,6 +23,7 @@ var (
 	mockChannels *int    = flag.Int("mockChannels", DefaultMockChannels, "the number of channels to mock in the mock device")
 )
 
+// devices
 var deviceMap map[string]Device
 
 func init() {
@@ -36,5 +47,15 @@ func Provide(device string) Device {
 	} else {
 		msg := fmt.Sprintf("unknown device: %s", device)
 		panic(msg)
+	}
+}
+
+// Convenience function for working with the
+// command line.
+func ProvideDevice() Device {
+	if *mockDevice {
+		return Provide("mock_avatar")
+	} else {
+		return Provide("avatar")
 	}
 }

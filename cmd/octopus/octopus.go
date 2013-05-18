@@ -6,44 +6,27 @@ package main
 import (
 	"flag"
 	"fmt"
-	. "github.com/jbrukh/goavatar"
-	. "github.com/jbrukh/goavatar/devices/avatar"
-	. "github.com/jbrukh/goavatar/devices/mock_avatar"
+	. "github.com/jbrukh/goavatar/devices"
 	. "github.com/jbrukh/goavatar/socket"
 	"log"
 	"net/http"
 )
 
 const (
-	DefaultSerialPort 	= "/dev/tty.AvatarEEG03009-SPPDev"
-	DefaultRepo       	= "var"
-	DefaultListenPort 	= 8000
-	ControlEndpoint   	= "/control"
-	DataEndpoint      	= "/device"
-	DefaultMockFile   	= "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
-	DefaultMockChannels = 2	
+	DefaultListenPort = 8000
+	ControlEndpoint   = "/control"
+	DataEndpoint      = "/device"
 )
 
 var (
-	serialPort *string = flag.String("serialPort", DefaultSerialPort, "the serial port for the device")
-	mockDevice *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
-	listenPort *int    = flag.Int("listenPort", DefaultListenPort, "the websocket port on which to listen")
-	verbose    *bool   = flag.Bool("verbose", false, "whether the socket is verbose (shows outgoing data)")
-	repo       *string = flag.String("repo", DefaultRepo, "directory where recordings are stored")
-	mockFile   *string = flag.String("mockFile", DefaultMockFile, "OBF file to play back in the mock device")
-	mockChannels *int  = flag.Int("mockChannels", DefaultMockChannels, "the number of channels to mock in the mock device")
+	listenPort *int  = flag.Int("listenPort", DefaultListenPort, "the websocket port on which to listen")
+	verbose    *bool = flag.Bool("verbose", false, "whether the socket is verbose (shows outgoing data)")
 )
 
 func main() {
 	flag.Parse()
-	var device Device
+	device := ProvideDevice()
 
-	// get the device
-	if *mockDevice {
-		device = NewMockDevice(*repo, *mockFile, *mockChannels)
-	} else {
-		device = NewAvatarDevice(*serialPort, *repo)
-	}
 	fmt.Printf("Device:   %v\n", device.Name())
 	fmt.Printf("Control:  http://localhost:%d%s\n", *listenPort, ControlEndpoint)
 	fmt.Printf("Data:     http://localhost:%d%s\n", *listenPort, DataEndpoint)
