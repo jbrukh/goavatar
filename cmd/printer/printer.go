@@ -7,24 +7,18 @@ import (
 	"flag"
 	"fmt"
 	. "github.com/jbrukh/goavatar"
-	. "github.com/jbrukh/goavatar/devices/avatar"
-	. "github.com/jbrukh/goavatar/devices/mock_avatar"
+	. "github.com/jbrukh/goavatar/devices"
 	"log"
 )
 
 const (
-	DefaultPort        = "/dev/tty.AvatarEEG03009-SPPDev"
-	DefaultMaxFrames   = 10000
-	WindowMultiple     = 10
-	DefaultMockFile    = "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
+	DefaultPort      = "/dev/tty.AvatarEEG03009-SPPDev"
+	DefaultMaxFrames = 10000
+	WindowMultiple   = 10
 )
 
 var (
-	serialPort  *string = flag.String("port", DefaultPort, "the serial port for the device")
-	maxFrames   *int    = flag.Int("maxFrames", DefaultMaxFrames, "maximum frames to read before turning off")
-	mockDevice  *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
-	mockFile    *string = flag.String("mockFile", DefaultMockFile, "OBF file to play back in the mock device")
-	mockChannels *int   = flag.Int("mockChannels", 2, "the number of channels to mock")
+	maxFrames *int = flag.Int("maxFrames", DefaultMaxFrames, "maximum frames to read before turning off")
 )
 
 func init() {
@@ -33,12 +27,7 @@ func init() {
 
 func main() {
 	// set up the device
-	var device Device
-	if *mockDevice {
-		device = NewMockDevice("", *mockFile, *mockChannels)
-	} else {
-		device = NewAvatarDevice(*serialPort, "")
-	}
+	device := ProvideDevice()
 
 	// connect to it
 	if err := device.Connect(); err != nil {
