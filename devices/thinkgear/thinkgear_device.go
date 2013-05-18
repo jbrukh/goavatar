@@ -7,6 +7,7 @@ import (
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/formats"
 	"io"
+	"log"
 	"os"
 )
 
@@ -51,5 +52,21 @@ func (d *ThinkGearDevice) Repo() string {
 }
 
 func (d *ThinkGearDevice) Stream(c *Control) (err error) {
-	return nil
+	return parseByteStream(d.reader, c)
+}
+
+func parseByteStream(reader io.ReadCloser, c *Control) (err error) {
+	parser := NewThinkGearParser(reader)
+	defer c.Close()
+	for {
+		if c.ShouldTerminate() {
+			return nil
+		}
+		frame, err := parser.ParseRaw()
+		if err != nil {
+			log.Printf("error parsing frame: %v", err)
+			return err
+		}
+		c.Send(frame)
+	}
 }
