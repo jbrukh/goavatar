@@ -33,9 +33,6 @@ type Device interface {
 	// stored.
 	Repo() string
 
-	// Obtain the device information
-	Info() *DeviceInfo
-
 	// Connect to the device and return the output channel.
 	// Connecting to a device that is already connected is
 	// an error.
@@ -75,27 +72,24 @@ type DeviceImpl interface {
 	// device for reading.
 	Engage() error
 
-	// Perfomrs the low-level operation to disconnect
+	// Perfoms the low-level operation to disconnect
 	// from the device. This usually means closing the port of the
 	// device.
 	Disengage() error
 
-	// Performs the operation of reading the stream and
+	// performs the operation of reading the stream and
 	// writing data frames to the output channel. This function is
-	// expected to obey the following contract with the Control:
+	// expected to obey the following contract:
 	//
-	// (1) The first possible call shalt be to SendInfo(), or else
-	//     the device Connect() function will wait indefinitely.
-	// (2) It shalt not perform any resource cleanup, this is the
-	//     job of Disengage(). It shalt NOT try to disengage the device.
-	// (3) It shalt obey c.ShouldTerminate() and exit without error.
-	// (4) Upon any error, it shalt return that error.
+	// (1) It shalt not perform any resource cleanup, this is the
+	//     job of the DisconnectFunc. It shalt not call
+	//     device.Disconnect().
+	// (2) It shalt obey c.ShouldTerminate() and exit without error.
+	// (3) Upon any error, it shall return that error.
 	//
-	// Note returning DeviceInfo in this way is a hardware limitation.
 	Stream(*Control) error
 
-	// Produces a recorder. This recorder will record a single recording
-	// to a single file, or fail, and be destroyed.
+	// Produces a recorder.
 	ProvideRecorder() Recorder
 
 	// The name of the device.
@@ -115,7 +109,6 @@ type DeviceImpl interface {
 type Control struct {
 	done chan bool
 	out  chan DataFrame
-	info chan *DeviceInfo
 	d    *BaseDevice
 }
 
@@ -124,7 +117,6 @@ func newControl(d *BaseDevice) *Control {
 	return &Control{
 		done: make(chan bool),
 		out:  make(chan DataFrame, DataFrameBufferSize),
-		info: make(chan *DeviceInfo, 1),
 		d:    d,
 	}
 }
@@ -151,26 +143,10 @@ func (control *Control) Send(df DataFrame) {
 	}
 }
 
-// The client must send DeviceInfo before sending
-// data.
-func (control *Control) SendInfo(info *DeviceInfo) {
-	control.info <- info
-}
-
 // The client worker should call this method before
 // exiting.
 func (control *Control) Close() {
 	close(control.out)
-}
-
-// ----------------------------------------------------------------- //
-// Device Info -- basic info about the device that should
-// be ascertained on every connect.
-// ----------------------------------------------------------------- //
-
-type DeviceInfo struct {
-	Channels   int // how many channels are streaming
-	SampleRate int // what is the sample rate of the device
 }
 
 // ----------------------------------------------------------------- //
@@ -184,7 +160,7 @@ type DeviceInfo struct {
 // be parameterized.
 //
 // In particular, implementors should respect the Control object
-// they are passed. See the contract of Stream() function above.
+// they are passed.
 type BaseDevice struct {
 	lock       sync.Mutex
 	connected  bool
@@ -192,7 +168,6 @@ type BaseDevice struct {
 	recorder   Recorder
 	control    *Control
 	deviceImpl DeviceImpl
-	info       *DeviceInfo
 }
 
 // Create a new device based on some given
@@ -212,12 +187,6 @@ func (d *BaseDevice) Name() string {
 // this device.
 func (d *BaseDevice) Repo() string {
 	return d.deviceImpl.Repo()
-}
-
-func (d *BaseDevice) Info() *DeviceInfo {
-	d.lock.Lock()
-	defer d.lock.Unlock()
-	return d.info
 }
 
 func (d *BaseDevice) Connect() (err error) {
@@ -254,15 +223,6 @@ func (d *BaseDevice) Connect() (err error) {
 		}
 
 	}()
-
-	// listen for info
-	info, ok := <-d.control.info
-	if !ok {
-		d.Disconnect()
-		return fmt.Errorf("couldn't read the device info")
-	}
-	d.info = info
-	log.Printf("DEVICE INFO: %+v", info)
 
 	// mark connected
 	d.connected = true
