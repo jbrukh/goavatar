@@ -21,13 +21,13 @@ import (
 
 // Approx the number of data points to be
 // coming in from the device per second
-const WINDOW_SIZE = 512
+const WindowSize = 512
 
-// MAX_PAYLOAD_LENGTH is the maximum number of
+// MaxPayloadLength is the maximum number of
 // bytes that can be contained in the payload
 // message, not including SYNC, PLENGTH and
 // CHECKSUM bytes.
-const MAX_PAYLOAD_LENGTH = 169
+const MaxPayloadLength = 169
 
 // protocol symbols
 const (
@@ -148,7 +148,7 @@ func parseByteStream(device io.ReadCloser, pparser payloadParser, conn <-chan bo
 		if pLength == SYNC {
 			goto syncLength
 		}
-		if pLength > MAX_PAYLOAD_LENGTH {
+		if pLength > MaxPayloadLength {
 			continue
 		}
 
@@ -291,19 +291,19 @@ func parseRawPayload(payloadPtr *[]byte, output chan<- float64) {
 	}
 }
 
-// Device represents a NeuroSky/ThinkGear device
-type Device struct {
+// TGDevice represents a NeuroSky/ThinkGear device
+type TGDevice struct {
 	conn      chan bool
 	Port      string
 	connected bool
 	lock      *sync.Mutex
 }
 
-// NewDevice returns a new Device; this object
+// NewTGDevice returns a new TGDevice; this object
 // will need to call Connect() (or ConnectRaw())
 // and Engage() in order to start reacting to data
-func NewDevice(serialPort string) *Device {
-	return &Device{
+func NewTGDevice(serialPort string) *TGDevice {
+	return &TGDevice{
 		conn: make(chan bool),
 		Port: serialPort,
 		lock: new(sync.Mutex),
@@ -315,7 +315,7 @@ func NewDevice(serialPort string) *Device {
 // data will stream until this call.
 // If the device is not connected, then this call
 // will have no effect.
-func (d *Device) Engage() {
+func (d *TGDevice) Engage() {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 	if d.connected {
@@ -326,7 +326,7 @@ func (d *Device) Engage() {
 // Disconnect will disconnect from the device and
 // close the serial port. If the device is not
 // connected, this call will have no effect.
-func (d *Device) Disconnect() {
+func (d *TGDevice) Disconnect() {
 	d.lock.Lock() // otherwise, multiple calls here can block forever
 	defer d.lock.Unlock()
 	if d.connected {
@@ -359,7 +359,7 @@ func (d *Device) Disconnect() {
 // onto channels for serial, asynchronous processing.
 // If you do use a channel, make sure that this channel
 // is asynchronous, or you can still hold up processing.
-func (d *Device) Connect(listener *ThinkGearListener) (err error) {
+func (d *TGDevice) Connect(listener *ThinkGearListener) (err error) {
 	d.lock.Lock() // multiple connects on the same device will block
 	defer d.lock.Unlock()
 
@@ -382,7 +382,7 @@ func (d *Device) Connect(listener *ThinkGearListener) (err error) {
 //
 // If the device is already connected, then this call
 // will have no effect.
-func (d *Device) ConnectRaw(output chan<- float64) (err error) {
+func (d *TGDevice) ConnectRaw(output chan<- float64) (err error) {
 	d.lock.Lock() // multiple connects on the same device will block
 	defer d.lock.Unlock()
 
@@ -397,9 +397,9 @@ func (d *Device) ConnectRaw(output chan<- float64) (err error) {
 }
 
 // connect will connect to the serial port and set internal
-// state of the Device appropriately. This method probably
+// state of the TGDevice appropriately. This method probably
 // needs to be synchronized externally.
-func (d *Device) connect() (device io.ReadCloser, err error) {
+func (d *TGDevice) connect() (device io.ReadCloser, err error) {
 	if d.connected {
 		return nil, errors.New("device is already connected")
 	}
