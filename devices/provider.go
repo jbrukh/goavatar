@@ -24,15 +24,17 @@ var (
 	mockChannels *int    = flag.Int("mockChannels", DefaultMockChannels, "the number of channels to mock in the mock device")
 )
 
+// devices
+var deviceMap map[string]Device
+
 func init() {
 	flag.Parse()
-}
 
-// devices
-var deviceMap = map[string]Device{
-	"avatar":      NewAvatarDevice(*repo, *serialPort),
-	"mock_avatar": NewMockDevice(*repo, *mockFile, *mockChannels),
-	"thinkgear":   NewThinkGearDevice(*repo, *serialPort),
+	deviceMap = map[string]Device{
+		"avatar":      NewAvatarDevice(*repo, *serialPort),
+		"mock_avatar": NewMockDevice(*repo, *mockFile, *mockChannels),
+		"thinkgear":   NewThinkGearDevice(*repo, *serialPort),
+	}
 }
 
 // Provides a new instance of a supported
