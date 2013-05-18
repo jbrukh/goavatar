@@ -6,6 +6,7 @@ import (
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/devices/avatar"
 	. "github.com/jbrukh/goavatar/devices/mock_avatar"
+	. "github.com/jbrukh/goavatar/devices/thinkgear"
 )
 
 const (
@@ -31,6 +32,7 @@ func init() {
 var deviceMap = map[string]Device{
 	"avatar":      NewAvatarDevice(*repo, *serialPort),
 	"mock_avatar": NewMockDevice(*repo, *mockFile, *mockChannels),
+	"thinkgear":   NewThinkGearDevice(*repo, *serialPort),
 }
 
 // Provides a new instance of a supported
@@ -38,6 +40,7 @@ var deviceMap = map[string]Device{
 //
 //    "avatar"
 //    "mock_avatar"
+//    "thinkgear"
 //
 func Provide(device string) Device {
 	dev, ok := deviceMap[device]

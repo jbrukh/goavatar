@@ -1,4 +1,4 @@
 package socket
 
-type OctopusSocketHandler struct {
+type OctopusSocket struct {
 }

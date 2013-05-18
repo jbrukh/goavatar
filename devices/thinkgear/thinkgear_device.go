@@ -22,7 +22,7 @@ type ThinkGearDevice struct {
 	reader     io.ReadCloser
 }
 
-func NewThinkGearDevice(serialPort, repo string) Device {
+func NewThinkGearDevice(repo, serialPort string) Device {
 	return NewDevice(&ThinkGearDevice{
 		name:       "NeuroSkyDevice",
 		repo:       repo,

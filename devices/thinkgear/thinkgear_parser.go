@@ -56,8 +56,9 @@ func (p *thinkGearParser) next() (b byte) {
 }
 
 func (p *thinkGearParser) ParseRaw() (df DataFrame, err error) {
+
+	// sync up with the stream
 syncUp:
-	// sync up
 	for {
 		if p.next() != SYNC || p.next() != SYNC {
 			continue
