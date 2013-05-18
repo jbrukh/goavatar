@@ -6,6 +6,7 @@ package socket
 import (
 	"bytes"
 	"fmt"
+	. "github.com/jbrukh/goavatar"
 	"io"
 	"log"
 	"mime/multipart"
@@ -15,7 +16,7 @@ import (
 
 const UploadEndpoint = "http://localhost:3000/recordings/%s/results"
 
-func UploadOBFFile(file string, endpoint string, token string) (err error) {
+func UploadOBFFile(device, sessionId, file, endpoint, token string) (err error) {
 	log.Printf("uploading file %s to endpoint: %s", file, endpoint)
 
 	// Create buffer
@@ -30,6 +31,26 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 		return
 	}
 	fileField.Write([]byte(file))
+
+	// note the device name
+	deviceField, err := w.CreateFormField("device_name")
+	if err != nil {
+		return
+	}
+	deviceField.Write([]byte(device))
+
+	// note the goavatar version
+	versionField, err := w.CreateFormField("version")
+	if err != nil {
+		return
+	}
+	versionField.Write([]byte(Version()))
+
+	sessionIdField, err := w.CreateFormField("session_id")
+	if err != nil {
+		return
+	}
+	sessionIdField.Write([]byte(sessionId))
 
 	// create file field
 	fw, err := w.CreateFormFile("result[data]", file)
@@ -53,7 +74,6 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 	w.Close()
 
 	authenticatedEndpoint := fmt.Sprintf("%s?auth_token=%s", endpoint, token)
-
 	req, err := http.NewRequest("POST", authenticatedEndpoint, buf)
 	if err != nil {
 		return
@@ -72,6 +92,9 @@ func UploadOBFFile(file string, endpoint string, token string) (err error) {
 		return
 	}
 
+	log.Printf("UPLOAD REQUEST -------------------------------------")
+	io.Copy(os.Stdout, req.Body)
+	log.Printf("UPLOAD RESPONSE -------------------------------------")
 	io.Copy(os.Stdout, res.Body) // replace this with status check
 	fmt.Println()
 	return

@@ -65,10 +65,13 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		defer conn.Close()
 		defer device.Disconnect()
+
+		uuid, _ := Uuid()
 		controller := &SocketController{
-			conn:    conn,
-			kickoff: kickoff, // there is only one kickoff channel
-			device:  device,
+			conn:      conn,
+			kickoff:   kickoff, // there is only one kickoff channel
+			device:    device,
+			sessionId: uuid,
 		}
 
 		for {
@@ -111,9 +114,10 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 // business logic of sending and receiving
 // control messages.
 type SocketController struct {
-	conn    *websocket.Conn
-	kickoff chan *SocketController
-	device  Device
+	conn      *websocket.Conn
+	kickoff   chan *SocketController
+	device    Device
+	sessionId string
 }
 
 // Receive receives control messages. If there is
@@ -176,7 +180,7 @@ func (s *SocketController) ProcessInfoMessage(msgBytes []byte, id string) {
 	r.MessageType = "info"
 	r.Id = msg.Id
 	r.Success = true
-	r.Version = "0.1"
+	r.Version = Version()
 	r.DeviceName = s.device.Name()
 
 	s.SendResponse(r)
@@ -327,7 +331,7 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 		file     = filepath.Join(s.device.Repo(), resId)
 	)
 
-	err = UploadOBFFile(file, endpoint, token)
+	err = UploadOBFFile(s.device.Name(), s.sessionId, file, endpoint, token)
 	if err != nil {
 		r.Err = err.Error()
 		return
@@ -339,15 +343,12 @@ func (s *SocketController) ProcessUploadMessage(msgBytes []byte, id string) {
 func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	return func(conn *websocket.Conn) {
 		defer conn.Close()
-
 		// gate to see if it is armed
 		select {
 		case controller := <-kickoff:
-
 			msg := new(ConnectResponse)
 			msg.MessageType = "connect"
 			msg.Success = false
-
 			// we connect and begin to stream
 			if !device.Connected() {
 				err := device.Connect()
@@ -366,7 +367,6 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 				log.Printf("WARNING: device was already operating")
 				return
 			}
-
 		default:
 			// kickoff is blocked, meaning no one has
 			// armed the device; we close the socket
