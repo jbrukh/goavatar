@@ -33,19 +33,19 @@ type Device interface {
 	// stored.
 	Repo() string
 
-	// Connect to the device and return the output channel.
-	// Connecting to a device that is already connected is
+	// Engage to the device and return the output channel.
+	// Engageing to a device that is already engaged is
 	// an error.
-	Connect() error
+	Engage() error
 
-	// Disconnects from the device, closes the output channel,
-	// and cleans relevant resources. Calls to disconnect are
+	// Disengages from the device, closes the output channel,
+	// and cleans relevant resources. Calls to disengage are
 	// idempotent.
-	Disconnect() error
+	Disengage() error
 
-	// Connected returns true if and only if the device is
-	// currently connected.
-	Connected() bool
+	// Engaged returns true if and only if the device is
+	// currently engaged.
+	Engaged() bool
 
 	// Returns the output channel for the device.
 	Out() <-chan DataFrame
@@ -67,12 +67,12 @@ type Device interface {
 
 // Device implementation interface.
 type DeviceImpl interface {
-	// Performs the low-level operation to connect
+	// Performs the low-level operation to engage
 	// to the device. This usually means opening the port of the
 	// device for reading.
 	Engage() error
 
-	// Perfoms the low-level operation to disconnect
+	// Perfoms the low-level operation to disengage
 	// from the device. This usually means closing the port of the
 	// device.
 	Disengage() error
@@ -82,8 +82,8 @@ type DeviceImpl interface {
 	// expected to obey the following contract:
 	//
 	// (1) It shalt not perform any resource cleanup, this is the
-	//     job of the DisconnectFunc. It shalt not call
-	//     device.Disconnect().
+	//     job of the DisengageFunc. It shalt not call
+	//     device.Disengage().
 	// (2) It shalt obey c.ShouldTerminate() and exit without error.
 	// (3) Upon any error, it shall return that error.
 	//
@@ -101,7 +101,7 @@ type DeviceImpl interface {
 
 // ----------------------------------------------------------------- //
 // Device Control -- used by implementation providers to report
-// data and know when to disconnect
+// data and know when to disengage
 // ----------------------------------------------------------------- //
 
 // Control is a control structure used by client workers
@@ -154,7 +154,7 @@ func (control *Control) Close() {
 // ----------------------------------------------------------------- //
 
 // BaseDevice provides the basic framework for devices, including
-// the skeleton implementation that keeps track of connection and
+// the skeleton implementation that keeps track of engageion and
 // recording state and thread-safety. However, the BaseDevice provides
 // no logic for streaming data and expects this functionality to
 // be parameterized.
@@ -163,7 +163,7 @@ func (control *Control) Close() {
 // they are passed.
 type BaseDevice struct {
 	lock       sync.Mutex
-	connected  bool
+	engaged    bool
 	recording  bool
 	recorder   Recorder
 	control    *Control
@@ -189,20 +189,20 @@ func (d *BaseDevice) Repo() string {
 	return d.deviceImpl.Repo()
 }
 
-func (d *BaseDevice) Connect() (err error) {
+func (d *BaseDevice) Engage() (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	// check connection
-	if d.connected {
-		return fmt.Errorf("already connected to the device")
+	// check engageion
+	if d.engaged {
+		return fmt.Errorf("already engaged to the device")
 	}
 
 	log.Printf("%s: CONNECT", d.Name())
 
-	// perform connect
+	// perform engage
 	if err = d.deviceImpl.Engage(); err != nil {
-		return fmt.Errorf("could not connect to the device: %v", err)
+		return fmt.Errorf("could not engage to the device: %v", err)
 	}
 
 	// create the controller
@@ -215,30 +215,30 @@ func (d *BaseDevice) Connect() (err error) {
 			log.Printf("error in streamer: %v", err)
 		}
 
-		// on error or exit, we will disconnect the device;
+		// on error or exit, we will disengage the device;
 		// since we know the streamer has exited we will
 		// not send the done signal
-		if err := d.disconnect(true); err != nil {
-			log.Printf("error on disconnect: %v", err)
+		if err := d.disengage(true); err != nil {
+			log.Printf("error on disengage: %v", err)
 		}
 
 	}()
 
-	// mark connected
-	d.connected = true
+	// mark engaged
+	d.engaged = true
 	return nil
 }
 
-func (d *BaseDevice) Disconnect() (err error) {
-	return d.disconnect(false)
+func (d *BaseDevice) Disengage() (err error) {
+	return d.disengage(false)
 }
 
-func (d *BaseDevice) disconnect(ignoreDone bool) (err error) {
+func (d *BaseDevice) disengage(ignoreDone bool) (err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
 	// check for idempotency
-	if !d.connected {
+	if !d.engaged {
 		return
 	}
 
@@ -256,17 +256,17 @@ func (d *BaseDevice) disconnect(ignoreDone bool) (err error) {
 		d.stop()
 	}
 
-	// disconnect
+	// disengage
 	err = d.deviceImpl.Disengage()
-	d.connected = false
+	d.engaged = false
 
 	return err
 }
 
-func (d *BaseDevice) Connected() bool {
+func (d *BaseDevice) Engaged() bool {
 	d.lock.Lock()
 	defer d.lock.Unlock()
-	return d.connected
+	return d.engaged
 }
 
 func (d *BaseDevice) Out() <-chan DataFrame {
@@ -288,8 +288,8 @@ func (d *BaseDevice) record() (err error) {
 		return fmt.Errorf("already recording")
 	}
 
-	if !d.connected {
-		return fmt.Errorf("device is not connected")
+	if !d.engaged {
+		return fmt.Errorf("device is not engaged")
 	}
 
 	log.Printf("%s: RECORD", d.Name())

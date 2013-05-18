@@ -30,11 +30,11 @@ func main() {
 	device := ProvideDevice()
 
 	// connect to it
-	if err := device.Connect(); err != nil {
+	if err := device.Engage(); err != nil {
 		log.Printf("Error: %v\n", err)
 		return
 	}
-	defer device.Disconnect()
+	defer device.Disengage()
 
 	out := device.Out()
 	printFrame(out)

@@ -64,7 +64,7 @@ func NewControlSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 	// return the actual handler function
 	return func(conn *websocket.Conn) {
 		defer conn.Close()
-		defer device.Disconnect()
+		defer device.Disengage()
 
 		uuid, _ := Uuid()
 		controller := &SocketController{
@@ -201,7 +201,7 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 
 	// should we disconnect?
 	if !msg.Connect {
-		err := s.device.Disconnect()
+		err := s.device.Disengage()
 		if err != nil {
 			r.Status = "error"
 			r.Err = err.Error()
@@ -232,7 +232,7 @@ func (s *SocketController) ProcessConnectMessage(msgBytes []byte, id string) {
 		}
 
 		// maybe someone is already using it
-		if s.device.Connected() {
+		if s.device.Engaged() {
 			r.Status = "busy"
 			r.Err = "device is already connected"
 			return
@@ -281,7 +281,7 @@ func (s *SocketController) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.Success = false
 	defer s.SendResponse(r)
 
-	if !s.device.Connected() {
+	if !s.device.Engaged() {
 		r.Err = "device is not streaming"
 		return
 	}
@@ -350,8 +350,8 @@ func NewDataSocket(device Device, verbose bool) func(ws *websocket.Conn) {
 			msg.MessageType = "connect"
 			msg.Success = false
 			// we connect and begin to stream
-			if !device.Connected() {
-				err := device.Connect()
+			if !device.Engaged() {
+				err := device.Engage()
 				if err != nil {
 					log.Printf("could not connect: %v", err)
 					msg.Err = fmt.Sprintf("could not connect to the device")
@@ -381,7 +381,7 @@ func stream(conn *websocket.Conn, device Device, verbose bool) {
 	defer log.Printf("DEVICE: STREAMING OFF")
 
 	// device stuff
-	defer device.Disconnect()
+	defer device.Disengage()
 	out := device.Out()
 
 	// diagnose the situation

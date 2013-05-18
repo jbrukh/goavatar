@@ -37,8 +37,8 @@ func (r *MockRecorder) Reset() {
 }
 
 type emptyDevice struct {
-	name string
-	repo string
+	name     string
+	repo     string
 	errProne bool // will produce errors in stream (for testing)
 }
 
@@ -71,7 +71,7 @@ func (ed *emptyDevice) Stream(c *Control) (err error) {
 }
 
 func (ed *emptyDevice) ProvideRecorder() Recorder {
-	return &MockRecorder{}	
+	return &MockRecorder{}
 }
 
 func newEmptyDevice() Device {
@@ -84,8 +84,8 @@ func newEmptyDevice() Device {
 // Returns a device whose stream always has errors.
 func newErrorProneDevice() Device {
 	return NewDevice(&emptyDevice{
-		name: "ErrorProneDevice",
-		repo: "var",
+		name:     "ErrorProneDevice",
+		repo:     "var",
 		errProne: true,
 	})
 }
@@ -121,34 +121,34 @@ func (f *MockFrame) Timestamps() (ts []int64) {
 	return
 }
 
-func TestConnectionLogic(t *testing.T) {
+func TestEngageionLogic(t *testing.T) {
 	d := newEmptyDevice()
-	d.Connect()
-	if !d.Connected() {
+	d.Engage()
+	if !d.Engaged() {
 		t.Errorf("didn't connect")
 	}
 
-	err := d.Connect()
+	err := d.Engage()
 	if err == nil {
 		t.Errorf("failed to block second connect")
 	}
 
-	d.Disconnect()
-	if d.Connected() {
+	d.Disengage()
+	if d.Engaged() {
 		t.Errorf("failed to disconnect")
 	}
 
-	d.Disconnect()
-	d.Disconnect()
-	d.Disconnect()
-	d.Disconnect()
+	d.Disengage()
+	d.Disengage()
+	d.Disengage()
+	d.Disengage()
 
-	if d.Connected() {
+	if d.Engaged() {
 		t.Errorf("connected now for some reason")
 	}
 
-	d.Connect()
-	if !d.Connected() {
+	d.Engage()
+	if !d.Engaged() {
 		t.Errorf("didn't connect for a second time")
 	}
 }
@@ -160,7 +160,7 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("has recorder/control for some reason")
 	}
 
-	err := d.Connect()
+	err := d.Engage()
 	if err != nil {
 		t.Errorf("failed to connect")
 	}
@@ -169,7 +169,7 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("didn't create out channel")
 	}
 
-	err = d.Disconnect()
+	err = d.Disengage()
 	if err != nil {
 		t.Errorf("failed to disconnect")
 	}
@@ -179,8 +179,8 @@ func TestCleanupLogic(t *testing.T) {
 
 func TestRecord(t *testing.T) {
 	d := newEmptyDevice()
-	err := d.Connect()
-	if err != nil || !d.Connected() {
+	err := d.Engage()
+	if err != nil || !d.Engaged() {
 		t.Errorf("failed to connect")
 	}
 
@@ -210,8 +210,8 @@ func TestRecord(t *testing.T) {
 		t.Errorf("mock recorder didn't hit stop")
 	}
 
-	err = d.Disconnect()
-	if err != nil || d.Connected() {
+	err = d.Disengage()
+	if err != nil || d.Engaged() {
 		t.Errorf("couldn't disconnect: %v", err)
 	}
 }
@@ -226,8 +226,8 @@ func TestRecordWhenOff(t *testing.T) {
 
 func TestMultipleRecording(t *testing.T) {
 	d := newEmptyDevice()
-	err := d.Connect()
-	if err != nil || !d.Connected() {
+	err := d.Engage()
+	if err != nil || !d.Engaged() {
 		t.Errorf("failed to connect")
 	}
 
@@ -241,8 +241,8 @@ func TestMultipleRecording(t *testing.T) {
 		t.Errorf("should have failed, device is already recording")
 	}
 
-	err = d.Disconnect()
-	if err != nil || d.Connected() {
+	err = d.Disengage()
+	if err != nil || d.Engaged() {
 		t.Errorf("couldn't disconnect: %v", err)
 	}
 
@@ -253,9 +253,9 @@ func TestMultipleRecording(t *testing.T) {
 
 func TestErrorProneStream(t *testing.T) {
 	d := newErrorProneDevice()
-	d.Connect()
+	d.Engage()
 	time.Sleep(time.Millisecond * 100) // wait for device to fail
-	if d.Connected() {
+	if d.Engaged() {
 		t.Errorf("device should have disconnected, probably")
 	}
 }
