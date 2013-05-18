@@ -38,61 +38,61 @@ func NewMockDevice(repo string, obfFile string, channels int) Device {
 	})
 }
 
-func (ad *MockDevice) Engage() (err error) {
-	ad.frames, err = MockDataFrames(ad.obfFile)
+func (d *MockDevice) Engage() (err error) {
+	d.frames, err = MockDataFrames(d.obfFile)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ad *MockDevice) Disengage() (err error) {
+func (d *MockDevice) Disengage() (err error) {
 	return nil
 }
 
-func (ad *MockDevice) Stream(c *Control) (err error) {
+func (d *MockDevice) Stream(c *Control) (err error) {
 	defer c.Close()
 	tick := 0
 	for {
 		if c.ShouldTerminate() {
 			return nil
 		}
-		frame := ad.getFrame(tick)
+		frame := d.getFrame(tick)
 		//arr, _ := frame.Buffer().Arrays()
 		//log.Printf("sending frame %d: %v", tick, arr)
 		c.Send(frame)
-		tick = (tick + 1) % len(ad.frames)
+		tick = (tick + 1) % len(d.frames)
 		time.Sleep(time.Millisecond * 64) // 15.625 fps == 1 frame every 64 milliseconds
 	}
 }
 
-func (ad *MockDevice) ProvideRecorder() Recorder {
-	return NewOBFRecorder(ad.repo)
+func (d *MockDevice) ProvideRecorder() Recorder {
+	return NewOBFRecorder(d.repo)
 }
 
-func (ad *MockDevice) Name() string {
-	return ad.name
+func (d *MockDevice) Name() string {
+	return d.name
 }
 
-func (ad *MockDevice) Repo() string {
-	return ad.repo
+func (d *MockDevice) Repo() string {
+	return d.repo
 }
 
 // Obtain the forward-facing DataFrame. Since the mock
 // device works on pre-recorded data, it must overwrite
 // the timestamps to maintain a continuous stream of times.
-// Further more, it may opt to add (duplicate) some channels
+// Further more, it may opt to dd (duplicate) some channels
 // to satisfy the channels parameter.
-func (ad *MockDevice) getFrame(tick int) DataFrame {
+func (d *MockDevice) getFrame(tick int) DataFrame {
 	// overwrite timestamps so the
 	// test recording doesn't repeat timestamps
 	var (
 		now   = time.Now().UnixNano()
-		frame = ad.frames[tick]
+		frame = d.frames[tick]
 		b     = frame.Buffer()
 		δ     = time.Millisecond * 4
 	)
-	bb := ad.transformBuffer(b)
+	bb := d.transformBuffer(b)
 	bb.TransformTs(func(s int, ts int64) int64 {
 		return InterpolateTs(now, s, δ)
 	})
@@ -102,14 +102,14 @@ func (ad *MockDevice) getFrame(tick int) DataFrame {
 // Appends (or reduces) some channels to the BlockBuffer depending
 // on the channels parameter. TODO: create AppendChannel
 // method in BlockBuffer.
-func (ad *MockDevice) transformBuffer(b *BlockBuffer) (bb *BlockBuffer) {
+func (d *MockDevice) transformBuffer(b *BlockBuffer) (bb *BlockBuffer) {
 	bb = b
-	if ad.channels != b.Channels() {
-		bb = NewBlockBuffer(ad.channels, b.Samples())
+	if d.channels != b.Channels() {
+		bb = NewBlockBuffer(d.channels, b.Samples())
 		samples := b.Samples()
 		for s := 0; s < samples; s++ {
 			v, t := b.Sample(s)
-			vv := make([]float64, ad.channels)
+			vv := make([]float64, d.channels)
 			for i := range vv {
 				vv[i] = v[i%len(v)]
 			}
