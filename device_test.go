@@ -67,7 +67,7 @@ func (ed *emptyDevice) Stream(c *Control) (err error) {
 	}
 	for !c.ShouldTerminate() {
 
-		time.Sleep(time.Millisecond * 10)
+		time.Sleep(time.Millisecond * 1)
 		c.Send(&MockFrame{})
 	}
 	c.Close()

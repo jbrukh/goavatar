@@ -258,7 +258,7 @@ func (d *BaseDevice) Engage() (err error) {
 	info := <-d.control.info
 
 	d.info = info
-	log.Printf("DEVICE INFO: %+v", info)
+	log.Printf("%s: DEVICE INFO %+v", d.Name(), info)
 
 	// mark engaged
 	d.engaged = true
