@@ -35,7 +35,11 @@ Use Go 1.1 (or later). Make sure your <code>$GOPATH</code> is set. To get the re
 
     $ go get -u -v github.com/jbrukh/goavatar/...
 
-This installs the repo into <code>$GOPATH/src/github.com/jbrukh/goavatar</code>. To compile, test, and install everything:
+This installs the repo into <code>$GOPATH/src/github.com/jbrukh/goavatar</code>. If you are not finding dependencies, then try go-getting them:
+
+    $ go get github.com/jbrukh/gplot
+
+To compile, test, and install everything:
 
     $ bin/release.sh
 
