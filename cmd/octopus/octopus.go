@@ -25,7 +25,10 @@ var (
 
 func main() {
 	flag.Parse()
-	device := ProvideDevice()
+	device, err := ProvideDevice()
+	if err != nil {
+		log.Fatalf("could not get device: %v", err)
+	}
 
 	fmt.Printf("Device:   %v\n", device.Name())
 	fmt.Printf("Control:  http://localhost:%d%s\n", *listenPort, ControlEndpoint)
@@ -35,7 +38,7 @@ func main() {
 	http.Handle(ControlEndpoint, ControlHandler(device, *verbose))
 	http.Handle(DataEndpoint, DataHandler(device, *verbose))
 
-	err := http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalf("could not start server: %v", err)
 	}

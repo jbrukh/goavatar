@@ -14,14 +14,16 @@ const (
 	DefaultRepo         = "var"
 	DefaultMockFile     = "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
 	DefaultMockChannels = 2
+	DefaultDevice       = "avatar"
 )
 
 var (
 	repo         *string = flag.String("repo", DefaultRepo, "directory where recordings are stored")
-	serialPort   *string = flag.String("serialPort", DefaultSerialPort, "the serial port for the device")
+	port         *string = flag.String("port", DefaultSerialPort, "the serial port for the device")
 	mockDevice   *bool   = flag.Bool("mockDevice", false, "whether to use the mock device")
 	mockFile     *string = flag.String("mockFile", DefaultMockFile, "OBF file to play back in the mock device")
 	mockChannels *int    = flag.Int("mockChannels", DefaultMockChannels, "the number of channels to mock in the mock device")
+	device       *string = flag.String("device", DefaultDevice, "one of {'avatar', 'mock_avatar', 'thinkgear'}")
 )
 
 // devices
@@ -31,9 +33,9 @@ func init() {
 	flag.Parse()
 
 	deviceMap = map[string]Device{
-		"avatar":      NewAvatarDevice(*repo, *serialPort),
+		"avatar":      NewAvatarDevice(*repo, *port),
 		"mock_avatar": NewMockDevice(*repo, *mockFile, *mockChannels),
-		"thinkgear":   NewThinkGearDevice(*repo, *serialPort),
+		"thinkgear":   NewThinkGearDevice(*repo, *port),
 	}
 }
 
@@ -44,22 +46,20 @@ func init() {
 //    "mock_avatar"
 //    "thinkgear"
 //
-func Provide(device string) Device {
+func Provide(device string) (Device, error) {
 	dev, ok := deviceMap[device]
 	if ok {
-		return dev
+		return dev, nil
 	} else {
-		msg := fmt.Sprintf("unknown device: %s", device)
-		panic(msg)
+		return nil, fmt.Errorf("unknown device: %s", device)
 	}
 }
 
 // Convenience function for working with the
 // command line.
-func ProvideDevice() Device {
+func ProvideDevice() (Device, error) {
 	if *mockDevice {
 		return Provide("mock_avatar")
-	} else {
-		return Provide("avatar")
 	}
+	return Provide(*device)
 }

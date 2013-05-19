@@ -2,7 +2,6 @@ package thinkgear
 
 import (
 	"bufio"
-	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"io"
 	"log"
@@ -59,16 +58,12 @@ func (p *thinkGearParser) ParseRaw() (df DataFrame, err error) {
 
 	// sync up with the stream
 syncUp:
-	for {
-		if p.next() != SYNC || p.next() != SYNC {
-			continue
-		}
-		break
+	if p.next() != SYNC || p.next() != SYNC {
+		goto syncUp
 	}
-	var plen byte // payload length
 
 syncLength: // using a label makes code 2 lines shorter :)
-	plen = p.next()
+	plen := p.next()
 	if plen == SYNC {
 		goto syncLength
 	}
@@ -100,18 +95,15 @@ syncLength: // using a label makes code 2 lines shorter :)
 		log.Printf("checksum has failed: expected %v but got %v", checksum, stated)
 		goto syncUp
 	}
-	return parseRawPayload(payload)
-}
 
-// parseRawPayload will parse the payload buffer for
-// raw signal only, and deliver that signal on the
-// given channel
-func parseRawPayload(payload []byte) (df DataFrame, err error) {
-	// check if there is not enough payload
-	// or if the raw code is missing, or if
-	// the raw value does not have two bytes
-	if len(payload) < 4 || payload[0] != CODE_RAW_VALUE || payload[1] != 2 {
-		return nil, fmt.Errorf("bad data")
+	// our frame must begin with CODE_RAW_VALUE or skip
+	if len(payload) < 4 || payload[0] != CODE_RAW_VALUE {
+		goto syncUp
+	}
+	if payload[1] != 2 {
+		// if the number of bytes in the value is not 2,
+		// we don't know how to read this yet; panic
+		panic("expecting two bytes in the raw value")
 	}
 
 	b := NewBlockBuffer(1, 1)
@@ -121,5 +113,6 @@ func parseRawPayload(payload []byte) (df DataFrame, err error) {
 		time.Now().UnixNano(),
 	)
 	df = NewDataFrame(b, SampleRate)
+
 	return
 }

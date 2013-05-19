@@ -62,6 +62,7 @@ func parseByteStream(reader io.ReadCloser, c *Control) (err error) {
 		if c.ShouldTerminate() {
 			return nil
 		}
+
 		frame, err := parser.ParseRaw()
 		if err != nil {
 			log.Printf("error parsing frame: %v", err)

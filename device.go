@@ -136,7 +136,22 @@ func (control *Control) ShouldTerminate() bool {
 // Device by calling this method.
 func (control *Control) Send(df DataFrame) {
 	control.out <- df
-	if !control.ShouldTerminate() {
+
+	// now we have to be careful; some other thread
+	// may have called Disengage, and so that thread
+	// is waiting on control.done; meanwhile the
+	// streamer thread is about to check Recording()
+	// which could cause deadlock.
+
+	// so we allow this streamer thread to skip over
+	// done and yet resend it back to the thread's
+	// d.ShouldTerminate() check.
+	select {
+	case v, ok := <-control.done:
+		if ok {
+			control.done <- v // pass on the value
+		}
+	default:
 		if control.d.Recording() {
 			control.d.recorder.ProcessFrame(df)
 		}

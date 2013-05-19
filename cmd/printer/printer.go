@@ -27,7 +27,10 @@ func init() {
 
 func main() {
 	// set up the device
-	device := ProvideDevice()
+	device, err := ProvideDevice()
+	if err != nil {
+		log.Fatalf("could not get device: %v", err)
+	}
 
 	// connect to it
 	if err := device.Engage(); err != nil {
