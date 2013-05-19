@@ -5,7 +5,6 @@ import (
 	. "github.com/jbrukh/goavatar"
 	"io"
 	"log"
-	"time"
 )
 
 // ----------------------------------------------------------------- //
@@ -22,6 +21,8 @@ const SampleRate = 512
 // CHECKSUM bytes.
 const MaxPayloadLength = 169
 
+const SamplePeriod = 1953125 // 1/512 (in nanos)
+
 // protocol symbols
 const (
 	SYNC           = 0xAA
@@ -35,6 +36,7 @@ const (
 
 type thinkGearParser struct {
 	reader *bufio.Reader // reader of the stream
+	ts     int64
 }
 
 // create a new parser
@@ -110,8 +112,9 @@ syncLength: // using a label makes code 2 lines shorter :)
 	v := float64(int16(payload[2])<<8 | int16(payload[3]))
 	b.AppendSample(
 		[]float64{v},
-		time.Now().UnixNano(),
+		p.ts,
 	)
+	p.ts += SamplePeriod
 	df = NewDataFrame(b, SampleRate)
 
 	return

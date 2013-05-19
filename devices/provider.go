@@ -16,7 +16,7 @@ const (
 	DefaultSerialPort   = "/dev/tty.AvatarEEG03009-SPPDev"
 	DefaultRepo         = "var"
 	DefaultMockFile     = "etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
-	DefaultMockChannels = 2
+	DefaultMockChannels = 4
 	DefaultDevice       = "avatar"
 )
 
