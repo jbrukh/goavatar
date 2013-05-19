@@ -239,13 +239,51 @@ func assertNoErrors(t *testing.T, fs ...func() error) {
 }
 
 func Test__MarshallUnmarshall(t *testing.T) {
-	const fn = "../etc/1fabece1-7a57-96ab-3de9-71da8446c52c"
+	const (
+		fn            = "../etc/364a47d2-053d-d52f-3b34-85f1a82f714e"
+		expChannels   = 1
+		expSamples    = 10706
+		expSampleRate = 512
+	)
 	file, err := os.Open(fn)
 	if err != nil {
 		t.Fatalf("could not open test file: %v", fn)
 	}
 	defer file.Close()
-	//oc := newObfCodec(file)
+	oc := newObfCodec(file)
 
-	// TODO TODO TODO
+	pb, err := oc.Parallel()
+	if err != nil {
+		t.Errorf("could not read parallel data")
+	}
+
+	if pb.Channels() != expChannels || pb.Samples() != expSamples || len(pb.Timestamps()) != expSamples {
+		t.Errorf("wrong data: %d channels, %d samples", pb.Channels(), pb.Samples())
+	}
+
+	if oc.Header().SampleRate != expSampleRate {
+		t.Errorf("wrong sample rate")
+	}
+
+	ps, ts, err := oc.Sequential()
+	if err != nil {
+		t.Errorf("could not read sequential data")
+	}
+
+	if len(ps) != expChannels || len(ps[0]) != expSamples || len(ts) != expSamples {
+		t.Errorf("wrong data: %d channels, %d samples", len(ps), len(ps[0]))
+	}
+
+	// check some samples
+	for s := 0; s < expSamples; s++ {
+		v, tsSample := pb.Sample(s)
+		if ts[s] != tsSample {
+			t.Errorf("wrong sample timestamp")
+		}
+		for i, value := range v {
+			if value != ps[i][s] {
+				t.Errorf("wrong value")
+			}
+		}
+	}
 }
