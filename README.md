@@ -1,19 +1,24 @@
-goavatar
-========
+Octopus Connector
+=================
 
-Go parser and websocket server for the AvatarEEG data stream.
+Local component that interfaces with external devices and the Octopus website.
+
+
 
 Overview
 ========
 
-    bin/          scripts for installing and testing
+    bin/              scripts for installing and testing
 
     cmd/
-        obf/      the Octopus Binary Format viewer        (see: obf --help)
-        octopus/  the Octopus Connector websocket server  (see: octopus --help)
-        streamer/ the gplot-based real-time data streamer (see: streamer --help)
+        obf/          the Octopus Binary Format viewer        (see: obf --help)
+        octopus/      the Octopus Connector websocket server  (see: octopus --help)
+        printer/      print device streams in the console     (see: printer --help)
     
-    devices/      devices we currently support (AvatarEEG and MockAvatarEEG)
+    devices/          devices we currently support
+        avatar/       the AvatarEEG
+        mock_avatar/  a fake AvatarEEG for testing
+        thinkgear/    devices with NeuroSky ThinkGear protocol
 
     etc/          tools for testing
 
@@ -26,7 +31,7 @@ Overview
 Installation
 ============
 
-You will need Go 1.1 and <code>gplot</code> if you want to use the streamer. Make sure your <code>$GOPATH</code> is set. To get the repo:
+Use Go 1.1 (or later). Make sure your <code>$GOPATH</code> is set. To get the repo:
 
     $ go get -u -v github.com/jbrukh/goavatar/...
 
@@ -36,21 +41,26 @@ This installs the repo into <code>$GOPATH/src/github.com/jbrukh/goavatar</code>.
 
 Make sure <code>$GOPATH/bin</code> is on your <code>PATH</code>.
 
-Mock Device
-===========
-
-    $ octopus --mockDevice
-    
-Options
+Devices
 =======
 
-    $ octopus --help
-    Usage of octopus:
-      -integers=false: whether to return integral data
-      -listenPort=8000: the websocket port on which to listen
-      -mockDevice=false: whether to use the mock device
-      -serialPort="/dev/tty.AvatarEEG03009-SPPDev": the serial port for the device
-      -verbose=false: whether the socket is verbose (shows outgoing data)
+Commands that take command-line parameters will usually take:
+
+    -device="avatar": one of {'avatar', 'mock_avatar', 'thinkgear'}
+    -mockChannels=2: the number of channels to mock in the mock device
+    -mockDevice=false: whether to use the mock device
+    -mockFile="etc/1fabece1-7a57-96ab-3de9-71da8446c52c": OBF file to play back in the mock device
+    -port="/dev/tty.AvatarEEG03009-SPPDev": the serial port for the device
+    -repo="var": directory where recordings are stored
+  
+The option <code>--mockDevice</code> is short for <code>--device="mock_avatar"</code>. Usually the NeuroSky MindBand lives on port <code>/dev/tty.BrainBand-DevB</dev>, so you would run like this:
+
+    $ octopus --device=thinkgear --port="/dev/tty.BrainBand-DevB"
+
+To simulate multiple channels when using the MockAvatarEEG, do:
+
+    $ octopus --mockDevice --mockChannels=8
+    
 
 Protocol
 ========
