@@ -57,7 +57,7 @@ Commands that take command-line parameters will usually take:
     -port="/dev/tty.AvatarEEG03009-SPPDev": the serial port for the device
     -repo="var": directory where recordings are stored
   
-The option <code>--mockDevice</code> is short for <code>--device="mock_avatar"</code>. Usually the NeuroSky MindBand lives on port <code>/dev/tty.BrainBand-DevB</dev>, so you would run like this:
+The option <code>--mockDevice</code> is short for <code>--device="mock_avatar"</code>. Usually the NeuroSky MindBand lives on port <code>/dev/tty.BrainBand-DevB</code>, so you would run like this:
 
     $ octopus --device=thinkgear --port="/dev/tty.BrainBand-DevB"
 
