@@ -7,7 +7,7 @@ import (
 	"flag"
 	"fmt"
 	. "github.com/jbrukh/goavatar/device"
-	. "github.com/jbrukh/goavatar/devices"
+	. "github.com/jbrukh/goavatar/drivers"
 	"log"
 )
 

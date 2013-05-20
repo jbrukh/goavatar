@@ -1,15 +1,15 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package devices
+package drivers
 
 import (
 	"flag"
 	"fmt"
 	. "github.com/jbrukh/goavatar/device"
-	. "github.com/jbrukh/goavatar/devices/avatar"
-	. "github.com/jbrukh/goavatar/devices/mock_avatar"
-	. "github.com/jbrukh/goavatar/devices/thinkgear"
+	. "github.com/jbrukh/goavatar/drivers/avatar"
+	. "github.com/jbrukh/goavatar/drivers/mock_avatar"
+	. "github.com/jbrukh/goavatar/drivers/thinkgear"
 )
 
 const (

@@ -4,7 +4,7 @@
 package main
 
 import (
-	. "github.com/jbrukh/goavatar/devices"
+	. "github.com/jbrukh/goavatar/drivers"
 	. "github.com/jbrukh/goavatar/socket"
 	"log"
 )
