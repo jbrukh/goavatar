@@ -3,6 +3,10 @@
 //
 package device
 
+import (
+	"log"
+)
+
 // A real-time recorder of dataframes.
 type Recorder interface {
 	Start() error
@@ -25,22 +29,34 @@ func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
 	}
 }
 
-// func (d *DeviceRecorder) SetMaxSamples(maxSamples int) {
-// 	d.maxSamples = maxSamples
-// }
+func (d *DeviceRecorder) SetMaxSamples(maxSamples int) {
+	d.maxSamples = maxSamples
+}
 
-// func (d *DeviceRecorder) Start() (err error) {
-// 	d.out, err = d.device.Subscribe("recorder")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return d.r.Start()
-// }
+func (d *DeviceRecorder) Record() (id string, err error) {
+	d.out, err = d.device.Subscribe("recorder")
+	if err != nil {
+		return
+	}
 
-// func (d *DeviceRecorder) RecordFrame(df DataFrame) (err error) {
-// 	return d.r.RecordFrame(df)
-// }
+	err = d.r.Start()
+	if err != nil {
+		return
+	}
 
-// func (d *DeviceRecorder) Stop() (id string, err error) {
-// 	id, err = d.r.Stop()
-// }
+	for {
+		df, ok := <-d.out
+		if !ok {
+			break
+		}
+		d.r.RecordFrame(df)
+	}
+
+	log.Printf("recording ended")
+	id, err = d.r.Stop()
+	return
+}
+
+func (d *DeviceRecorder) Stop() {
+	d.device.Unsubscribe("recorder")
+}
