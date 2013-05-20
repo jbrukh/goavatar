@@ -78,4 +78,36 @@ func TestPubSub__Publish(t *testing.T) {
 	if two := <-out2; two != df {
 		t.Errorf("failed to publish")
 	}
+
+	// now unsubscribe from one
+	ps.Unsubscribe("2")
+	ps.publish(df)
+
+	if one := <-out1; one != df {
+		t.Errorf("failed to publish")
+	}
+	if _, ok := <-out2; ok {
+		t.Errorf("failed to close channel")
+	}
+}
+
+func TestPubSub__UnsubscribeAll(t *testing.T) {
+	ps := NewPubSub()
+	var outs [6]chan DataFrame
+	outs[0], _ = ps.Subscribe("1")
+	outs[1], _ = ps.Subscribe("2")
+	outs[2], _ = ps.Subscribe("3")
+	outs[3], _ = ps.Subscribe("4")
+	outs[4], _ = ps.Subscribe("5")
+	outs[5], _ = ps.Subscribe("6")
+	if len(ps.subs) != 6 {
+		t.Errorf("wrong size")
+	}
+	ps.UnsubscribeAll()
+	if len(ps.subs) != 0 {
+		t.Errorf("wrong size")
+	}
+	for _, v := range outs {
+		ensureClosed(t, v)
+	}
 }
