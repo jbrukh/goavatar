@@ -170,6 +170,22 @@ func (b *BlockBuffer) Arrays() ([][]float64, []int64) {
 	return values, b.Timestamps()
 }
 
+// Create a new BlockBuffer backed by a sub-slice of the
+// current BlockBuffer, giving a view into the subset
+// of the data
+func (b *BlockBuffer) Slice(from, to int) *BlockBuffer {
+	if from >= to {
+		panic("from must be > to")
+	}
+	var (
+		v  = b.values[b.channels*from : b.channels*to]
+		ts = b.ts[from:to]
+		bb = NewBlockBuffer(b.channels, (to - from + 1))
+	)
+	bb.appendBlocks(v, ts)
+	return bb
+}
+
 func (b *BlockBuffer) appendBlocks(v []float64, ts []int64) {
 	b.values = append(b.values, v...)
 	b.ts = append(b.ts, ts...)

@@ -258,6 +258,22 @@ func TestBlockBufferAppendSample__NotComparable(t *testing.T) {
 	})
 }
 
+func TestBlockBufferSlice(t *testing.T) {
+	b := mockBlockBuffer()
+	bb1 := b.Slice(0, 1)
+	if bb1.Samples() != 1 {
+		t.Errorf("bad slice: %d", bb1.Samples())
+	}
+	bb2 := b.Slice(0, 3)
+	if bb2.Samples() != 3 {
+		t.Errorf("bad slice")
+	}
+	bb3 := b.Slice(3, 5)
+	if bb3.Samples() != 2 {
+		t.Errorf("bad slice")
+	}
+}
+
 func mockBlockBuffer() (b *BlockBuffer) {
 	b = NewBlockBuffer(2, 10)
 	b.appendBlocks(
