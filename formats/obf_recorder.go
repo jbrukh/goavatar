@@ -76,7 +76,7 @@ func worker(r *OBFRecorder) {
 }
 
 // Process each incoming frame, if there is an error
-func (r *OBFRecorder) ProcessFrame(df DataFrame) error {
+func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 	select {
 	case err := <-r.cerr:
 		close(r.out)
