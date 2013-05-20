@@ -1,7 +1,11 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package goavatar
+package device
+
+import (
+	. "github.com/jbrukh/goavatar/datastruct"
+)
 
 // A generic data frame interface.
 type DataFrame interface {

@@ -5,7 +5,7 @@ package avatar
 
 import (
 	"errors"
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/formats"
 	"io"
 	"log"

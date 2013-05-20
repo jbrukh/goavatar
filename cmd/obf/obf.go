@@ -6,7 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/formats"
 	"github.com/jbrukh/gplot"
 	"os"

@@ -6,7 +6,7 @@ package devices
 import (
 	"flag"
 	"fmt"
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/devices/avatar"
 	. "github.com/jbrukh/goavatar/devices/mock_avatar"
 	. "github.com/jbrukh/goavatar/devices/thinkgear"

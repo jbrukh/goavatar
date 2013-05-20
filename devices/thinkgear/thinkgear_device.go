@@ -4,7 +4,7 @@
 package thinkgear
 
 import (
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/formats"
 	"io"
 	"log"

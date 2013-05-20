@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/device"
 	"path/filepath"
 )
 

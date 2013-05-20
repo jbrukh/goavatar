@@ -4,9 +4,11 @@
 package mock_avatar
 
 import (
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/datastruct"
+	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/etc"
 	. "github.com/jbrukh/goavatar/formats"
+	. "github.com/jbrukh/goavatar/util"
 	"log"
 	"time"
 )

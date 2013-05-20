@@ -2,7 +2,8 @@ package thinkgear
 
 import (
 	"bufio"
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/datastruct"
+	. "github.com/jbrukh/goavatar/device"
 	"io"
 	"log"
 )

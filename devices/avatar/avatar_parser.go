@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/datastruct"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
 	"time"

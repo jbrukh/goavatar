@@ -1,10 +1,11 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package goavatar
+package device
 
 import (
 	"fmt"
+	. "github.com/jbrukh/goavatar/datastruct"
 	"testing"
 	"time"
 )

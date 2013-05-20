@@ -5,7 +5,8 @@ package formats
 
 import (
 	"bytes"
-	. "github.com/jbrukh/goavatar"
+	. "github.com/jbrukh/goavatar/device"
+	. "github.com/jbrukh/goavatar/util"
 	"io"
 	"log"
 	"os"

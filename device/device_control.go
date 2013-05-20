@@ -1,4 +1,7 @@
-package goavatar
+//
+// Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
+//
+package device
 
 // ----------------------------------------------------------------- //
 // Device Control -- used by implementation providers to report
