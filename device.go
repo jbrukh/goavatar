@@ -52,16 +52,6 @@ type Device interface {
 
 	// Returns the output channel for the device.
 	Out() <-chan DataFrame
-
-	// Starts recording the streaming data to a file.
-	Record() (err error)
-
-	// Stops recording the streaming data.
-	Stop() (outFile string, err error)
-
-	// Recording returns true if and only if the device is currently
-	// recording.
-	Recording() bool
 }
 
 // ----------------------------------------------------------------- //
@@ -93,10 +83,6 @@ type DeviceImpl interface {
 	//
 	// Note returning DeviceInfo in this way is a hardware limitation.
 	Stream(*Control) error
-
-	// Produces a recorder. This recorder will record a single recording
-	// to a single file, or fail, and be destroyed.
-	ProvideRecorder() Recorder
 
 	// The name of the device.
 	Name() string
@@ -144,9 +130,6 @@ func (control *Control) ShouldTerminate() bool {
 // Device by calling this method.
 func (control *Control) Send(df DataFrame) {
 	control.out <- df
-	if control.d.Recording() {
-		control.d.recorder.ProcessFrame(df)
-	}
 }
 
 // The client must send DeviceInfo before sending
@@ -185,10 +168,7 @@ type DeviceInfo struct {
 // they are passed. See the contract of Stream() function above.
 type BaseDevice struct {
 	sync.Mutex
-	rlock      sync.Mutex
 	engaged    bool
-	recording  bool
-	recorder   Recorder
 	control    *Control
 	deviceImpl DeviceImpl
 	info       *DeviceInfo
@@ -286,14 +266,6 @@ func (d *BaseDevice) disengage(ignoreDone bool) (err error) {
 		d.control.done <- true
 	}
 
-	d.rlock.Lock()
-	// if we are in the process of recording, we
-	// should stop
-	if d.recording {
-		d.stop()
-	}
-	d.rlock.Unlock()
-
 	// disengage
 	err = d.deviceImpl.Disengage()
 	d.engaged = false
@@ -310,62 +282,4 @@ func (d *BaseDevice) Out() <-chan DataFrame {
 	d.Lock()
 	defer d.Unlock()
 	return d.control.out
-}
-
-func (d *BaseDevice) Record() (err error) {
-	d.rlock.Lock()
-	defer d.rlock.Unlock()
-	return d.record()
-}
-
-// record is the unsynchronized version of Record,
-// used internally.
-func (d *BaseDevice) record() (err error) {
-	if d.recording {
-		return fmt.Errorf("already recording")
-	}
-
-	if !d.engaged {
-		return fmt.Errorf("device is not engaged")
-	}
-
-	log.Printf("%s: RECORD", d.Name())
-
-	if d.recorder = d.deviceImpl.ProvideRecorder(); d.recorder == nil {
-		return fmt.Errorf("no recorder was provided")
-	}
-
-	if err := d.recorder.Start(); err != nil {
-		return fmt.Errorf("could not start the recorder: %v", err)
-	}
-
-	d.recording = true
-	return
-}
-
-func (d *BaseDevice) Stop() (outFile string, err error) {
-	d.rlock.Lock()
-	defer d.rlock.Unlock()
-	return d.stop()
-}
-
-func (d *BaseDevice) stop() (outFile string, err error) {
-	if !d.recording {
-		return
-	}
-
-	log.Printf("%s: STOP RECORDING", d.Name())
-
-	if outFile, err = d.recorder.Stop(); err != nil {
-		log.Printf("could not shut down the recorder: %v", err)
-	}
-	d.recorder = nil
-	d.recording = false
-	return
-}
-
-func (d *BaseDevice) Recording() bool {
-	d.rlock.Lock()
-	defer d.rlock.Unlock()
-	return d.recording
 }

@@ -195,79 +195,79 @@ func TestCleanupLogic(t *testing.T) {
 	//time.Sleep(10 * time.Second)
 }
 
-func TestRecord(t *testing.T) {
-	d := newEmptyDevice()
-	err := d.Engage()
-	if err != nil || !d.Engaged() {
-		t.Errorf("failed to connect")
-	}
+// func TestRecord(t *testing.T) {
+// 	d := newEmptyDevice()
+// 	err := d.Engage()
+// 	if err != nil || !d.Engaged() {
+// 		t.Errorf("failed to connect")
+// 	}
 
-	err = d.Record()
-	if err != nil || !d.Recording() {
-		t.Errorf("failed to start recording, or wrong status")
-	}
+// 	err = d.Record()
+// 	if err != nil || !d.Recording() {
+// 		t.Errorf("failed to start recording, or wrong status")
+// 	}
 
-	r := d.(*BaseDevice).recorder.(*MockRecorder)
-	if !r.started {
-		t.Errorf("mock recorder didn't start")
-	}
+// 	r := d.(*BaseDevice).recorder.(*MockRecorder)
+// 	if !r.started {
+// 		t.Errorf("mock recorder didn't start")
+// 	}
 
-	// wait for a single data frame to go through
-	<-d.Out()
+// 	// wait for a single data frame to go through
+// 	<-d.Out()
 
-	if !r.processed {
-		t.Errorf("mock recorder didn't process")
-	}
+// 	if !r.processed {
+// 		t.Errorf("mock recorder didn't process")
+// 	}
 
-	d.Stop()
-	if err != nil || d.Recording() {
-		t.Errorf("recorder failed to stop")
-	}
+// 	d.Stop()
+// 	if err != nil || d.Recording() {
+// 		t.Errorf("recorder failed to stop")
+// 	}
 
-	if !r.stopped {
-		t.Errorf("mock recorder didn't hit stop")
-	}
+// 	if !r.stopped {
+// 		t.Errorf("mock recorder didn't hit stop")
+// 	}
 
-	err = d.Disengage()
-	if err != nil || d.Engaged() {
-		t.Errorf("couldn't disconnect: %v", err)
-	}
-}
+// 	err = d.Disengage()
+// 	if err != nil || d.Engaged() {
+// 		t.Errorf("couldn't disconnect: %v", err)
+// 	}
+// }
 
-func TestRecordWhenOff(t *testing.T) {
-	d := newEmptyDevice()
-	err := d.Record()
-	if err == nil {
-		t.Errorf("should have failed, the device is not connected")
-	}
-}
+// func TestRecordWhenOff(t *testing.T) {
+// 	d := newEmptyDevice()
+// 	err := d.Record()
+// 	if err == nil {
+// 		t.Errorf("should have failed, the device is not connected")
+// 	}
+// }
 
-func TestMultipleRecording(t *testing.T) {
-	d := newEmptyDevice()
-	err := d.Engage()
-	if err != nil || !d.Engaged() {
-		t.Errorf("failed to connect")
-	}
+// func TestMultipleRecording(t *testing.T) {
+// 	d := newEmptyDevice()
+// 	err := d.Engage()
+// 	if err != nil || !d.Engaged() {
+// 		t.Errorf("failed to connect")
+// 	}
 
-	err = d.Record()
-	if err != nil || !d.Recording() {
-		t.Errorf("failed to start recording, or wrong status")
-	}
+// 	err = d.Record()
+// 	if err != nil || !d.Recording() {
+// 		t.Errorf("failed to start recording, or wrong status")
+// 	}
 
-	err = d.Record()
-	if err == nil {
-		t.Errorf("should have failed, device is already recording")
-	}
+// 	err = d.Record()
+// 	if err == nil {
+// 		t.Errorf("should have failed, device is already recording")
+// 	}
 
-	err = d.Disengage()
-	if err != nil || d.Engaged() {
-		t.Errorf("couldn't disconnect: %v", err)
-	}
+// 	err = d.Disengage()
+// 	if err != nil || d.Engaged() {
+// 		t.Errorf("couldn't disconnect: %v", err)
+// 	}
 
-	if d.Recording() {
-		t.Errorf("recording didn't stop")
-	}
-}
+// 	if d.Recording() {
+// 		t.Errorf("recording didn't stop")
+// 	}
+// }
 
 func TestErrorProneStream(t *testing.T) {
 	d := newErrorProneDevice()
