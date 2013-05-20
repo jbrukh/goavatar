@@ -118,12 +118,11 @@ type DeviceInfo struct {
 // they are passed. See the contract of Stream() function above.
 type BaseDevice struct {
 	sync.Mutex
-	plock      sync.Mutex
 	engaged    bool
 	control    *Control
 	deviceImpl DeviceImpl
 	info       *DeviceInfo
-	subs       map[string]chan DataFrame
+	ps         *PubSub
 }
 
 // Create a new device based on some given
@@ -131,7 +130,7 @@ type BaseDevice struct {
 func NewDevice(deviceImpl DeviceImpl) Device {
 	return &BaseDevice{
 		deviceImpl: deviceImpl,
-		subs:       make(map[string]chan DataFrame),
+		ps:         NewPubSub(),
 	}
 }
 
@@ -219,7 +218,7 @@ func (d *BaseDevice) disengage(ignoreDone bool) (err error) {
 		d.control.done <- true
 	}
 
-	d.unsubscribeAll()
+	d.ps.UnsubscribeAll()
 
 	// disengage
 	err = d.deviceImpl.Disengage()
@@ -233,42 +232,14 @@ func (d *BaseDevice) Engaged() bool {
 	return d.engaged
 }
 
-func (d *BaseDevice) Subscribe(name string) (out chan DataFrame, err error) {
-	d.Lock()
-	defer d.Unlock()
-	if _, ok := d.subs[name]; ok {
-		log.Printf("subscription '%s' already exists", name)
-		return nil, fmt.Errorf("subscription already exists")
-	}
-	out = make(chan DataFrame, DataFrameBufferSize)
-	d.subs[name] = out
-	return
+func (d *BaseDevice) Subscribe(name string) (chan DataFrame, error) {
+	return d.ps.Subscribe(name)
 }
 
 func (d *BaseDevice) Unsubscribe(name string) {
-	d.plock.Lock()
-	defer d.plock.Unlock()
-	d.unsubscribe(name)
-}
-
-func (d *BaseDevice) unsubscribe(name string) {
-	if out, ok := d.subs[name]; ok {
-		close(out)
-	}
-	delete(d.subs, name)
-}
-
-func (d *BaseDevice) unsubscribeAll() {
-	for name, out := range d.subs {
-		close(out)
-		delete(d.subs, name)
-	}
+	d.ps.Unsubscribe(name)
 }
 
 func (d *BaseDevice) publish(df DataFrame) {
-	d.plock.Lock()
-	defer d.plock.Unlock()
-	for _, v := range d.subs {
-		v <- df
-	}
+	d.ps.publish(df)
 }

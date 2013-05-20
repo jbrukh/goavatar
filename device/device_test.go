@@ -178,24 +178,13 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	if len(bd.subs) != 0 {
-		t.Errorf("already has subscriptions?")
-	}
-
 	bd.Subscribe("test")
-
-	if len(bd.subs) != 1 {
-		t.Errorf("should have 1 subscription")
-	}
 
 	err = d.Disengage()
 	if err != nil {
 		t.Errorf("failed to disconnect")
 	}
 
-	if len(bd.subs) != 0 {
-		t.Errorf("didn't unsubscribe properly")
-	}
 }
 
 // func TestRecord(t *testing.T) {
