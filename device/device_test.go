@@ -71,12 +71,7 @@ func (ed *emptyDevice) Stream(c *Control) (err error) {
 		time.Sleep(time.Millisecond * 1)
 		c.Send(&MockFrame{})
 	}
-	c.Close()
 	return
-}
-
-func (ed *emptyDevice) ProvideRecorder() Recorder {
-	return &MockRecorder{}
 }
 
 func newEmptyDevice() Device {
@@ -183,8 +178,14 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to connect")
 	}
 
-	if bd.control.out == nil {
-		t.Errorf("didn't create out channel")
+	if len(bd.subs) != 0 {
+		t.Errorf("already has subscriptions?")
+	}
+
+	bd.Subscribe("test")
+
+	if len(bd.subs) != 1 {
+		t.Errorf("should have 1 subscription")
 	}
 
 	err = d.Disengage()
@@ -192,8 +193,9 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to disconnect")
 	}
 
-	ensureClosed(t, bd.control.out)
-	//time.Sleep(10 * time.Second)
+	if len(bd.subs) != 0 {
+		t.Errorf("didn't unsubscribe properly")
+	}
 }
 
 // func TestRecord(t *testing.T) {

@@ -39,7 +39,11 @@ func main() {
 	}
 	defer device.Disengage()
 
-	out := device.Out()
+	out, err := device.Subscribe("printer")
+	if err != nil {
+		log.Printf("could not subscribe to device: %s", err)
+		return
+	}
 	printFrame(out)
 	log.Printf("Thank you!")
 }

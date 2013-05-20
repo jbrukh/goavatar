@@ -12,7 +12,6 @@ package device
 // that stream data.
 type Control struct {
 	done chan bool
-	out  chan DataFrame
 	info chan *DeviceInfo
 	d    *BaseDevice
 }
@@ -21,7 +20,6 @@ type Control struct {
 func newControl(d *BaseDevice) *Control {
 	return &Control{
 		done: make(chan bool),
-		out:  make(chan DataFrame, DataFrameBufferSize),
 		info: make(chan *DeviceInfo, 1),
 		d:    d,
 	}
@@ -41,17 +39,11 @@ func (c *Control) ShouldTerminate() bool {
 // The client worker should send data frames to the
 // Device by calling this method.
 func (c *Control) Send(df DataFrame) {
-	c.out <- df
+	c.d.publish(df)
 }
 
 // The client must send DeviceInfo before sending
 // data.
 func (c *Control) SendInfo(info *DeviceInfo) {
 	c.info <- info
-}
-
-// The client worker should call this method before
-// exiting.
-func (c *Control) Close() {
-	close(c.out)
 }

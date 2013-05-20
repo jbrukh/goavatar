@@ -53,7 +53,6 @@ func (d *MockDevice) Disengage() (err error) {
 }
 
 func (d *MockDevice) Stream(c *Control) (err error) {
-	defer c.Close()
 	tick := 0
 
 	// send device info

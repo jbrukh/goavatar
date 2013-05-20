@@ -57,7 +57,6 @@ func (d *ThinkGearDevice) Stream(c *Control) (err error) {
 
 func parseByteStream(reader io.ReadCloser, c *Control) (err error) {
 	parser := NewThinkGearParser(reader)
-	defer c.Close()
 
 	c.SendInfo(&DeviceInfo{
 		SampleRate: 512,

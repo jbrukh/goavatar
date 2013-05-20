@@ -86,7 +86,6 @@ func (ad *AvatarDevice) Repo() string {
 // and call Close() upon exiting.
 func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 	parser := NewAvatarParser(r)
-	defer c.Close()
 
 	// first send the device info; the Avatar keeps its
 	// info on its frames, so we will parse the first frame

@@ -43,7 +43,11 @@ func stream(dataConn *websocket.Conn, s *SocketSession) {
 
 	// device stuff
 	defer s.device.Disengage()
-	out := s.device.Out()
+	out, err := s.device.Subscribe("datasocket")
+	if err != nil {
+		log.Printf("could not subscribe to device: %s", err)
+		return
+	}
 
 	// diagnose the situation
 	df, ok := <-out
