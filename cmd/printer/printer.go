@@ -8,6 +8,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/drivers"
+	. "github.com/jbrukh/goavatar/formats"
 	"log"
 )
 
@@ -19,6 +20,7 @@ const (
 
 var (
 	maxFrames *int = flag.Int("maxFrames", DefaultMaxFrames, "maximum frames to read before turning off")
+	rec       *int = flag.Int("rec", 10, "frames to record")
 )
 
 func init() {
@@ -39,6 +41,14 @@ func main() {
 	}
 	defer device.Disengage()
 
+	if *rec > 0 {
+		r := NewDeviceRecorder(device, NewOBFRecorder(device.Repo()))
+		r.SetMaxSamples(*rec)
+		go func() {
+			r.Record()
+		}()
+	}
+
 	out, err := device.Subscribe("printer")
 	if err != nil {
 		log.Printf("could not subscribe to device: %s", err)
@@ -57,8 +67,9 @@ func printFrame(out <-chan DataFrame) {
 		}
 
 		b := df.Buffer()
-		for b.Samples() > 0 {
-			v, t := b.PopSample()
+		samples := b.Samples()
+		for s := 0; s < samples; s++ {
+			v, t := b.Sample(s)
 			fmt.Printf("%v, %v\n", t, v)
 		}
 	}
