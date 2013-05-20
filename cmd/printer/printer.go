@@ -42,11 +42,13 @@ func main() {
 	defer device.Disengage()
 
 	if *rec > 0 {
+		log.Printf("going to record...")
 		r := NewDeviceRecorder(device, NewOBFRecorder(device.Repo()))
 		r.SetMaxSamples(*rec)
-		go func() {
-			r.Record()
-		}()
+		if _, err = r.Record(); err != nil {
+			log.Printf("Error: %v", err)
+			return
+		}
 	}
 
 	out, err := device.Subscribe("printer")

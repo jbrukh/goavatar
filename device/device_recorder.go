@@ -39,17 +39,24 @@ func (d *DeviceRecorder) Record() (id string, err error) {
 		return
 	}
 
+	log.Printf("got channel: %v", d.out)
+
 	err = d.r.Start()
 	if err != nil {
 		return
 	}
 
 	for {
+		log.Printf("reading frame...")
 		df, ok := <-d.out
 		if !ok {
 			break
 		}
 		d.r.RecordFrame(df)
+		d.sampleCount += df.Buffer().Samples()
+		if d.sampleCount >= d.maxSamples {
+			break
+		}
 	}
 
 	log.Printf("recording ended")
