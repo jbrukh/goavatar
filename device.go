@@ -184,7 +184,7 @@ type DeviceInfo struct {
 // In particular, implementors should respect the Control object
 // they are passed. See the contract of Stream() function above.
 type BaseDevice struct {
-	lock       sync.Mutex
+	sync.Mutex
 	rlock      sync.Mutex
 	engaged    bool
 	recording  bool
@@ -214,14 +214,14 @@ func (d *BaseDevice) Repo() string {
 }
 
 func (d *BaseDevice) Info() *DeviceInfo {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.Lock()
+	defer d.Unlock()
 	return d.info
 }
 
 func (d *BaseDevice) Engage() (err error) {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.Lock()
+	defer d.Unlock()
 
 	// check engageion
 	if d.engaged {
@@ -270,8 +270,8 @@ func (d *BaseDevice) Disengage() (err error) {
 }
 
 func (d *BaseDevice) disengage(ignoreDone bool) (err error) {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.Lock()
+	defer d.Unlock()
 
 	// check for idempotency
 	if !d.engaged {
@@ -301,14 +301,14 @@ func (d *BaseDevice) disengage(ignoreDone bool) (err error) {
 }
 
 func (d *BaseDevice) Engaged() bool {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.Lock()
+	defer d.Unlock()
 	return d.engaged
 }
 
 func (d *BaseDevice) Out() <-chan DataFrame {
-	d.lock.Lock()
-	defer d.lock.Unlock()
+	d.Lock()
+	defer d.Unlock()
 	return d.control.out
 }
 
