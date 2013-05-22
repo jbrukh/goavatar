@@ -9,7 +9,7 @@ import (
 
 // A real-time recorder of dataframes.
 type Recorder interface {
-	Start() error
+	Init() error
 	RecordFrame(DataFrame) error
 	Stop() (id string, err error)
 }
@@ -39,27 +39,20 @@ func (d *DeviceRecorder) Record() (id string, err error) {
 		return
 	}
 
-	log.Printf("got channel: %v", d.out)
-
-	err = d.r.Start()
+	err = d.r.Init()
 	if err != nil {
 		return
 	}
 
 	for {
-		log.Printf("reading frame...")
 		df, ok := <-d.out
 		if !ok {
 			break
 		}
+		log.Printf("read frame %v", df)
 		d.r.RecordFrame(df)
-		d.sampleCount += df.Buffer().Samples()
-		if d.sampleCount >= d.maxSamples {
-			break
-		}
 	}
 
-	log.Printf("recording ended")
 	id, err = d.r.Stop()
 	return
 }

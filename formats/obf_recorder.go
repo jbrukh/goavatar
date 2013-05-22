@@ -13,105 +13,64 @@ import (
 	"path/filepath"
 )
 
-// Recorder that records the Octopus format.
-// Warning: calling Start() twice may have unintended
-// consequences.
 type OBFRecorder struct {
 	repo     string    // repository where file is being recorded to
 	fileName string    // name of the file/resource id
 	file     *os.File  // the file we're writing
 	codec    *obfCodec // codec for the OBF format
 
-	out  chan DataFrame // channel for the worker to process frames
-	cerr chan error     // channel for worker error feedback
-
 	// diagnostics
 	channels   int
 	samples    int
 	sampleRate int
-	buf        *bytes.Buffer
+	buf        bytes.Buffer
+	tsFirst    int64
+	fc         int // frame count
+}
+
+func (r *OBFRecorder) tsTransform(ts int64) uint32 {
+	return toTs32Diff(ts, r.tsFirst)
 }
 
 func NewOBFRecorder(repo string) *OBFRecorder {
 	return &OBFRecorder{
-		out:  make(chan DataFrame, DataFrameBufferSize),
-		cerr: make(chan error, 1),
 		repo: repo,
 	}
 }
 
-func (r *OBFRecorder) Start() (err error) {
-	// buffer the data in this buffer
-	r.buf = new(bytes.Buffer)
-	go worker(r)
-	return
-}
-
-func worker(r *OBFRecorder) {
-	defer close(r.cerr)
-	var (
-		tsFirst     int64
-		tsTransform = func(ts int64) uint32 {
-			return toTs32Diff(ts, tsFirst)
-		}
-	)
-	for {
-		// get the frame or die
-		df, ok := <-r.out
-		if !ok {
-			return
-		}
-
-		if tsFirst == 0 {
-			tsFirst = df.Buffer().Timestamps()[0]
-		}
-
-		//log.Printf("writing frame: %v", df)
-		// write the frame, or send back an error
-		if err := WriteParallelTo(r.buf, df.Buffer(), tsTransform); err != nil {
-			r.cerr <- err
-			return
-		}
-	}
+func (r *OBFRecorder) Init() error {
+	return nil
 }
 
 // Process each incoming frame, if there is an error
 func (r *OBFRecorder) RecordFrame(df DataFrame) error {
-	select {
-	case err := <-r.cerr:
-		close(r.out)
-		r.RollbackFile()
-		log.Printf("error while processing frame for recording: %v", err)
-		return err
-	default:
-		r.out <- df
-		r.channels = df.Buffer().Channels() // TODO
-		r.sampleRate = df.SampleRate()      // TODO
-		r.samples += df.Buffer().Samples()
+	if df == nil {
+		return nil
 	}
-	return nil
+	r.fc++
+
+	// on the first frame, obtain the first timestamp
+	// and normalize to that
+	if r.fc == 1 {
+		if b := df.Buffer(); b != nil {
+			ts := b.Timestamps()
+			if len(ts) > 1 {
+				r.tsFirst = ts[0]
+			}
+		}
+	}
+
+	// TODO
+	r.channels = df.Buffer().Channels()
+	r.samples += df.Buffer().Samples()
+	r.sampleRate = df.SampleRate()
+
+	//log.Printf("writing frame: %v", df)
+	// write the frame, or send back an error
+	return WriteParallelTo(&r.buf, df.Buffer(), r.tsTransform)
 }
 
 func (r *OBFRecorder) Stop() (id string, err error) {
-
-	// close the worker
-	select {
-	case <-r.out:
-	default:
-		close(r.out) // close the worker
-	}
-
-	// at this point, the worker may still be operating
-	// on the file, therefore we should make sure the worker
-	// is done
-	err = <-r.cerr
-	if err != nil {
-		return "", err
-	}
-
-	// at this point, the worker is surely exited, so it
-	// safe to read from the buffer
-
 	defer func() {
 		log.Printf("OBFRecorder: closing the file: %v", r.fileName)
 		// TODO: if err, rollback
@@ -149,7 +108,7 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	}
 
 	// write the parallel frames from the buffer
-	if _, err = io.Copy(r.file, r.buf); err != nil {
+	if _, err = io.Copy(r.file, &r.buf); err != nil {
 		return "", err
 	}
 

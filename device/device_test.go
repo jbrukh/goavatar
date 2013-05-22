@@ -16,7 +16,7 @@ type MockRecorder struct {
 	stopped   bool
 }
 
-func (r *MockRecorder) Start() (err error) {
+func (r *MockRecorder) Init() (err error) {
 	r.started = true
 	return
 }
@@ -60,7 +60,7 @@ func (ed *emptyDevice) Disengage() error {
 
 func (ed *emptyDevice) Stream(c *Control) (err error) {
 	c.SendInfo(&DeviceInfo{
-		Channels:   2,
+		Channels:   1,
 		SampleRate: 250,
 	})
 	if ed.errProne {
@@ -68,7 +68,9 @@ func (ed *emptyDevice) Stream(c *Control) (err error) {
 	}
 	for !c.ShouldTerminate() {
 		time.Sleep(time.Millisecond * 1)
-		c.Send(&MockFrame{})
+		b := NewBlockBuffer(1, 1)
+		b.AppendSample([]float64{42}, time.Now().UnixNano())
+		c.Send(&MockFrame{buf: b})
 	}
 	return
 }
@@ -90,37 +92,18 @@ func newErrorProneDevice() Device {
 }
 
 type MockFrame struct {
+	buf *BlockBuffer
 }
 
 func (f *MockFrame) Buffer() (data *BlockBuffer) {
-	return
-}
-
-func (f *MockFrame) Channels() (c int) {
-	return
-}
-
-func (f *MockFrame) Samples() (s int) {
-	return
+	return f.buf
 }
 
 func (f *MockFrame) SampleRate() (r int) {
-	return
+	return 250
 }
 
-func (f *MockFrame) Received() (t time.Time) {
-	return
-}
-
-func (f *MockFrame) Generated() (t time.Time) {
-	return
-}
-
-func (f *MockFrame) Timestamps() (ts []int64) {
-	return
-}
-
-func TestEngageionLogic(t *testing.T) {
+func TestEngageLogic(t *testing.T) {
 	d := newEmptyDevice()
 	d.Engage()
 	if !d.Engaged() {
