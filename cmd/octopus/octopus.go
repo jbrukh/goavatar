@@ -4,10 +4,15 @@
 package main
 
 import (
+	"flag"
 	. "github.com/jbrukh/goavatar/drivers"
 	. "github.com/jbrukh/goavatar/socket"
 	"log"
 )
+
+func init() {
+	flag.Parse()
+}
 
 func main() {
 	device, err := ProvideDevice()
