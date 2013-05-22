@@ -7,7 +7,6 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
-	. "github.com/jbrukh/goavatar/device"
 	"log"
 )
 

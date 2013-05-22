@@ -1,6 +1,7 @@
 package device
 
 import (
+	. "github.com/jbrukh/goavatar/datastruct"
 	"testing"
 )
 
@@ -68,7 +69,7 @@ func TestPubSub__Publish(t *testing.T) {
 		t.Errorf("could not subscribe")
 	}
 
-	df := &dataFrame{}
+	df := &MockFrame{}
 	ps.publish(df)
 
 	if one := <-out1; one != df {

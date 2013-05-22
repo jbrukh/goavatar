@@ -5,6 +5,7 @@ package device
 
 import (
 	"fmt"
+	. "github.com/jbrukh/goavatar/datastruct"
 	"log"
 	"sync"
 )

@@ -3,6 +3,10 @@
 //
 package device
 
+import (
+	. "github.com/jbrukh/goavatar/datastruct"
+)
+
 // ----------------------------------------------------------------- //
 // Device Control -- used by implementation providers to report
 // data and know when to disengage

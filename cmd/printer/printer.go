@@ -6,6 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	. "github.com/jbrukh/goavatar/datastruct"
 	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/drivers"
 	. "github.com/jbrukh/goavatar/formats"

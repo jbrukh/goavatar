@@ -4,6 +4,7 @@
 package device
 
 import (
+	. "github.com/jbrukh/goavatar/datastruct"
 	"log"
 )
 
@@ -33,6 +34,8 @@ func (d *DeviceRecorder) SetMaxSamples(maxSamples int) {
 	d.maxSamples = maxSamples
 }
 
+// Make a recording. This method will block as the recording
+// proceeds until a separate thread calls Stop().
 func (d *DeviceRecorder) Record() (id string, err error) {
 	d.out, err = d.device.Subscribe("recorder")
 	if err != nil {

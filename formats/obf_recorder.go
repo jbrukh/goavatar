@@ -5,7 +5,7 @@ package formats
 
 import (
 	"bytes"
-	. "github.com/jbrukh/goavatar/device"
+	. "github.com/jbrukh/goavatar/datastruct"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
 	"log"
@@ -54,16 +54,15 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 	if r.fc == 1 {
 		if b := df.Buffer(); b != nil {
 			ts := b.Timestamps()
-			if len(ts) > 1 {
+			if len(ts) > 0 {
 				r.tsFirst = ts[0]
+				log.Printf("SETTING %d", r.tsFirst)
 			}
+			r.sampleRate = df.SampleRate()
+			r.channels = b.Channels()
 		}
 	}
-
-	// TODO
-	r.channels = df.Buffer().Channels()
 	r.samples += df.Buffer().Samples()
-	r.sampleRate = df.SampleRate()
 
 	//log.Printf("writing frame: %v", df)
 	// write the frame, or send back an error
@@ -71,12 +70,6 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 }
 
 func (r *OBFRecorder) Stop() (id string, err error) {
-	defer func() {
-		log.Printf("OBFRecorder: closing the file: %v", r.fileName)
-		// TODO: if err, rollback
-		r.file.Close()
-	}()
-
 	return r.commit()
 }
 
@@ -90,6 +83,11 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	if err != nil {
 		return
 	}
+	defer func() {
+		log.Printf("OBFRecorder: closing the file: %v", r.fileName)
+		// TODO: if err, rollback
+		r.file.Close()
+	}()
 
 	// get the codec
 	r.codec = newObfCodec(r.file)
