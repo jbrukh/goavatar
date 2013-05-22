@@ -11,9 +11,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 type OBFRecorder struct {
+	sync.Mutex
 	repo     string    // repository where file is being recorded to
 	fileName string    // name of the file/resource id
 	file     *os.File  // the file we're writing
@@ -66,6 +68,9 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 
 	log.Printf("writing frame: %v", df.Buffer())
 	// write the frame, or send back an error
+	// we are using synchronization to protect the buffer
+	r.Lock()
+	defer r.Unlock()
 	return WriteParallelTo(&r.buf, df.Buffer(), r.tsTransform)
 }
 
@@ -106,9 +111,11 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	}
 
 	// write the parallel frames from the buffer
+	r.Lock()
 	if _, err = io.Copy(r.file, &r.buf); err != nil {
 		return "", err
 	}
+	r.Unlock()
 
 	//read the parallel frames from the buffer as a BlockBuffer
 	b, err := r.codec.Parallel()

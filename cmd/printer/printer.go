@@ -46,10 +46,16 @@ func main() {
 		log.Printf("going to record...")
 		r := NewDeviceRecorder(device, NewOBFRecorder(device.Repo()))
 		r.SetMax(*rec)
-		if _, err = r.Record(); err != nil {
+		if err = r.Record(); err != nil {
 			log.Printf("Error: %v", err)
 			return
 		}
+		if id, err := r.Stop(); err != nil {
+			log.Printf("could not stop")
+		} else {
+			log.Printf("Recorded result to: %s", id)
+		}
+
 	}
 
 	out, err := device.Subscribe("printer")

@@ -20,7 +20,7 @@ func TestRecord(t *testing.T) {
 		r.Stop()
 	}()
 
-	_, err := r.Record()
+	err := r.Record()
 	if err != nil {
 		t.Fatalf("failed to record")
 	}
@@ -34,8 +34,9 @@ func TestRecord__MaxSamples(t *testing.T) {
 
 	r := NewDeviceRecorder(d, NewOBFRecorder("../var"))
 	r.SetMax(2)
-	_, err := r.Record()
+	err := r.Record()
 	if err != nil {
 		t.Fatalf("failed to record")
 	}
+	r.Stop()
 }

@@ -15,6 +15,7 @@ type Recorder interface {
 	Stop() (id string, err error)
 }
 
+// DeviceRecorder
 type DeviceRecorder struct {
 	device Device
 	r      Recorder
@@ -31,12 +32,14 @@ func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
 }
 
 func (d *DeviceRecorder) SetMax(max int) {
-	d.max = max
+	if d.max == 0 {
+		d.max = max
+	}
 }
 
 // Make a recording. This method will block as the recording
 // proceeds until a separate thread calls Stop().
-func (d *DeviceRecorder) Record() (id string, err error) {
+func (d *DeviceRecorder) Record() (err error) {
 	d.out, err = d.device.Subscribe("recorder")
 	if err != nil {
 		return
@@ -54,22 +57,19 @@ func (d *DeviceRecorder) Record() (id string, err error) {
 	for {
 		df, ok = <-d.out
 		if !ok {
-			goto Finish
+			break
 		}
 		d.count += df.Buffer().Samples()
 		if d.max > 0 && d.count >= d.max {
 			if err = d.recordLast(df); err != nil {
 				return
 			}
-			goto Finish
+			break
 		}
 		if err = d.r.RecordFrame(df); err != nil {
 			return
 		}
 	}
-
-Finish:
-	id, err = d.r.Stop()
 	return
 }
 
@@ -89,6 +89,7 @@ func (d *DeviceRecorder) recordLast(df DataFrame) (err error) {
 	return
 }
 
-func (d *DeviceRecorder) Stop() {
+func (d *DeviceRecorder) Stop() (id string, err error) {
 	d.device.Unsubscribe("recorder")
+	return d.r.Stop()
 }
