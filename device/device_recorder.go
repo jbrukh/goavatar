@@ -4,92 +4,166 @@
 package device
 
 import (
+	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
-	"log"
+	//"log"
+	"sync"
 )
 
-// A real-time recorder of dataframes.
+// A real-time recorder of dataframes. This recorder
+// should support calling the given methods in the
+// given order: Init, RecordFrame (multiple times),
+// and finally stop.
 type Recorder interface {
 	Init() error
 	RecordFrame(DataFrame) error
 	Stop() (id string, err error)
 }
 
-// DeviceRecorder
+// DeviceRecorder -- a thread-safe recorder that
+// operates on a device and a Recorder implementation.
 type DeviceRecorder struct {
-	device Device
-	r      Recorder
-	out    chan DataFrame
-	count  int // sample count
-	max    int // max samples
+	sync.Mutex
+	device    Device
+	r         Recorder
+	cerr      chan error
+	kill      chan bool
+	recording bool
+	max       int // max samples
 }
 
+// Create a new DeviceRecorder.
 func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
 	return &DeviceRecorder{
 		device: device,
 		r:      r,
+		cerr:   make(chan error, 1),
+		kill:   make(chan bool),
 	}
 }
 
+// Set the maximum number of samples that the recorder will
+// read. If this number is set to 0 (default), the recorder
+// will record indefinitely until such time that Stop() is
+// called.
 func (d *DeviceRecorder) SetMax(max int) {
-	if d.max == 0 {
+	d.Lock()
+	defer d.Unlock()
+	if d.max == 0 && max > 0 {
 		d.max = max
 	}
 }
 
-// Make a recording. This method will block as the recording
-// proceeds until a separate thread calls Stop().
-func (d *DeviceRecorder) Record() (err error) {
-	d.out, err = d.device.Subscribe("recorder")
+// Recording returns true if and only if this
+// device is currently recording.
+func (d *DeviceRecorder) Recording() bool {
+	d.Lock()
+	defer d.Unlock()
+	return d.recording
+}
+
+// RecordAsync will subscribe to its device and begin to record
+// asynchronously. An error is returned if the device
+// cannot be subscribed to. If the subscription is closed (for
+// instance, if the device is turned off) then the
+// asynchronous worker will exit.
+func (d *DeviceRecorder) RecordAsync() (err error) {
+	d.Lock()
+	defer d.Unlock()
+
+	// already recording?
+	if d.recording {
+		return fmt.Errorf("already recording")
+	}
+
+	// subscribe to the device
+	out, err := d.device.Subscribe("recorder")
 	if err != nil {
 		return
 	}
 
+	// initialize the underlying recorder
 	err = d.r.Init()
 	if err != nil {
 		return
 	}
 
+	// record asynchronously
+	go worker(d.r, out, d.cerr, d.max)
+	d.recording = true
+	return
+}
+
+// worker will read the frames one by one and write them
+// to the Recorder; if we have reached max frames, he will
+// stop.
+func worker(r Recorder, out chan DataFrame, cerr chan error, max int) {
+	defer close(cerr)
 	var (
-		df DataFrame
-		ok bool
+		df      DataFrame
+		ok      bool
+		count   int
+		samples int
 	)
 	for {
-		df, ok = <-d.out
+		// take a data frame from the device
+		df, ok = <-out
 		if !ok {
-			break
+			return
 		}
-		d.count += df.Buffer().Samples()
-		if d.max > 0 && d.count >= d.max {
-			if err = d.recordLast(df); err != nil {
-				return
-			}
-			break
+
+		// count the samples
+		samples = df.Buffer().Samples()
+		count += samples
+
+		// respect max samples
+		frame, proceed := nextFrame(df, max, count, samples)
+
+		// record the frame
+		if err := r.RecordFrame(frame); err != nil {
+			cerr <- err
+			return
 		}
-		if err = d.r.RecordFrame(df); err != nil {
+
+		if !proceed {
 			return
 		}
 	}
-	return
 }
 
-func (d *DeviceRecorder) recordLast(df DataFrame) (err error) {
-	var (
-		samples = df.Buffer().Samples()
-		needed  = samples - (d.count - d.max)
-	)
-	if needed < samples {
-		buf := df.Buffer().Slice(0, needed)
-		df = NewDataFrame(buf, df.SampleRate())
+// nextFrame will decide if we need to proceed writing frames
+// with respect to the max frames
+func nextFrame(df DataFrame, max, count, samples int) (DataFrame, bool) {
+	if max > 0 && count >= max {
+		if needed := (samples - count + max); needed < samples {
+			buf := df.Buffer().Slice(0, needed)
+			df = NewDataFrame(buf, df.SampleRate())
+		}
+		return df, false
 	}
-	log.Printf("got to record last with : %v", df.Buffer())
-	if err = d.r.RecordFrame(df); err != nil {
+	return df, true
+}
+
+func (d *DeviceRecorder) Wait() (id string, err error) {
+	d.Lock()
+	defer d.Unlock()
+
+	// wait for the worker
+	err, _ = <-d.cerr
+	if err != nil {
 		return
 	}
-	return
+
+	// stop recording
+	d.recording = false
+
+	// stop
+	return d.r.Stop()
+
 }
 
 func (d *DeviceRecorder) Stop() (id string, err error) {
+	// this will cause the worker to exit on the next iteration
 	d.device.Unsubscribe("recorder")
-	return d.r.Stop()
+	return d.Wait()
 }

@@ -46,11 +46,11 @@ func main() {
 		log.Printf("going to record...")
 		r := NewDeviceRecorder(device, NewOBFRecorder(device.Repo()))
 		r.SetMax(*rec)
-		if err = r.Record(); err != nil {
+		if err = r.RecordAsync(); err != nil {
 			log.Printf("Error: %v", err)
 			return
 		}
-		if id, err := r.Stop(); err != nil {
+		if id, err := r.Wait(); err != nil {
 			log.Printf("could not stop")
 		} else {
 			log.Printf("Recorded result to: %s", id)
