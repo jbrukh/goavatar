@@ -26,6 +26,7 @@ type SocketSession struct {
 	pps       int
 	batchSize int
 	kickoff   chan *SocketSession
+	recorder  *DeviceRecorder
 }
 
 func (s *SocketSession) Process(msgBytes []byte, msgBase Message) {
@@ -162,34 +163,31 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.Success = false
 	defer Send(s.conn, r)
 
-	/* if !s.device.Engaged() {
+	if !s.device.Engaged() {
 		r.Err = "device is not streaming"
 		return
 	}
 
-	if !msg.Record {
-		outFile, err := s.device.Stop()
+	if msg.Record {
+		if s.recorder.Recording() {
+			r.Err = "already recording"
+			return
+		}
+
+		err = s.recorder.RecordAsync()
+		if err != nil {
+			r.Err = err.Error()
+			return
+		}
+		r.Success = true
+	} else if !msg.Record {
+		outFile, err := s.recorder.Stop()
 		if err == nil {
 			r.Success = true
 			r.ResourceId = outFile
 		}
 		return
 	}
-
-	if msg.Record {
-		if s.device.Recording() {
-			r.Err = "already recording"
-			return
-		}
-
-		err = s.device.Record()
-		if err != nil {
-			r.Err = err.Error()
-			return
-		}
-		r.Success = true
-	}
-	*/
 
 }
 

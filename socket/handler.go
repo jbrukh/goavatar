@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	. "github.com/jbrukh/goavatar/device"
+	. "github.com/jbrukh/goavatar/formats"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
 	"log"
@@ -93,6 +94,7 @@ func (s *OctopusSocket) handleControlConn(conn *websocket.Conn) {
 		pps:       s.pps,
 		batchSize: s.batchSize,
 		kickoff:   s.kickoff,
+		recorder:  NewDeviceRecorder(s.device, NewOBFRecorder(s.device.Repo())),
 	}
 
 	// keep processing as long as we are connected

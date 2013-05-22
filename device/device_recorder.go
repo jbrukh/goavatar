@@ -36,7 +36,6 @@ func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
 	return &DeviceRecorder{
 		device: device,
 		r:      r,
-		cerr:   make(chan error, 1),
 	}
 }
 
@@ -87,6 +86,7 @@ func (d *DeviceRecorder) RecordAsync() (err error) {
 	}
 
 	// record asynchronously
+	d.cerr = make(chan error, 1)
 	go worker(d.r, out, d.cerr, d.max)
 	d.recording = true
 	return
@@ -161,6 +161,11 @@ func (d *DeviceRecorder) Wait() (id string, err error) {
 }
 
 func (d *DeviceRecorder) Stop() (id string, err error) {
+	d.Lock()
+	if !d.recording {
+		return "", fmt.Errorf("not recording")
+	}
+	d.Unlock()
 	// this will cause the worker to exit on the next iteration
 	d.device.Unsubscribe("recorder")
 	return d.Wait()

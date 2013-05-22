@@ -58,7 +58,6 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 			ts := b.Timestamps()
 			if len(ts) > 0 {
 				r.tsFirst = ts[0]
-				log.Printf("SETTING %d", r.tsFirst)
 			}
 			r.sampleRate = df.SampleRate()
 			r.channels = b.Channels()
@@ -66,7 +65,6 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 	}
 	r.samples += df.Buffer().Samples()
 
-	log.Printf("writing frame: %v", df.Buffer())
 	// write the frame, or send back an error
 	// we are using synchronization to protect the buffer
 	r.Lock()
