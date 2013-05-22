@@ -64,7 +64,7 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 	}
 	r.samples += df.Buffer().Samples()
 
-	//log.Printf("writing frame: %v", df)
+	log.Printf("writing frame: %v", df.Buffer())
 	// write the frame, or send back an error
 	return WriteParallelTo(&r.buf, df.Buffer(), r.tsTransform)
 }

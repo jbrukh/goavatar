@@ -21,7 +21,7 @@ const (
 
 var (
 	maxFrames *int = flag.Int("maxFrames", DefaultMaxFrames, "maximum frames to read before turning off")
-	rec       *int = flag.Int("rec", 10, "frames to record")
+	rec       *int = flag.Int("rec", 0, "frames to record")
 )
 
 func init() {
@@ -45,7 +45,7 @@ func main() {
 	if *rec > 0 {
 		log.Printf("going to record...")
 		r := NewDeviceRecorder(device, NewOBFRecorder(device.Repo()))
-		r.SetMaxSamples(*rec)
+		r.SetMax(*rec)
 		if _, err = r.Record(); err != nil {
 			log.Printf("Error: %v", err)
 			return

@@ -16,11 +16,11 @@ type Recorder interface {
 }
 
 type DeviceRecorder struct {
-	device      Device
-	r           Recorder
-	out         chan DataFrame
-	sampleCount int
-	maxSamples  int
+	device Device
+	r      Recorder
+	out    chan DataFrame
+	count  int // sample count
+	max    int // max samples
 }
 
 func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
@@ -30,8 +30,8 @@ func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
 	}
 }
 
-func (d *DeviceRecorder) SetMaxSamples(maxSamples int) {
-	d.maxSamples = maxSamples
+func (d *DeviceRecorder) SetMax(max int) {
+	d.max = max
 }
 
 // Make a recording. This method will block as the recording
@@ -47,16 +47,45 @@ func (d *DeviceRecorder) Record() (id string, err error) {
 		return
 	}
 
+	var (
+		df DataFrame
+		ok bool
+	)
 	for {
-		df, ok := <-d.out
+		df, ok = <-d.out
 		if !ok {
-			break
+			goto Finish
 		}
-		log.Printf("read frame %v", df)
-		d.r.RecordFrame(df)
+		d.count += df.Buffer().Samples()
+		if d.max > 0 && d.count >= d.max {
+			if err = d.recordLast(df); err != nil {
+				return
+			}
+			goto Finish
+		}
+		if err = d.r.RecordFrame(df); err != nil {
+			return
+		}
 	}
 
+Finish:
 	id, err = d.r.Stop()
+	return
+}
+
+func (d *DeviceRecorder) recordLast(df DataFrame) (err error) {
+	var (
+		samples = df.Buffer().Samples()
+		needed  = samples - (d.count - d.max)
+	)
+	if needed < samples {
+		buf := df.Buffer().Slice(0, needed)
+		df = NewDataFrame(buf, df.SampleRate())
+	}
+	log.Printf("got to record last with : %v", df.Buffer())
+	if err = d.r.RecordFrame(df); err != nil {
+		return
+	}
 	return
 }
 
