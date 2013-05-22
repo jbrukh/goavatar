@@ -27,7 +27,6 @@ type DeviceRecorder struct {
 	device    Device
 	r         Recorder
 	cerr      chan error
-	kill      chan bool
 	recording bool
 	max       int // max samples
 }
@@ -38,7 +37,6 @@ func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
 		device: device,
 		r:      r,
 		cerr:   make(chan error, 1),
-		kill:   make(chan bool),
 	}
 }
 
