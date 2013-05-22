@@ -67,7 +67,6 @@ func (ed *emptyDevice) Stream(c *Control) (err error) {
 		return fmt.Errorf("errProne device is error prone")
 	}
 	for !c.ShouldTerminate() {
-
 		time.Sleep(time.Millisecond * 1)
 		c.Send(&MockFrame{})
 	}
@@ -185,6 +184,56 @@ func TestCleanupLogic(t *testing.T) {
 		t.Errorf("failed to disconnect")
 	}
 
+}
+
+func TestDevice__Subscription(t *testing.T) {
+	d := newEmptyDevice()
+	err := d.Engage()
+	if err != nil || !d.Engaged() {
+		t.Errorf("failed to engage device")
+	}
+
+	out, err := d.Subscribe("test")
+	if err != nil {
+		t.Errorf("failed to subscribe")
+	}
+
+	// suck out 5
+	for i := 0; i < 5; i++ {
+		fmt.Printf("got: %v\n", <-out)
+	}
+
+	d.Unsubscribe("test")
+	// check the channel is closed
+	if _, ok := <-out; ok {
+		t.Errorf("channel is still open")
+	}
+	fmt.Printf("still %d items on the channel (ok)\n", len(out))
+
+	// now test 2
+	out1, err1 := d.Subscribe("1")
+	out2, err2 := d.Subscribe("2")
+	if err1 != nil || err2 != nil {
+		t.Errorf("could not subscribe 2")
+	}
+
+	for i := 0; i < 5; i++ {
+		fmt.Printf("got: %v %v\n", <-out1, <-out2)
+	}
+	d.Unsubscribe("1")
+	d.Unsubscribe("2")
+
+	if _, ok := <-out1; ok {
+		t.Errorf("channel is still open")
+	}
+	if _, ok := <-out2; ok {
+		t.Errorf("channel is still open")
+	}
+
+	err = d.Disengage()
+	if err != nil {
+		t.Fatalf("failed to disengage")
+	}
 }
 
 // func TestRecord(t *testing.T) {
