@@ -142,9 +142,23 @@ func nextFrame(df DataFrame, max, count, samples int) (DataFrame, bool) {
 	return df, true
 }
 
+// Wait will block until the recorder has finished recording. If
+// the recorder is not recording, an error is returned. This method
+// is only appropriate when SetMax() has been set, as otherwise
+// the device will never stop recording; the proper way to stop
+// an indefinitely recording recorder is to call Stop(). If the
+// device is recording indefinitely and this method is called
+// followed by Stop(), then recording will stop, this method will
+// succeed, but the Stop() call will fail with an error.
 func (d *DeviceRecorder) Wait() (id string, err error) {
 	d.Lock()
 	defer d.Unlock()
+
+	// you can only wait on recording
+	// devices
+	if !d.recording {
+		return "", fmt.Errorf("not recording")
+	}
 
 	// wait for the worker
 	err, _ = <-d.cerr
@@ -160,12 +174,10 @@ func (d *DeviceRecorder) Wait() (id string, err error) {
 
 }
 
+// Stop will stop recording and return the details of the
+// recorder file. If the device is not recording, then this
+// operation will fail.
 func (d *DeviceRecorder) Stop() (id string, err error) {
-	d.Lock()
-	if !d.recording {
-		return "", fmt.Errorf("not recording")
-	}
-	d.Unlock()
 	// this will cause the worker to exit on the next iteration
 	d.device.Unsubscribe("recorder")
 	return d.Wait()
