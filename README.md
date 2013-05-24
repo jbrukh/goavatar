@@ -9,24 +9,21 @@ Overview
 ========
 
     bin/              scripts for installing and testing
-
     cmd/
         obf/          the Octopus Binary Format viewer        (see: obf --help)
         octopus/      the Octopus Connector websocket server  (see: octopus --help)
-        printer/      print device streams in the console     (see: printer --help)
-    
-    devices/          devices we currently support
+        printer/      print device streams in the console     (see: printer --help)  
+    datastruct/       data structures used in the application layer
+    device/           application layer generic device
+    drivers/          devices we currently support
         avatar/       the AvatarEEG
         mock_avatar/  a fake AvatarEEG for testing
         thinkgear/    devices with NeuroSky ThinkGear protocol
-
-    etc/          tools for testing
-
-    formats/      codecs and file recorders for OBF
-
-    var/          empty directory for testing files
-
-    .             framework files      
+    etc/              tools for testing
+    formats/          codecs and file recorders for OBF
+    socket/           the octopus socket and protocol
+    util/             generic utilities
+    var/              empty directory for testing files
 
 Installation
 ============
