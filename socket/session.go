@@ -278,7 +278,13 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			return
 		}
 	case "clear":
-		r.Err = "not implemented"
+		if err := removeFiles(s.device.Repo()); err != nil {
+			r.Err = err.Error()
+			return
+		} else {
+			r.Success = true
+			return
+		}
 	default:
 		r.Err = fmt.Sprintf("unknown operation: %s", msg.Operation)
 	}
@@ -290,11 +296,27 @@ func listFiles(repo string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
+		base := filepath.Base(path)
+		if !f.IsDir() && !strings.HasPrefix(base, ".") {
 			log.Printf("LIST\t%s", path)
-			files = append(files, path)
+			files = append(files, base)
 		}
 		return nil
 	})
 	return files, err
+}
+
+func removeFiles(repo string) error {
+	return filepath.Walk(repo, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
+			if err := os.RemoveAll(path); err != nil {
+				log.Printf("could not remove file: %v", err)
+			}
+			log.Printf("DELETE\t%s", path)
+		}
+		return nil
+	})
 }
