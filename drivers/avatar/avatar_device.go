@@ -38,7 +38,7 @@ type AvatarDevice struct {
 // NewAvatarDevice creates a new AvatarEEG connection. The user
 // can then start streaming data by calling Connect() and reading the
 // output channel.
-func NewAvatarDevice(serialPort, repo string) Device {
+func NewAvatarDevice(repo, serialPort string) Device {
 	return NewDevice(&AvatarDevice{
 		serialPort: serialPort,
 		name:       "AvatarEEG",
@@ -91,8 +91,12 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 	// info on its frames, so we will parse the first frame
 	frame, err := parser.ParseFrame()
 	if err != nil {
-		log.Printf("error parsing frame: %v", err)
-		return err
+		if IsCrcErr(err) || IsSizeErr(err) {
+			log.Printf("skippable error: %v", err)
+		} else {
+			log.Printf("error parsing frame: %v", err)
+			return err
+		}
 	}
 	info := &DeviceInfo{
 		Channels:   frame.Channels(),
@@ -107,8 +111,13 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 
 		frame, err = parser.ParseFrame()
 		if err != nil {
-			log.Printf("error parsing frame: %v", err)
-			return err
+			if IsCrcErr(err) || IsSizeErr(err) {
+				log.Printf("skippable error: %v", err)
+				continue
+			} else {
+				log.Printf("error parsing frame: %v", err)
+				return err
+			}
 		}
 
 		c.Send(frame)

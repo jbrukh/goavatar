@@ -11,6 +11,7 @@ import (
 	. "github.com/jbrukh/goavatar/datastruct"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
+	//"log"
 	"time"
 )
 
@@ -91,7 +92,7 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 	// sync bytes if there is corruption
 	frameSize := int(uint16(three[1])<<8 | uint16(three[2]))
 	if frameSize > AvatarMaxFramesSize {
-		return nil, fmt.Errorf("this frame is over max frame size: %d", frameSize)
+		return nil, SizeErrf("this frame is over max frame size: %d", frameSize)
 	}
 
 	// now that we know the frame size, we can read the
@@ -112,7 +113,7 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 
 	// check the crc
 	if crc != ourCrc {
-		return nil, fmt.Errorf("crc doesn't match: expected %d but calculated %d", crc, ourCrc)
+		return nil, CrcErrf("crc doesn't match: expected %d but calculated %d", crc, ourCrc)
 	}
 
 	// everything is okay, now
@@ -124,6 +125,7 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 
 	header := new(AvatarHeader)
 	buf := bytes.NewBuffer(frame[:AvatarHeaderSize])
+	//log.Printf("header: %v", frame[:AvatarHeaderSize])
 	err = binary.Read(buf, binary.BigEndian, header)
 	if err != nil {
 		return nil, err
@@ -174,10 +176,49 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 		received:     timeReceived,
 		crc:          crc,
 	}
+	//log.Printf("got time: %v %v", dataFrame.Generated().UnixNano(), dataFrame.Received().UnixNano())
 	return
 }
 
 func consumeDataPoint(payload []byte, voltRange float64) float64 {
 	raw := uint32(payload[0])<<16 | uint32(payload[1])<<8 | uint32(payload[2])
 	return ((float64(raw) / float64(1000) / float64(AvatarAdcRange)) * voltRange)
+}
+
+type CrcErr struct {
+	msg string
+}
+
+func (e *CrcErr) Error() string {
+	return e.msg
+}
+
+func CrcErrf(format string, items ...interface{}) *CrcErr {
+	return &CrcErr{
+		msg: fmt.Sprintf(format, items...),
+	}
+}
+
+func IsCrcErr(err error) bool {
+	_, ok := (err).(*CrcErr)
+	return ok
+}
+
+type SizeErr struct {
+	msg string
+}
+
+func (e *SizeErr) Error() string {
+	return e.msg
+}
+
+func SizeErrf(format string, items ...interface{}) *SizeErr {
+	return &SizeErr{
+		msg: fmt.Sprintf(format, items...),
+	}
+}
+
+func IsSizeErr(err error) bool {
+	_, ok := (err).(*SizeErr)
+	return ok
 }
