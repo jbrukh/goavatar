@@ -188,7 +188,7 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 				ar.MessageType = "record"
 				ar.Id = msg.Id
 				ar.Success = false
-				ar.Seconds = r.Seconds
+				ar.Seconds = msg.Seconds
 				outFile, err := s.recorder.Wait()
 				if err != nil {
 					log.Printf("error during fixed-time recording: %v", err)
