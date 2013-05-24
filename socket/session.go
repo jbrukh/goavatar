@@ -269,26 +269,32 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 
 	switch msg.Operation {
 	case "list":
-		var files []string
-		err := filepath.Walk(s.device.Repo(), func(path string, f os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
-				log.Printf("LIST\t%s", path)
-				files = append(files, path)
-			}
-			return nil
-		})
-		if err != nil {
+		if files, err := listFiles(s.device.Repo()); err != nil {
 			r.Err = err.Error()
 			return
+		} else {
+			r.ResourceIds = files
+			r.Success = true
+			return
 		}
-		r.ResourceIds = files
-		r.Success = true
 	case "clear":
 		r.Err = "not implemented"
 	default:
 		r.Err = fmt.Sprintf("unknown operation: %s", msg.Operation)
 	}
+}
+
+func listFiles(repo string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(repo, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
+			log.Printf("LIST\t%s", path)
+			files = append(files, path)
+		}
+		return nil
+	})
+	return files, err
 }
