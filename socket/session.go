@@ -9,6 +9,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/device"
+	"log"
 	"path/filepath"
 )
 
@@ -174,12 +175,38 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 			return
 		}
 
+		// if this is a fixed-time session,
+		// then wait for the recording to stop
+		if msg.Seconds > 0 {
+			// calculate how many data points we need
+			points := msg.Seconds * s.device.Info().SampleRate
+			log.Printf("FIXED TIME RECORDING: %d seconds, %d points", msg.Seconds, points)
+
+			s.recorder.SetMax(points)
+			go func() {
+				ar := new(RecordResponse)
+				ar.MessageType = "record"
+				ar.Id = msg.Id
+				ar.Success = false
+				ar.Seconds = r.Seconds
+				outFile, err := s.recorder.Wait()
+				if err != nil {
+					log.Printf("error during fixed-time recording: %v", err)
+					ar.Err = err.Error()
+				}
+				ar.Success = true
+				ar.ResourceId = outFile
+				Send(s.conn, ar)
+			}()
+		}
+
 		err = s.recorder.RecordAsync()
 		if err != nil {
 			r.Err = err.Error()
 			return
 		}
 		r.Success = true
+
 	} else if !msg.Record {
 		outFile, err := s.recorder.Stop()
 		if err == nil {

@@ -41,6 +41,7 @@ type (
 		Id          string `json:"id"`           // should be non-empty
 		MessageType string `json:"message_type"` // should be "record"
 		Record      bool   `json:"record"`       // start or stop recording
+		Seconds     int    `json:"seconds"`      // number of seconds after which to cease recording
 	}
 
 	// UploadMessage is used to trigger upload of a
@@ -79,6 +80,7 @@ type (
 		Success     bool   `json:"success"`      // whether or not the control message was successful
 		Err         string `json:"err"`          // error text, if any
 		ResourceId  string `json:"resource_id"`  // id of the resource
+		Seconds     int    `json:"seconds"`      // number of seconds recorder if this was a fixed-time recording
 	}
 
 	// UploadResponse is sent in response to an UploadMessage, providing
