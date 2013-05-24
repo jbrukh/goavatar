@@ -249,6 +249,14 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		r.Err = err.Error()
 		return
 	}
+
+	if msg.Clear {
+		// best-effort removal, will still return
+		// Success: true even if removal fails
+		if err := os.Remove(file); err != nil {
+			r.Err = err.Error()
+		}
+	}
 	r.Success = true
 }
 

@@ -96,6 +96,10 @@ func UploadOBFFile(device, sessionId, file, endpoint, token string) (err error) 
 	io.Copy(os.Stdout, req.Body)
 	log.Printf("UPLOAD RESPONSE -------------------------------------")
 	io.Copy(os.Stdout, res.Body) // replace this with status check
+
 	fmt.Println()
+	if res.StatusCode != 200 {
+		return fmt.Errorf("failed to upload, status: %v", res.StatusCode)
+	}
 	return
 }
