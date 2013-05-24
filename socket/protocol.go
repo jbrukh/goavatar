@@ -54,6 +54,15 @@ type (
 		Endpoint    string `json:"endpoint"`     // domain-qualified endpoint to upload to
 	}
 
+	// RepositoryMessage performs operations on the
+	// device repository.
+	RepositoryMessage struct {
+		Id          string `json:"id"`           // should be non-empty
+		MessageType string `json:"message_type"` // should be "repository"
+		Operation   string `json:"operation"`    // one of {"list", "clear"}
+		ResourceId  string `json:"resource_id"`  // delete a specific file
+	}
+
 	// Base type for response messages.
 	Response struct {
 		Id          string `json:"id"`           // echo of your correlation id
@@ -92,6 +101,7 @@ type (
 		Err         string `json:"err"`          // error text, if any
 	}
 
+	// InfoResponse sends back information about the device and server.
 	InfoResponse struct {
 		Id          string `json:"id"`           // echo of your correlation id
 		MessageType string `json:"message_type"` // will be "info"
@@ -99,6 +109,15 @@ type (
 		Err         string `json:"err"`          // error text, if any
 		Version     string `json:"version"`      // octopus server version
 		DeviceName  string `json:"device_name"`  // device name
+	}
+
+	// RepositoryResponse sends back messages about repository operations.
+	RepositoryResponse struct {
+		Id          string   `json:"id"`           // echo of your correlation id
+		MessageType string   `json:"message_type"` // will be "repository"
+		Success     bool     `json:"success"`      // whether or not the control message was successful
+		Err         string   `json:"err"`          // error text, if any
+		ResourceIds []string `json:"resource_ids"` // list of files
 	}
 
 	// DataMessage returns datapoints from the device across

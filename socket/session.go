@@ -10,7 +10,9 @@ import (
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/device"
 	"log"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 //---------------------------------------------------------//
@@ -46,6 +48,9 @@ func (s *SocketSession) Process(msgBytes []byte, msgBase Message) {
 
 	case "upload":
 		s.ProcessUploadMessage(msgBytes, msgBase.Id)
+
+	case "repository":
+		s.ProcessRepositoryMessage(msgBytes, msgBase.Id)
 
 	default:
 		errStr := fmt.Sprintf("unknown message type: '%s'", msgType)
@@ -245,5 +250,45 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		return
 	}
 	r.Success = true
+}
 
+func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
+	var (
+		msg RepositoryMessage
+		err error
+	)
+	if err = json.Unmarshal(msgBytes, &msg); err != nil {
+		SendError(s.conn, id, err.Error())
+	}
+
+	r := new(RepositoryResponse)
+	r.MessageType = "repository"
+	r.Id = msg.Id
+	r.Success = false
+	defer Send(s.conn, r)
+
+	switch msg.Operation {
+	case "list":
+		var files []string
+		err := filepath.Walk(s.device.Repo(), func(path string, f os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
+				log.Printf("LIST\t%s", path)
+				files = append(files, path)
+			}
+			return nil
+		})
+		if err != nil {
+			r.Err = err.Error()
+			return
+		}
+		r.ResourceIds = files
+		r.Success = true
+	case "clear":
+		r.Err = "not implemented"
+	default:
+		r.Err = fmt.Sprintf("unknown operation: %s", msg.Operation)
+	}
 }
