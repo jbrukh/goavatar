@@ -52,7 +52,7 @@ type (
 		Token       string `json:"token"`        // authentication token for upload
 		ResourceId  string `json:"resource_id"`  // id of the resource to upload
 		Endpoint    string `json:"endpoint"`     // domain-qualified endpoint to upload to
-		Clear       string `json:"clear"`        // delete the file after upload
+		Clear       bool   `json:"clear"`        // delete the file after upload?
 	}
 
 	// RepositoryMessage performs operations on the
