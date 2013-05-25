@@ -298,13 +298,6 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	}
 }
 
-type ResourceInfo struct {
-	ResourceId   string `json:"resource_id"`
-	File         string `json:"file"`
-	SizeBytes    int64  `json:"size_bytes"`
-	LastModified int64  `json:"last_modified"`
-}
-
 func listFiles(repo string) ([]*ResourceInfo, error) {
 	var infos []*ResourceInfo
 	err := filepath.Walk(repo, func(path string, f os.FileInfo, err error) error {

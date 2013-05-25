@@ -121,6 +121,14 @@ type (
 		ResourceInfos []*ResourceInfo `json:"resource_infos"` // list of files and infos
 	}
 
+	// Resource information from the repo.
+	ResourceInfo struct {
+		ResourceId   string `json:"resource_id"`
+		File         string `json:"file"`
+		SizeBytes    int64  `json:"size_bytes"`
+		LastModified int64  `json:"last_modified"`
+	}
+
 	// DataMessage returns datapoints from the device across
 	// the channels. These data points represent incremental data
 	// that has not been seen before. The data messages come at a
