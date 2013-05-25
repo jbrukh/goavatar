@@ -277,11 +277,11 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 
 	switch msg.Operation {
 	case "list":
-		if files, err := listFiles(s.device.Repo()); err != nil {
+		if infos, err := listFiles(s.device.Repo()); err != nil {
 			r.Err = err.Error()
 			return
 		} else {
-			r.ResourceIds = files
+			r.ResourceInfos = infos
 			r.Success = true
 			return
 		}
@@ -298,8 +298,15 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	}
 }
 
-func listFiles(repo string) ([]string, error) {
-	var files []string
+type ResourceInfo struct {
+	ResourceId   string `json:"resource_id"`
+	File         string `json:"file"`
+	SizeBytes    int64  `json:"size_bytes"`
+	LastModified int64  `json:"last_modified"`
+}
+
+func listFiles(repo string) ([]*ResourceInfo, error) {
+	var infos []*ResourceInfo
 	err := filepath.Walk(repo, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -307,11 +314,16 @@ func listFiles(repo string) ([]string, error) {
 		base := filepath.Base(path)
 		if !f.IsDir() && !strings.HasPrefix(base, ".") {
 			log.Printf("LIST\t%s", path)
-			files = append(files, base)
+			infos = append(infos, &ResourceInfo{
+				ResourceId:   base,
+				File:         path,
+				SizeBytes:    f.Size(),
+				LastModified: f.ModTime().Unix(),
+			})
 		}
 		return nil
 	})
-	return files, err
+	return infos, err
 }
 
 func removeFiles(repo string) error {

@@ -114,11 +114,11 @@ type (
 
 	// RepositoryResponse sends back messages about repository operations.
 	RepositoryResponse struct {
-		Id          string   `json:"id"`           // echo of your correlation id
-		MessageType string   `json:"message_type"` // will be "repository"
-		Success     bool     `json:"success"`      // whether or not the control message was successful
-		Err         string   `json:"err"`          // error text, if any
-		ResourceIds []string `json:"resource_ids"` // list of files
+		Id            string          `json:"id"`             // echo of your correlation id
+		MessageType   string          `json:"message_type"`   // will be "repository"
+		Success       bool            `json:"success"`        // whether or not the control message was successful
+		Err           string          `json:"err"`            // error text, if any
+		ResourceInfos []*ResourceInfo `json:"resource_infos"` // list of files and infos
 	}
 
 	// DataMessage returns datapoints from the device across
