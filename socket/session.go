@@ -299,7 +299,7 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 }
 
 func listFiles(repo string) ([]*ResourceInfo, error) {
-	var infos []*ResourceInfo
+	infos := make([]*ResourceInfo, 0)
 	err := filepath.Walk(repo, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
