@@ -24,8 +24,11 @@ var (
 	rec       *int = flag.Int("rec", 0, "frames to record")
 )
 
-func main() {
+func init() {
 	flag.Parse()
+}
+
+func main() {
 	// set up the device
 	device, err := ProvideDevice()
 	if err != nil {

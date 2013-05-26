@@ -32,15 +32,6 @@ var (
 // devices
 var deviceMap map[string]Device
 
-func init() {
-	flag.Parse()
-	deviceMap = map[string]Device{
-		"avatar":      NewAvatarDevice(*repo, *port),
-		"mock_avatar": NewMockDevice(*repo, *mockFile, *mockChannels),
-		"thinkgear":   NewThinkGearDevice(*repo, *port),
-	}
-}
-
 // Provides a new instance of a supported
 // device. Options:
 //
@@ -48,7 +39,8 @@ func init() {
 //    "mock_avatar"
 //    "thinkgear"
 //
-func Provide(device string) (Device, error) {
+// Must be called after initialize().
+func provide(device string) (Device, error) {
 	dev, ok := deviceMap[device]
 	if ok {
 		return dev, nil
@@ -60,8 +52,22 @@ func Provide(device string) (Device, error) {
 // Convenience function for working with the
 // command line.
 func ProvideDevice() (Device, error) {
+	initialize()
 	if *mockDevice {
-		return Provide("mock_avatar")
+		return provide("mock_avatar")
 	}
-	return Provide(*device)
+	return provide(*device)
+}
+
+func initialize() {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
+	if deviceMap == nil {
+		deviceMap = map[string]Device{
+			"avatar":      NewAvatarDevice(*repo, *port),
+			"mock_avatar": NewMockDevice(*repo, *mockFile, *mockChannels),
+			"thinkgear":   NewThinkGearDevice(*repo, *port),
+		}
+	}
 }
