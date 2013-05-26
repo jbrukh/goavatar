@@ -182,10 +182,10 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 
 		// if this is a fixed-time session,
 		// then wait for the recording to stop
-		if msg.Seconds > 0 {
+		if msg.Milliseconds > 0 {
 			// calculate how many data points we need
-			points := msg.Seconds * s.device.Info().SampleRate
-			log.Printf("FIXED TIME RECORDING: %d seconds, %d points", msg.Seconds, points)
+			points := (msg.Milliseconds * s.device.Info().SampleRate) / 1000
+			log.Printf("FIXED TIME RECORDING: %d milliseconds, %d points", msg.Milliseconds, points)
 
 			s.recorder.SetMax(points)
 			go func() {
@@ -193,7 +193,7 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 				ar.MessageType = "record"
 				ar.Id = msg.Id
 				ar.Success = false
-				ar.Seconds = msg.Seconds
+				ar.Milliseconds = msg.Milliseconds
 				outFile, err := s.recorder.Wait()
 				if err != nil {
 					log.Printf("error during fixed-time recording: %v", err)
