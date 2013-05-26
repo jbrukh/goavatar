@@ -60,6 +60,11 @@ func (p *thinkGearParser) next() (b byte) {
 }
 
 func (p *thinkGearParser) ParseRaw() (df DataFrame, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = r.(error)
+		}
+	}()
 
 	// sync up with the stream
 syncUp:
