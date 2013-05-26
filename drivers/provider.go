@@ -33,6 +33,7 @@ var (
 var deviceMap map[string]Device
 
 func init() {
+	flag.Parse()
 	deviceMap = map[string]Device{
 		"avatar":      NewAvatarDevice(*repo, *port),
 		"mock_avatar": NewMockDevice(*repo, *mockFile, *mockChannels),

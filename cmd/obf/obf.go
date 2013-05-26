@@ -19,10 +19,6 @@ var (
 	seq       *bool = flag.Bool("seq", false, "read sequential data, if available")
 )
 
-func init() {
-	flag.Parse()
-}
-
 const preludeFmt = `# Octopus Binary Format.
 #
 # Copyright (c) 2013. Jake Brukhman/Octopus.
@@ -45,6 +41,7 @@ const headerFmt = `# HEADER ----------------------------------
 // WARNING: this is a work in progress and only supports two channels for graphing.
 //
 func main() {
+	flag.Parse()
 	// read the options and args
 	args := flag.Args()
 	if len(args) < 1 {

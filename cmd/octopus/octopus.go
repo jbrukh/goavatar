@@ -10,11 +10,8 @@ import (
 	"log"
 )
 
-func init() {
-	flag.Parse()
-}
-
 func main() {
+	flag.Parse()
 	device, err := ProvideDevice()
 	if err != nil {
 		log.Fatalf("could not get device: %v", err)
