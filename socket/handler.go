@@ -8,12 +8,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/formats"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -72,10 +74,21 @@ func (s *OctopusSocket) ListenAndServe() {
 		absRepo = s.device.Repo()
 	}
 
+	fmt.Printf(`Octopus Connector
+Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
+
+`)
+
+	fmt.Printf("Version:  %s\n", Version())
 	fmt.Printf("Device:   %v\n", s.device.Name())
 	fmt.Printf("Control:  http://localhost:%d%s\n", *listenPort, *controlEndpoint)
 	fmt.Printf("Data:     http://localhost:%d%s\n", *listenPort, *dataEndpoint)
-	fmt.Printf("Repo:     %v\n", absRepo)
+	fmt.Printf("Repo:     %v\n\n", absRepo)
+
+	// ensure the repository exists
+	if err := os.MkdirAll(absRepo, 0755); err != nil {
+		log.Fatalf("could not create the device repo: %s", absRepo)
+	}
 
 	http.Handle(*controlEndpoint, wsControl)
 	http.Handle(*dataEndpoint, wsData)

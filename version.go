@@ -10,8 +10,9 @@ import (
 const (
 	GoavatarVersionMajor = 0
 	GoavatarVersionMinor = 1
+	GoavatarVersionSha   = "a84852b0e57e05f14c9c370e3ff3c09b7c02e1f1"
 )
 
 func Version() string {
-	return fmt.Sprintf("%d.%d", GoavatarVersionMajor, GoavatarVersionMinor)
+	return fmt.Sprintf("%d.%d.%s", GoavatarVersionMajor, GoavatarVersionMinor, GoavatarVersionSha)
 }
