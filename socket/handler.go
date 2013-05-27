@@ -14,6 +14,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 // --------------------------------------------------------- //
@@ -66,9 +67,15 @@ func (s *OctopusSocket) ListenAndServe() {
 		wsData    = websocket.Handler(s.handleDataConn)
 	)
 
+	absRepo, err := filepath.Abs(s.device.Repo())
+	if err != nil {
+		absRepo = s.device.Repo()
+	}
+
 	fmt.Printf("Device:   %v\n", s.device.Name())
 	fmt.Printf("Control:  http://localhost:%d%s\n", *listenPort, *controlEndpoint)
 	fmt.Printf("Data:     http://localhost:%d%s\n", *listenPort, *dataEndpoint)
+	fmt.Printf("Repo:     %v\n", absRepo)
 
 	http.Handle(*controlEndpoint, wsControl)
 	http.Handle(*dataEndpoint, wsData)
