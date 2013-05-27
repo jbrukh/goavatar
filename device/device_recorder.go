@@ -98,7 +98,6 @@ func (d *DeviceRecorder) RecordAsync() (err error) {
 
 	// record asynchronously
 	d.cerr = make(chan error, 1)
-	log.Printf("sending %d MAX", d.max)
 	go worker(d.r, out, d.cerr, d.max)
 	d.recording = true
 	return
@@ -163,12 +162,12 @@ func nextFrame(df DataFrame, max, count, samples int) (DataFrame, bool) {
 // followed by Stop(), then recording will stop, this method will
 // succeed, but the Stop() call will fail with an error.
 func (d *DeviceRecorder) Wait() (id string, err error) {
-	d.Lock()
-	defer d.Unlock()
-
 	// you can only wait on recording
 	// devices
-	if !d.recording {
+	d.Lock()
+	recording := d.recording
+	d.Unlock()
+	if !recording {
 		return "", fmt.Errorf("not recording")
 	}
 
@@ -179,8 +178,9 @@ func (d *DeviceRecorder) Wait() (id string, err error) {
 		return
 	}
 
-	// stop recording
+	d.Lock()
 	d.recording = false
+	defer d.Unlock()
 
 	// stop
 	return d.r.Stop()

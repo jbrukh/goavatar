@@ -167,7 +167,14 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.MessageType = "record"
 	r.Id = msg.Id
 	r.Success = false
-	defer Send(s.conn, r)
+	shouldRespond := true
+
+	// by default, send the response
+	defer func() {
+		if shouldRespond {
+			Send(s.conn, r)
+		}
+	}()
 
 	if !s.device.Engaged() {
 		r.Err = "device is not streaming"
@@ -214,8 +221,9 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 
 	} else if !msg.Record {
 		if s.recorder.RecordingTimed() {
-			log.Printf("this is a timed recording, letting go of worker")
 			s.recorder.Release()
+			// don't send a response in this case
+			shouldRespond = false
 		} else {
 			outFile, err := s.recorder.Stop()
 			if err == nil {
