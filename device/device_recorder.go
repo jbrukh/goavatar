@@ -48,7 +48,7 @@ func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
 func (d *DeviceRecorder) SetMax(max int) {
 	d.Lock()
 	defer d.Unlock()
-	if d.max == 0 && max > 0 {
+	if max > 0 {
 		d.max = max
 	}
 }
@@ -98,6 +98,7 @@ func (d *DeviceRecorder) RecordAsync() (err error) {
 
 	// record asynchronously
 	d.cerr = make(chan error, 1)
+	log.Printf("sending %d MAX", d.max)
 	go worker(d.r, out, d.cerr, d.max)
 	d.recording = true
 	return
