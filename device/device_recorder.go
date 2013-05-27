@@ -6,9 +6,11 @@ package device
 import (
 	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
-	//"log"
+	"log"
 	"sync"
 )
+
+const RecorderName = "recorder"
 
 // A real-time recorder of dataframes. This recorder
 // should support calling the given methods in the
@@ -59,6 +61,15 @@ func (d *DeviceRecorder) Recording() bool {
 	return d.recording
 }
 
+// RecordingTimed returns true if and only if this
+// device is currently recording a fixed-time
+// recording.
+func (d *DeviceRecorder) RecordingTimed() bool {
+	d.Lock()
+	defer d.Unlock()
+	return d.recording && d.max > 0
+}
+
 // RecordAsync will subscribe to its device and begin to record
 // asynchronously. An error is returned if the device
 // cannot be subscribed to. If the subscription is closed (for
@@ -74,7 +85,7 @@ func (d *DeviceRecorder) RecordAsync() (err error) {
 	}
 
 	// subscribe to the device
-	out, err := d.device.Subscribe("recorder")
+	out, err := d.device.Subscribe(RecorderName)
 	if err != nil {
 		return
 	}
@@ -163,6 +174,7 @@ func (d *DeviceRecorder) Wait() (id string, err error) {
 	// wait for the worker
 	err, _ = <-d.cerr
 	if err != nil {
+		log.Printf("wait err: %v", err)
 		return
 	}
 
@@ -174,11 +186,16 @@ func (d *DeviceRecorder) Wait() (id string, err error) {
 
 }
 
+// Release the worker.
+func (d *DeviceRecorder) Release() {
+	d.device.Unsubscribe(RecorderName)
+}
+
 // Stop will stop recording and return the details of the
 // recorder file. If the device is not recording, then this
 // operation will fail.
 func (d *DeviceRecorder) Stop() (id string, err error) {
 	// this will cause the worker to exit on the next iteration
-	d.device.Unsubscribe("recorder")
+	d.Release()
 	return d.Wait()
 }

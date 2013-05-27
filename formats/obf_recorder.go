@@ -41,6 +41,12 @@ func NewOBFRecorder(repo string) *OBFRecorder {
 }
 
 func (r *OBFRecorder) Init() error {
+	r.channels = 0
+	r.samples = 0
+	r.sampleRate = 0
+	r.tsFirst = 0
+	r.fc = 0
+	r.buf = bytes.Buffer{}
 	return nil
 }
 
@@ -116,7 +122,8 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	r.Unlock()
 
 	//read the parallel frames from the buffer as a BlockBuffer
-	b, err := r.codec.Parallel()
+	var b *BlockBuffer
+	b, err = r.codec.Parallel()
 	if err != nil {
 		return "", err
 	}

@@ -213,10 +213,15 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 		r.Success = true
 
 	} else if !msg.Record {
-		outFile, err := s.recorder.Stop()
-		if err == nil {
-			r.Success = true
-			r.ResourceId = outFile
+		if s.recorder.RecordingTimed() {
+			log.Printf("this is a timed recording, letting go of worker")
+			s.recorder.Release()
+		} else {
+			outFile, err := s.recorder.Stop()
+			if err == nil {
+				r.Success = true
+				r.ResourceId = outFile
+			}
 		}
 		return
 	}
