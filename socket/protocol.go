@@ -110,6 +110,7 @@ type (
 		Err         string `json:"err"`          // error text, if any
 		Version     string `json:"version"`      // octopus server version
 		DeviceName  string `json:"device_name"`  // device name
+		SessionId   string `json:"session_id"`   // session id, lives for the life of control socket connection
 	}
 
 	// RepositoryResponse sends back messages about repository operations.

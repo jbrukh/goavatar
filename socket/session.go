@@ -70,6 +70,7 @@ func (s *SocketSession) ProcessInfoMessage(msgBytes []byte, id string) {
 	r.Success = true
 	r.Version = Version()
 	r.DeviceName = s.device.Name()
+	r.SessionId = s.sessionId
 
 	Send(s.conn, r)
 }
