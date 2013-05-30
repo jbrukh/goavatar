@@ -91,6 +91,7 @@ type (
 		Err         string `json:"err"`          // error text, if any
 		ResourceId  string `json:"resource_id"`  // id of the resource
 		Seconds     int    `json:"seconds"`      // number of seconds recorder if this was a fixed-time recording
+		SessionId   string `json:"session_id"`   // the connector session that made this recording (see InfoResponse.SessionId)
 	}
 
 	// UploadResponse is sent in response to an UploadMessage, providing

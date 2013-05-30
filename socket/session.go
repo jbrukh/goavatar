@@ -168,6 +168,7 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.MessageType = "record"
 	r.Id = msg.Id
 	r.Success = false
+	r.SessionId = s.sessionId
 	shouldRespond := true
 
 	// by default, send the response
