@@ -10,7 +10,7 @@ import (
 const (
 	GoavatarVersionMajor = 0
 	GoavatarVersionMinor = 1
-	GoavatarVersionSha   = "a84852b0e57e05f14c9c370e3ff3c09b7c02e1f1"
+	GoavatarVersionSha   = "414c6701fe534710256c9988329b2da9113911d9"
 )
 
 func Version() string {
