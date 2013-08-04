@@ -125,7 +125,7 @@ type (
 
 	// Resource information from the repo.
 	ResourceInfo struct {
-		ResourceId   string `json:"resource_id"`
+		Id           string `json:"id"` // this is the resourceId
 		File         string `json:"file"`
 		SizeBytes    int64  `json:"size_bytes"`
 		LastModified int64  `json:"last_modified"`

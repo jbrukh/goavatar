@@ -337,7 +337,7 @@ func listFiles(repo string) ([]*ResourceInfo, error) {
 		if !f.IsDir() && !strings.HasPrefix(base, ".") {
 			log.Printf("LIST\t%s", path)
 			infos = append(infos, &ResourceInfo{
-				ResourceId:   base,
+				Id:           base,
 				File:         path,
 				SizeBytes:    f.Size(),
 				LastModified: f.ModTime().Unix(),
