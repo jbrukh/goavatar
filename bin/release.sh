@@ -3,7 +3,7 @@ cd $GOPATH/src/github.com/jbrukh/goavatar
 export GORACE="log_path=stdout"
 go build ./... && go install -v ./... && go test ./...
 
-if [ $? -eq 0 ]; then
+if [ $? -eq 0 ] && [ "$1" != "--no-version-stamp" ]; then
   if [[ -n $(git status -s) ]]; then
     echo ""
     echo "WARNING: not updating version, your working tree is dirty."
@@ -13,7 +13,7 @@ if [ $? -eq 0 ]; then
     echo "Updating version to: $SHA"
     sed -i '' "s#\(GoavatarVersionSha   = \"\)\([a-f0-9]*\)\"#\1$SHA\"#g" version.go
     git commit -a -m "Updating latest Octopus version to $SHA."
-  fi    
+  fi
 fi
 
 echo ""
