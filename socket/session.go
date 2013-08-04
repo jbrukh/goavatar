@@ -291,6 +291,7 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	defer Send(s.conn, r)
 
 	switch msg.Operation {
+	// list the files in the repo
 	case "list":
 		if infos, err := listFiles(s.device.Repo()); err != nil {
 			r.Err = err.Error()
@@ -300,10 +301,23 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Success = true
 			return
 		}
+	// clear a specific file
 	case "clear":
 		if err := removeFiles(s.device.Repo()); err != nil {
 			r.Err = err.Error()
 			return
+		} else {
+			r.Success = true
+			return
+		}
+	// delete a specific file
+	case "delete":
+		if msg.ResourceId == "" {
+			r.Err = "You must specify a valid resource id"
+			return
+		}
+		if err := removeFile(s.device.Repo(), msg.ResourceId); err != nil {
+			r.Err = err.Error()
 		} else {
 			r.Success = true
 			return
@@ -347,4 +361,10 @@ func removeFiles(repo string) error {
 		}
 		return nil
 	})
+}
+
+func removeFile(repo, resourceId string) error {
+	target := filepath.Join(repo, resourceId)
+	log.Printf("DELETE\t%s", target)
+	return os.Remove(target)
 }
