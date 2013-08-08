@@ -13,6 +13,7 @@ import (
 	. "github.com/jbrukh/goavatar/formats"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -180,6 +181,17 @@ func Send(conn *websocket.Conn, r interface{}) {
 	if err != nil {
 		log.Printf("error sending: %v\n", err)
 	}
+}
+
+// Send a file as binary over the socket.
+func SendFile(conn *websocket.Conn, filename string) {
+	log.Printf("Octopus Socket: SENDING FILE %s", file)
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		log.Printf("Could not read file %s: %v", filename, err)
+		data = []byte{0}
+	}
+	websocket.Message.Send(conn, data)
 }
 
 // Send an error response on the connection.

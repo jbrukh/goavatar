@@ -322,6 +322,11 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Success = true
 			return
 		}
+	case "get":
+		if msg.ResourceId == "" {
+			r.Err = "You must specify a valid resource id"
+			return
+		}
 	default:
 		r.Err = fmt.Sprintf("unknown operation: %s", msg.Operation)
 	}
