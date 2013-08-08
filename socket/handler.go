@@ -184,14 +184,18 @@ func Send(conn *websocket.Conn, r interface{}) {
 }
 
 // Send a file as binary over the socket.
-func SendFile(conn *websocket.Conn, filename string) {
-	log.Printf("Octopus Socket: SENDING FILE %s", file)
+func SendFile(conn *websocket.Conn, filename string) (err error) {
+	log.Printf("Octopus Socket: SENDING FILE %s", filename)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Printf("Could not read file %s: %v", filename, err)
 		data = []byte{0}
 	}
-	websocket.Message.Send(conn, data)
+	err = websocket.Message.Send(conn, data)
+	if err != nil {
+		log.Printf("error sending: %v\n", err)
+	}
+	return
 }
 
 // Send an error response on the connection.

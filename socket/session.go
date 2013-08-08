@@ -318,6 +318,7 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 		}
 		if err := removeFile(s.device.Repo(), msg.ResourceId); err != nil {
 			r.Err = err.Error()
+			return
 		} else {
 			r.Success = true
 			return
@@ -325,6 +326,13 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	case "get":
 		if msg.ResourceId == "" {
 			r.Err = "You must specify a valid resource id"
+			return
+		}
+		if err := sendFile(s.conn, s.device.Repo(), msg.ResourceId); err != nil {
+			r.Err = err.Error()
+			return
+		} else {
+			r.Success = true
 			return
 		}
 	default:
@@ -372,4 +380,10 @@ func removeFile(repo, resourceId string) error {
 	target := filepath.Join(repo, resourceId)
 	log.Printf("DELETE\t%s", target)
 	return os.Remove(target)
+}
+
+func sendFile(conn *websocket.Conn, repo, resourceId string) error {
+	target := filepath.Join(repo, resourceId)
+	log.Printf("SEND\t%s", target)
+	return SendFile(conn, target)
 }
