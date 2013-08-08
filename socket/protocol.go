@@ -120,6 +120,7 @@ type (
 		MessageType   string          `json:"message_type"`   // will be "repository"
 		Success       bool            `json:"success"`        // whether or not the control message was successful
 		Err           string          `json:"err"`            // error text, if any
+		Operation     string          `json:"operation"`      // echoes one of {"list", "clear", "delete", "get"}
 		ResourceInfos []*ResourceInfo `json:"resource_infos"` // list of files and infos
 	}
 

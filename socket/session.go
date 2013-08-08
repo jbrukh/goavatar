@@ -288,6 +288,7 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	r.MessageType = "repository"
 	r.Id = msg.Id
 	r.Success = false
+	r.Operation = msg.Operation
 	defer Send(s.conn, r)
 
 	switch msg.Operation {
