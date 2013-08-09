@@ -4,7 +4,9 @@
 package socket
 
 import (
+	"bytes"
 	"code.google.com/p/go.net/websocket"
+	"encoding/binary"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -184,14 +186,26 @@ func Send(conn *websocket.Conn, r interface{}) {
 }
 
 // Send a file as binary over the socket.
-func SendFile(conn *websocket.Conn, filename string) (err error) {
+func SendFile(conn *websocket.Conn, filename string, correlationId int32) (err error) {
 	log.Printf("Octopus Socket: SENDING FILE %s", filename)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Printf("Could not read file %s: %v", filename, err)
 		data = []byte{0}
 	}
-	err = websocket.Message.Send(conn, data)
+
+	// put in the correlation id
+	id := new(bytes.Buffer)
+
+	// write the id
+	if err = binary.Write(id, binary.BigEndian, correlationId); err != nil {
+		return err
+	}
+
+	// combine with data
+	stampedData := append(id.Bytes(), data...)
+
+	err = websocket.Message.Send(conn, stampedData)
 	if err != nil {
 		log.Printf("error sending: %v\n", err)
 	}

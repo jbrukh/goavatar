@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -338,13 +339,13 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Err = "You must specify a valid resource id"
 			return
 		}
-		if err := sendFile(s.conn, s.device.Repo(), msg.ResourceId); err != nil {
+		if err := sendFile(s.conn, s.device.Repo(), msg.ResourceId, msg.Id); err != nil {
 			r.Err = err.Error()
 			return
 		} else {
 			r.Success = true
 			// TODO: this is a temporary hack to suppress JSON
-			// responses to "get" operations
+			// responses to successful "get" operations
 			suppress = true // Oh my
 			return
 		}
@@ -395,8 +396,12 @@ func removeFile(repo, resourceId string) error {
 	return os.Remove(target)
 }
 
-func sendFile(conn *websocket.Conn, repo, resourceId string) error {
+func sendFile(conn *websocket.Conn, repo, resourceId, correlationId string) error {
 	target := filepath.Join(repo, resourceId)
+	id, err := strconv.ParseInt(correlationId, 10, 32)
+	if err != nil {
+		return err
+	}
 	log.Printf("SEND\t%s", target)
-	return SendFile(conn, target)
+	return SendFile(conn, target, int32(id))
 }
