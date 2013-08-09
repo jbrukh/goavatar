@@ -289,7 +289,16 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	r.Id = msg.Id
 	r.Success = false
 	r.Operation = msg.Operation
-	defer Send(s.conn, r)
+
+	// TODO: this is a temporary hack
+	// to suppress the sending of JSON
+	// responses for "get" operations
+	suppress := false
+	defer func() {
+		if !suppress {
+			Send(s.conn, r)
+		}
+	}()
 
 	switch msg.Operation {
 	// list the files in the repo
@@ -334,6 +343,9 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			return
 		} else {
 			r.Success = true
+			// TODO: this is a temporary hack to suppress JSON
+			// responses to "get" operations
+			suppress = true // Oh my
 			return
 		}
 	default:
