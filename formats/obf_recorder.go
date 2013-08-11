@@ -27,7 +27,8 @@ type OBFRecorder struct {
 	sampleRate int
 	buf        bytes.Buffer
 	tsFirst    int64
-	fc         int // frame count
+	fc         int               // frame count
+	params     map[string]string // recording parameters
 }
 
 func (r *OBFRecorder) tsTransform(ts int64) uint32 {
@@ -40,13 +41,14 @@ func NewOBFRecorder(repo string) *OBFRecorder {
 	}
 }
 
-func (r *OBFRecorder) Init() error {
+func (r *OBFRecorder) Init(params map[string]string) error {
 	r.channels = 0
 	r.samples = 0
 	r.sampleRate = 0
 	r.tsFirst = 0
 	r.fc = 0
 	r.buf = bytes.Buffer{}
+	r.params = params
 	return nil
 }
 
@@ -86,6 +88,12 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	// get the file name
 	r.newFileName()
 	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
+
+	// make sure the directory exists
+	dir := filepath.Dir(r.fileName)
+	if err = os.MkdirAll(dir, 0755); err != nil {
+		return
+	}
 
 	// open the file
 	r.file, err = os.OpenFile(r.fileName, os.O_CREATE|os.O_RDWR, 0655)
@@ -151,9 +159,11 @@ func (r *OBFRecorder) RollbackFile() {
 
 // return the name of the recording file
 func (r *OBFRecorder) newFileName() {
+	// get the subdirectory
+	subdir := r.params["subdir"]
 	for i := 0; i < 100; i++ {
 		f, _ := Uuid()
-		r.fileName = filepath.Join(r.repo, f)
+		r.fileName = filepath.Join(r.repo, subdir, f)
 
 		// check for clash just in case
 		_, err := os.Stat(r.fileName)
