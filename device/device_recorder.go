@@ -17,7 +17,7 @@ const RecorderName = "recorder"
 // given order: Init, RecordFrame (multiple times),
 // and finally stop.
 type Recorder interface {
-	Init() error
+	Init(rp RecordingParameters) error
 	RecordFrame(DataFrame) error
 	Stop() (id string, err error)
 }
@@ -32,6 +32,9 @@ type DeviceRecorder struct {
 	recording bool
 	max       int // max samples
 }
+
+// Parameters for each individual recording.
+type RecordingParameters map[string]string
 
 // Create a new DeviceRecorder.
 func NewDeviceRecorder(device Device, r Recorder) *DeviceRecorder {
@@ -75,7 +78,7 @@ func (d *DeviceRecorder) RecordingTimed() bool {
 // cannot be subscribed to. If the subscription is closed (for
 // instance, if the device is turned off) then the
 // asynchronous worker will exit.
-func (d *DeviceRecorder) RecordAsync() (err error) {
+func (d *DeviceRecorder) RecordAsync(rp RecordingParameters) (err error) {
 	d.Lock()
 	defer d.Unlock()
 
@@ -91,7 +94,7 @@ func (d *DeviceRecorder) RecordAsync() (err error) {
 	}
 
 	// initialize the underlying recorder
-	err = d.r.Init()
+	err = d.r.Init(rp)
 	if err != nil {
 		return
 	}

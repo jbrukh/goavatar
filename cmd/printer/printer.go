@@ -46,7 +46,7 @@ func main() {
 		log.Printf("going to record...")
 		r := NewDeviceRecorder(device, NewOBFRecorder(device.Repo()))
 		r.SetMax(*rec)
-		if err = r.RecordAsync(); err != nil {
+		if err = r.RecordAsync(map[string]string{"subdir": "printer"}); err != nil {
 			log.Printf("Error: %v", err)
 			return
 		}

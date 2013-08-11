@@ -42,6 +42,7 @@ type (
 		MessageType string `json:"message_type"` // should be "record"
 		Record      bool   `json:"record"`       // start or stop recording
 		Seconds     int    `json:"seconds"`      // number of seconds after which to cease recording
+		Local       bool   `json:"local"`        // whether the recording should be designated local
 	}
 
 	// UploadMessage is used to trigger upload of a

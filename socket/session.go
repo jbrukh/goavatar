@@ -20,6 +20,14 @@ import (
 // Constants
 //-------------------------------------------------------
 
+var CloudRecordingParameters = map[string]string{
+	"subdir": "cloud",
+}
+
+var LocalRecordingParameters = map[string]string{
+	"subdir": "local",
+}
+
 // SocketSession encapsulates all of the
 // business logic of sending and receiving
 // control messages.
@@ -215,7 +223,16 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 			}()
 		}
 
-		err = s.recorder.RecordAsync()
+		// gather the recording parameters
+		var rp map[string]string
+		if msg.Local {
+			rp = LocalRecordingParameters
+		} else {
+			rp = CloudRecordingParameters
+		}
+
+		// kick off the recording
+		err = s.recorder.RecordAsync(rp)
 		if err != nil {
 			r.Err = err.Error()
 			return
