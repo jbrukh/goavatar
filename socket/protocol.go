@@ -40,9 +40,9 @@ type (
 	RecordMessage struct {
 		Id          string `json:"id"`           // should be non-empty
 		MessageType string `json:"message_type"` // should be "record"
+		Local       bool   `json:"local"`        // whether the recording should be designated local
 		Record      bool   `json:"record"`       // start or stop recording
 		Seconds     int    `json:"seconds"`      // number of seconds after which to cease recording
-		Local       bool   `json:"local"`        // whether the recording should be designated local
 	}
 
 	// UploadMessage is used to trigger upload of a
@@ -50,6 +50,7 @@ type (
 	UploadMessage struct {
 		Id          string `json:"id"`           // should be non-empty
 		MessageType string `json:"message_type"` // should be "upload"
+		Local       bool   `json:"local"`        // specify whether the file to upload is local
 		Token       string `json:"token"`        // authentication token for upload
 		ResourceId  string `json:"resource_id"`  // id of the resource to upload
 		Endpoint    string `json:"endpoint"`     // domain-qualified endpoint to upload to
@@ -61,6 +62,7 @@ type (
 	RepositoryMessage struct {
 		Id          string `json:"id"`           // should be non-empty
 		MessageType string `json:"message_type"` // should be "repository"
+		Local       bool   `json:"local"`        // whether to operate on local files
 		Operation   string `json:"operation"`    // one of {"list", "clear", "delete", "get"}
 		ResourceId  string `json:"resource_id"`  // delete a specific file, in the case of "delete" or "get"
 	}

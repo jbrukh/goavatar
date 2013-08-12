@@ -20,12 +20,17 @@ import (
 // Constants
 //-------------------------------------------------------
 
-var CloudRecordingParameters = map[string]string{
-	"subdir": "cloud",
+var (
+	LocalSubdir = "local"
+	CloudSubdir = "cloud"
+)
+
+var CloudParameters = map[string]string{
+	"subdir": CloudSubdir,
 }
 
-var LocalRecordingParameters = map[string]string{
-	"subdir": "local",
+var LocalParameters = map[string]string{
+	"subdir": LocalSubdir,
 }
 
 // SocketSession encapsulates all of the
@@ -212,6 +217,8 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 				ar.Id = msg.Id
 				ar.Success = false
 				ar.Seconds = msg.Seconds
+
+				// TODO: fix this!!!!
 				outFile, err := s.recorder.Wait()
 				if err != nil {
 					log.Printf("error during fixed-time recording: %v", err)
@@ -224,15 +231,15 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 		}
 
 		// gather the recording parameters
-		var rp map[string]string
+		var params map[string]string
 		if msg.Local {
-			rp = LocalRecordingParameters
+			params = LocalParameters
 		} else {
-			rp = CloudRecordingParameters
+			params = CloudParameters
 		}
 
 		// kick off the recording
-		err = s.recorder.RecordAsync(rp)
+		err = s.recorder.RecordAsync(params)
 		if err != nil {
 			r.Err = err.Error()
 			return
@@ -269,12 +276,20 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 	r.Success = false
 	defer Send(s.conn, r)
 
+	// find the subdir of the file
+	var subdir string
+	if msg.Local {
+		subdir = LocalSubdir
+	} else {
+		subdir = CloudSubdir
+	}
+
 	// perform the upload
 	var (
 		resId    = msg.ResourceId
 		token    = msg.Token
 		endpoint = msg.Endpoint
-		file     = filepath.Join(s.device.Repo(), resId)
+		file     = filepath.Join(s.device.Repo(), subdir, resId)
 	)
 
 	err = UploadOBFFile(s.device.Name(), s.sessionId, file, endpoint, token)
@@ -287,6 +302,12 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		// best-effort removal, will still return
 		// Success: true even if removal fails
 		if err := os.Remove(file); err != nil {
+			r.Err = err.Error()
+		}
+	} else if msg.Local {
+		// file moved to cloud
+		newFile := filepath.Join(s.device.Repo(), CloudSubdir, resId)
+		if err := os.Rename(file, newFile); err != nil {
 			r.Err = err.Error()
 		}
 	}
@@ -318,10 +339,17 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 		}
 	}()
 
+	// determine subdir
+	var subdir = CloudSubdir
+	if msg.Local {
+		subdir = LocalSubdir
+	}
+
 	switch msg.Operation {
-	// list the files in the repo
+	// list the files in the repo (always local)
 	case "list":
-		if infos, err := listFiles(s.device.Repo()); err != nil {
+		basedir := filepath.Join(s.device.Repo(), LocalSubdir)
+		if infos, err := listFiles(basedir); err != nil {
 			r.Err = err.Error()
 			return
 		} else {
@@ -331,7 +359,8 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 		}
 	// clear a specific file
 	case "clear":
-		if err := removeFiles(s.device.Repo()); err != nil {
+		basedir := filepath.Join(s.device.Repo(), subdir)
+		if err := removeFiles(basedir); err != nil {
 			r.Err = err.Error()
 			return
 		} else {
@@ -344,7 +373,8 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Err = "You must specify a valid resource id"
 			return
 		}
-		if err := removeFile(s.device.Repo(), msg.ResourceId); err != nil {
+		basedir := filepath.Join(s.device.Repo(), subdir)
+		if err := removeFile(basedir, msg.ResourceId); err != nil {
 			r.Err = err.Error()
 			return
 		} else {
@@ -356,7 +386,8 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Err = "You must specify a valid resource id"
 			return
 		}
-		if err := sendFile(s.conn, s.device.Repo(), msg.ResourceId, msg.Id); err != nil {
+		basedir := filepath.Join(s.device.Repo(), subdir)
+		if err := sendFile(s.conn, basedir, msg.ResourceId, msg.Id); err != nil {
 			r.Err = err.Error()
 			return
 		} else {
@@ -371,9 +402,9 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	}
 }
 
-func listFiles(repo string) ([]*ResourceInfo, error) {
+func listFiles(basedir string) ([]*ResourceInfo, error) {
 	infos := make([]*ResourceInfo, 0)
-	err := filepath.Walk(repo, func(path string, f os.FileInfo, err error) error {
+	err := filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -392,8 +423,8 @@ func listFiles(repo string) ([]*ResourceInfo, error) {
 	return infos, err
 }
 
-func removeFiles(repo string) error {
-	return filepath.Walk(repo, func(path string, f os.FileInfo, err error) error {
+func removeFiles(basedir string) error {
+	return filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -407,14 +438,14 @@ func removeFiles(repo string) error {
 	})
 }
 
-func removeFile(repo, resourceId string) error {
-	target := filepath.Join(repo, resourceId)
+func removeFile(basedir, resourceId string) error {
+	target := filepath.Join(basedir, resourceId)
 	log.Printf("DELETE\t%s", target)
 	return os.Remove(target)
 }
 
-func sendFile(conn *websocket.Conn, repo, resourceId, correlationId string) error {
-	target := filepath.Join(repo, resourceId)
+func sendFile(conn *websocket.Conn, basedir, resourceId, correlationId string) error {
+	target := filepath.Join(basedir, resourceId)
 	id, err := strconv.ParseInt(correlationId, 10, 32)
 	if err != nil {
 		return err
