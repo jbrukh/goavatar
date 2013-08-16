@@ -14,7 +14,9 @@ import (
 	"os"
 )
 
-const UploadEndpoint = "http://localhost:3000/recordings/%s/results"
+func UploadS3(device, sessionId, file, aws_key_id, aws_bucket string) (err error) {
+
+}
 
 func UploadOBFFile(device, sessionId, file, endpoint, token string) (err error) {
 	log.Printf("uploading file %s to endpoint: %s", file, endpoint)
