@@ -74,7 +74,7 @@ func UploadOBFFile(device, sessionId, file, endpoint, token string) (err error) 
 	w.Close()
 
 	authenticatedEndpoint := fmt.Sprintf("%s?auth_token=%s", endpoint, token)
-	req, err := http.NewRequest("POST", authenticatedEndpoint, buf)
+	req, err := http.NewRequest("PATCH", authenticatedEndpoint, buf)
 	if err != nil {
 		return
 	}
