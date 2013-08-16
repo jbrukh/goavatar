@@ -8,6 +8,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"io"
+	"launchpad.net/goamz/s3"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -15,7 +16,9 @@ import (
 )
 
 func UploadS3(device, sessionId, file, aws_key_id, aws_bucket string) (err error) {
-
+	x := s3.BucketOwnerFull
+	x = x
+	return
 }
 
 func UploadOBFFile(device, sessionId, file, endpoint, token string) (err error) {
