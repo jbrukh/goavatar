@@ -48,13 +48,15 @@ type (
 	// UploadMessage is used to trigger upload of a
 	// recorded resource available in the local repository.
 	UploadMessage struct {
-		Id          string `json:"id"`           // should be non-empty
-		MessageType string `json:"message_type"` // should be "upload"
-		Local       bool   `json:"local"`        // specify whether the file to upload is local
-		Token       string `json:"token"`        // authentication token for upload
-		ResourceId  string `json:"resource_id"`  // id of the resource to upload
-		Endpoint    string `json:"endpoint"`     // domain-qualified endpoint to upload to
-		Clear       bool   `json:"clear"`        // delete the file after upload?
+		Id           string            `json:"id"`            // should be non-empty
+		MessageType  string            `json:"message_type"`  // should be "upload"
+		Local        bool              `json:"local"`         // specify whether the file to upload is local
+		Destination  bool              `json:"destination"`   // one of {"s3", "direct"}
+		Token        string            `json:"token"`         // authentication token for upload
+		ResourceId   string            `json:"resource_id"`   // id of the resource to upload
+		Endpoint     string            `json:"endpoint"`      // domain-qualified endpoint to upload to
+		Clear        bool              `json:"clear"`         // delete the file after upload?
+		UploadParams map[string]string `json:"upload_params"` // key-value pairs parameterizing destination, if needed
 	}
 
 	// RepositoryMessage performs operations on the
