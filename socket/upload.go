@@ -8,6 +8,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"io"
+	"launchpad.net/goamz/aws"
 	"launchpad.net/goamz/s3"
 	"log"
 	"mime/multipart"
