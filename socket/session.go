@@ -295,8 +295,9 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 	dest := msg.Destination
 	if dest == "direct" {
 		var (
-			token    = msg.Token
-			endpoint = msg.Endpoint
+			params   = msg.UploadParams
+			token    = params["token"]
+			endpoint = params["endpoint"]
 		)
 		err = UploadOBFFile(s.device.Name(), s.sessionId, file, endpoint, token)
 		if err != nil {
