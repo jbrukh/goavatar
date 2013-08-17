@@ -49,6 +49,7 @@ type S3UploadParameters struct {
 	keyMapping     KeyMapping
 }
 
+// Mapping policy that maps a resourceId
 type KeyMapping func(resourceId string) string
 
 // Basic key mapping that maps the resourceId to a
@@ -168,8 +169,8 @@ func UploadS3(p S3UploadParameters) (err error) {
 	// set the headers
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	client := &http.Transport{}
+	res, err := client.RoundTrip(req)
 	if err != nil {
 		return
 	}
@@ -179,8 +180,14 @@ func UploadS3(p S3UploadParameters) (err error) {
 	log.Printf("UPLOAD RESPONSE -------------------------------------")
 	io.Copy(os.Stdout, res.Body) // replace this with status check
 
-	fmt.Println()
-	if res.StatusCode != http.StatusMovedPermanently {
+	loc, err := res.Location()
+	if err != nil {
+		return
+	}
+
+	//fmt.Println("LOCATION:", loc)
+
+	if res.StatusCode != http.StatusSeeOther {
 		return fmt.Errorf("expecting HTTP 301 but: %v", res.StatusCode)
 	}
 	return
