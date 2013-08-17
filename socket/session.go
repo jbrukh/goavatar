@@ -304,11 +304,17 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 			keyMapping:     SubdirKeyMapping,
 		}
 
-		err = UploadS3(p)
+		s3Key, err := UploadS3(p)
 		if err != nil {
 			r.Err = err.Error()
 			return
 		}
+
+		// send some response fields
+		r.ResponseFields = map[string]string{
+			"s3_key": s3Key,
+		}
+
 	} else {
 		r.Err = "your 'destination' field must be one of {'s3', 'direct'}"
 		return

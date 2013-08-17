@@ -60,11 +60,11 @@ var SubdirKeyMapping = func(resourceId string) string {
 
 // Upload a file to S3
 // Following http://aws.amazon.com/articles/1434?_encoding=UTF8&jiveRedirect=1
-func UploadS3(p S3UploadParameters) (err error) {
+func UploadS3(p S3UploadParameters) (s3Key string, err error) {
 	// check consistency
 	if p.file == "" || p.awsAccessKeyId == "" || p.awsBucket == "" ||
 		p.policy == "" || p.signature == "" {
-		return fmt.Errorf("You must provide all of: file, awsAccessKeyId, awsBucket, policy, signature.")
+		return "", fmt.Errorf("You must provide all of: file, awsAccessKeyId, awsBucket, policy, signature.")
 	}
 
 	// default acl
@@ -87,11 +87,12 @@ func UploadS3(p S3UploadParameters) (err error) {
 	// this handles the addressing of data files in S3; currently
 	// we are sticking all data files into the same bucket nakedly.
 	// TODO
+	s3Key = p.keyMapping(p.resourceId)
 	keyField, err := w.CreateFormField(AF_KEY)
 	if err != nil {
 		return
 	}
-	keyField.Write([]byte(p.keyMapping(p.resourceId)))
+	keyField.Write([]byte(s3Key))
 
 	// AWS_ACCESS_KEY_ID field
 	accessKeyIdField, err := w.CreateFormField(AF_AWS_ACCESS_KEY_ID)
@@ -180,15 +181,8 @@ func UploadS3(p S3UploadParameters) (err error) {
 	log.Printf("UPLOAD RESPONSE -------------------------------------")
 	io.Copy(os.Stdout, res.Body) // replace this with status check
 
-	loc, err := res.Location()
-	if err != nil {
-		return
-	}
-
-	//fmt.Println("LOCATION:", loc)
-
 	if res.StatusCode != http.StatusSeeOther {
-		return fmt.Errorf("expecting HTTP 301 but: %v", res.StatusCode)
+		return "", fmt.Errorf("expecting HTTP 301 but: %v", res.StatusCode)
 	}
 	return
 }
