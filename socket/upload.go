@@ -46,6 +46,15 @@ type S3UploadParameters struct {
 	policy         string
 	signature      string
 	contentType    string
+	keyMapping     KeyMapping
+}
+
+type KeyMapping func(resourceId string) string
+
+// Basic key mapping that maps the resourceId to a
+// subdirectory of the bucket called "recordings".
+var SubdirKeyMapping = func(resourceId string) string {
+	return fmt.Sprintf("recordings/%s", resourceId)
 }
 
 // Upload a file to S3
@@ -81,7 +90,7 @@ func UploadS3(p S3UploadParameters) (err error) {
 	if err != nil {
 		return
 	}
-	keyField.Write([]byte(p.resourceId))
+	keyField.Write([]byte(p.keyMapping(p.resourceId)))
 
 	// AWS_ACCESS_KEY_ID field
 	accessKeyIdField, err := w.CreateFormField(AF_AWS_ACCESS_KEY_ID)

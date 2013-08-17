@@ -301,6 +301,7 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 			policy:         params["policy"],
 			signature:      params["signature"],
 			contentType:    "application/octet-stream",
+			keyMapping:     SubdirKeyMapping,
 		}
 
 		err = UploadS3(p)
