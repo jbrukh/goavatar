@@ -19,7 +19,7 @@ import (
 const (
 	DEFAULT_ACL             = "private"
 	SUCCESS_ACTION_REDIRECT = "http://localhost/"
-	AWS_ENDPOINT_FMT        = "%s.s3.amazonaws.com"
+	AWS_ENDPOINT_FMT        = "https://%s.s3.amazonaws.com"
 )
 
 // AWS request fields
