@@ -230,16 +230,9 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 			}()
 		}
 
-		// gather the recording parameters
-		var params map[string]string
-		if msg.Local {
-			params = LocalParameters
-		} else {
-			params = CloudParameters
-		}
-
-		// kick off the recording
-		err = s.recorder.RecordAsync(params)
+		// kick off the recording, always going to
+		// the local directory
+		err = s.recorder.RecordAsync(LocalParameters)
 		if err != nil {
 			r.Err = err.Error()
 			return
@@ -276,17 +269,9 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 	r.Success = false
 	defer Send(s.conn, r)
 
-	// find the subdir of the file
-	var subdir string
-	if msg.Local {
-		subdir = LocalSubdir
-	} else {
-		subdir = CloudSubdir
-	}
-
 	var (
 		resourceId = msg.ResourceId
-		file       = filepath.Join(s.device.Repo(), subdir, resourceId)
+		file       = filepath.Join(s.device.Repo(), LocalSubdir, resourceId)
 	)
 
 	// direct uploads go through the Octopus site
@@ -328,19 +313,21 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		return
 	}
 
+	// the upload has completed successfully, and we now wish to
+	// move the file from Local to Cloud subdirectory
+	newFile := filepath.Join(s.device.Repo(), CloudSubdir, resourceId)
+	if err := os.Rename(file, newFile); err != nil {
+		r.Err = err.Error()
+	}
+
 	if msg.Clear {
 		// best-effort removal, will still return
 		// Success: true even if removal fails
 		if err := os.Remove(file); err != nil {
 			r.Err = err.Error()
 		}
-	} else if msg.Local {
-		// file moved to cloud
-		newFile := filepath.Join(s.device.Repo(), CloudSubdir, resourceId)
-		if err := os.Rename(file, newFile); err != nil {
-			r.Err = err.Error()
-		}
 	}
+
 	r.Success = true
 }
 

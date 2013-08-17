@@ -40,7 +40,6 @@ type (
 	RecordMessage struct {
 		Id          string `json:"id"`           // should be non-empty
 		MessageType string `json:"message_type"` // should be "record"
-		Local       bool   `json:"local"`        // whether the recording should be designated local
 		Record      bool   `json:"record"`       // start or stop recording
 		Seconds     int    `json:"seconds"`      // number of seconds after which to cease recording
 	}
@@ -63,7 +62,6 @@ type (
 	UploadMessage struct {
 		Id           string            `json:"id"`            // should be non-empty
 		MessageType  string            `json:"message_type"`  // should be "upload"
-		Local        bool              `json:"local"`         // specify whether the file to upload is local
 		Destination  string            `json:"destination"`   // one of {"s3", "direct"}
 		ResourceId   string            `json:"resource_id"`   // id of the resource to upload
 		Clear        bool              `json:"clear"`         // delete the file after upload?
