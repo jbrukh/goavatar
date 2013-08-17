@@ -51,7 +51,7 @@ type (
 		Id           string            `json:"id"`            // should be non-empty
 		MessageType  string            `json:"message_type"`  // should be "upload"
 		Local        bool              `json:"local"`         // specify whether the file to upload is local
-		Destination  bool              `json:"destination"`   // one of {"s3", "direct"}
+		Destination  string            `json:"destination"`   // one of {"s3", "direct"}
 		Token        string            `json:"token"`         // authentication token for upload
 		ResourceId   string            `json:"resource_id"`   // id of the resource to upload
 		Endpoint     string            `json:"endpoint"`      // domain-qualified endpoint to upload to
