@@ -8,17 +8,45 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	"io"
-	"launchpad.net/goamz/aws"
-	"launchpad.net/goamz/s3"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
 )
 
-func UploadS3(device, sessionId, file, aws_key_id, aws_bucket string) (err error) {
-	x := s3.BucketOwnerFull
-	x = x
+// Upload a file to S3
+// Following http://aws.amazon.com/articles/1434?_encoding=UTF8&jiveRedirect=1
+func UploadS3(device, sessionId, file, aws_access_key_id, aws_bucket string) (err error) {
+	if aws_access_key_id == "" || aws_bucket == "" {
+		return fmt.Errorf("You must provide an aws_access_key_id and aws_bucket.")
+	}
+
+	log.Printf("uploading file to S3 endpoint")
+
+	// Create buffer
+	var (
+		buf = new(bytes.Buffer) // TODO may be bad for large files
+		w   = multipart.NewWriter(buf)
+	)
+
+	// resource id
+	resourceId := filepath.Base(file)
+
+	// this handles the addressing of data files in S3; currently
+	// we are sticking all data files into the same bucket nakedly.
+	// TODO
+	keyField, err := w.CreateFormField("key")
+	if err != nil {
+		return
+	}
+	keyField.Write([]byte(resourceId))
+
+	accessKeyIdField, err := w.CreateFormField("AWSAccessKeyId")
+	if err != nil {
+		return
+	}
+	accessKeyIdField.Write([]byte(aws_access_key_id))
+
 	return
 }
 
