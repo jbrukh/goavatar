@@ -18,7 +18,7 @@ import (
 // constants
 const (
 	DEFAULT_ACL             = "private"
-	SUCCESS_ACTION_REDIRECT = "TODO"
+	SUCCESS_ACTION_REDIRECT = "http://localhost/"
 	AWS_ENDPOINT_FMT        = "%s.s3.amazonaws.com"
 )
 
