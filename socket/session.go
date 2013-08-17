@@ -284,17 +284,46 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		subdir = CloudSubdir
 	}
 
-	// perform the upload
 	var (
-		resId    = msg.ResourceId
-		token    = msg.Token
-		endpoint = msg.Endpoint
-		file     = filepath.Join(s.device.Repo(), subdir, resId)
+		resourceId = msg.ResourceId
+		file       = filepath.Join(s.device.Repo(), subdir, resourceId)
 	)
 
-	err = UploadOBFFile(s.device.Name(), s.sessionId, file, endpoint, token)
-	if err != nil {
-		r.Err = err.Error()
+	// direct uploads go through the Octopus site
+	// while S3 uploads go directly to S3, with the
+	// Octopus site providing authentication info
+	dest := msg.Destination
+	if dest == "direct" {
+		var (
+			token    = msg.Token
+			endpoint = msg.Endpoint
+		)
+		err = UploadOBFFile(s.device.Name(), s.sessionId, file, endpoint, token)
+		if err != nil {
+			r.Err = err.Error()
+			return
+		}
+	} else if dest == "s3" {
+
+		params := msg.UploadParams
+		p := S3UploadParameters{
+			file:           file,
+			resourceId:     resourceId,
+			awsAccessKeyId: params["aws_access_key_id"],
+			awsBucket:      params["aws_bucket"],
+			acl:            "private",
+			policy:         params["policy"],
+			signature:      params["signature"],
+			contentType:    "application/octet-stream",
+		}
+
+		err = UploadS3(p)
+		if err != nil {
+			r.Err = err.Error()
+			return
+		}
+	} else {
+		r.Err = "your 'destination' field must be one of {'s3', 'direct'}"
 		return
 	}
 
@@ -306,7 +335,7 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		}
 	} else if msg.Local {
 		// file moved to cloud
-		newFile := filepath.Join(s.device.Repo(), CloudSubdir, resId)
+		newFile := filepath.Join(s.device.Repo(), CloudSubdir, resourceId)
 		if err := os.Rename(file, newFile); err != nil {
 			r.Err = err.Error()
 		}
