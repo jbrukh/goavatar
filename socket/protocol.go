@@ -111,11 +111,11 @@ type (
 	// UploadResponse is sent in response to an UploadMessage, providing
 	// the URL of the uploaded resource.
 	UploadResponse struct {
-		Id             string            `json:"id"`              // echo of your correlation id
-		MessageType    string            `json:"message_type"`    // will be "upload"
-		Success        bool              `json:"success"`         // whether or not the control message was successful
-		Err            string            `json:"err"`             // error text, if any
-		ResponseFields map[string]string `json:"response_fields"` // response fields, info about the response
+		Id             string                 `json:"id"`              // echo of your correlation id
+		MessageType    string                 `json:"message_type"`    // will be "upload"
+		Success        bool                   `json:"success"`         // whether or not the control message was successful
+		Err            string                 `json:"err"`             // error text, if any
+		ResponseFields map[string]interface{} `json:"response_fields"` // response fields, info about the response
 	}
 
 	// InfoResponse sends back information about the device and server.

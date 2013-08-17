@@ -291,6 +291,14 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		}
 	} else if dest == "s3" {
 
+		// check the size of the file
+		fi, err := os.Stat(file)
+		if err != nil {
+			r.Err = fmt.Sprintf("couldn't get file size: %v", err.Error())
+			return
+		}
+		fileBytes := fi.Size()
+
 		params := msg.UploadParams
 		p := S3UploadParameters{
 			file:           file,
@@ -311,8 +319,9 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		}
 
 		// send some response fields
-		r.ResponseFields = map[string]string{
-			"s3_key": s3Key,
+		r.ResponseFields = map[string]interface{}{
+			"s3_key":     s3Key,
+			"file_bytes": fileBytes,
 		}
 
 	} else {
