@@ -332,6 +332,12 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 	// the upload has completed successfully, and we now wish to
 	// move the file from Local to Cloud subdirectory
 	newFile := filepath.Join(s.device.Repo(), CloudSubdir, resourceId)
+
+	// make sure the directory exists
+	if err := os.MkdirAll(newFile, 0755); err != nil {
+		r.Err = err.Error()
+	}
+
 	if err := os.Rename(file, newFile); err != nil {
 		r.Err = err.Error()
 	}
