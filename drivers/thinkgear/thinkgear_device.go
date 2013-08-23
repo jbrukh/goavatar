@@ -17,15 +17,15 @@ import (
 
 type ThinkGearDevice struct {
 	name       string
-	repo       string
+	repo       *Repository
 	serialPort string
 	reader     io.ReadCloser
 }
 
-func NewThinkGearDevice(repo, serialPort string) Device {
+func NewThinkGearDevice(basedir, serialPort string) Device {
 	return NewDevice(&ThinkGearDevice{
 		name:       "NeuroSkyDevice",
-		repo:       repo,
+		repo:       NewRepositoryOrPanic(basedir),
 		serialPort: serialPort,
 	})
 }
@@ -47,7 +47,7 @@ func (d *ThinkGearDevice) Name() string {
 	return d.name
 }
 
-func (d *ThinkGearDevice) Repo() string {
+func (d *ThinkGearDevice) Repo() *Repository {
 	return d.repo
 }
 

@@ -34,7 +34,7 @@ func NewMockDevice(basedir string, obfFile string, channels int) Device {
 	}
 	return NewDevice(&MockDevice{
 		name:     "MockAvatarEEG",
-		repo:     NewRepository(basedir),
+		repo:     NewRepositoryOrPanic(basedir),
 		obfFile:  obfFile,
 		channels: channels,
 	})
@@ -82,7 +82,7 @@ func (d *MockDevice) Name() string {
 	return d.name
 }
 
-func (d *MockDevice) Repo() string {
+func (d *MockDevice) Repo() *Repository {
 	return d.repo
 }
 

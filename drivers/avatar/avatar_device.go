@@ -42,7 +42,7 @@ func NewAvatarDevice(basedir, serialPort string) Device {
 	return NewDevice(&AvatarDevice{
 		serialPort: serialPort,
 		name:       "AvatarEEG",
-		repo:       NewRepository(basedir),
+		repo:       NewRepositoryOrPanic(basedir),
 	})
 
 }
@@ -76,7 +76,7 @@ func (ad *AvatarDevice) Name() string {
 }
 
 // The repo to which recordings are written.
-func (ad *AvatarDevice) Repo() string {
+func (ad *AvatarDevice) Repo() *Repository {
 	return ad.repo
 }
 

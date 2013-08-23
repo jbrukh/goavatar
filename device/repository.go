@@ -74,6 +74,14 @@ func NewRepository(basedir string) (r *Repository, err error) {
 	return
 }
 
+func NewRepositoryOrPanic(basedir string) *Repository {
+	r, err := NewRepository(basedir)
+	if err != nil {
+		panic("could not create a new repository")
+	}
+	return r
+}
+
 // Return the base directory of the repository.
 func (r *Repository) Basedir() string {
 	return r.basedir
