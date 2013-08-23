@@ -6,6 +6,7 @@ package formats
 import (
 	"bytes"
 	. "github.com/jbrukh/goavatar/datastruct"
+	. "github.com/jbrukh/goavatar/device"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
 	"log"
@@ -16,10 +17,10 @@ import (
 
 type OBFRecorder struct {
 	sync.Mutex
-	repo     string    // repository where file is being recorded to
-	fileName string    // name of the file/resource id
-	file     *os.File  // the file we're writing
-	codec    *obfCodec // codec for the OBF format
+	repo     *Repository // repository where file is being recorded to
+	fileName string      // name of the file/resource id
+	file     *os.File    // the file we're writing
+	codec    *obfCodec   // codec for the OBF format
 
 	// diagnostics
 	channels   int
@@ -35,7 +36,7 @@ func (r *OBFRecorder) tsTransform(ts int64) uint32 {
 	return toTs32Diff(ts, r.tsFirst)
 }
 
-func NewOBFRecorder(repo string) *OBFRecorder {
+func NewOBFRecorder(repo *Repository) *OBFRecorder {
 	return &OBFRecorder{
 		repo: repo,
 	}
