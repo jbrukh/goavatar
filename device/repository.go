@@ -3,6 +3,11 @@
 //
 package device
 
+import (
+	"os"
+	"path/filepath"
+)
+
 // A Repository encasulates an Octopus data repository. It is
 // local to a user's computer and performs all the operations
 // around storing the files.
@@ -20,12 +25,30 @@ package device
 
 // An Octopus file repository.
 type Repository struct {
-	baseDir string
+	basedir string
 }
 
-// Create a new Repository.
-func NewRepository(baseDir string) *Repository {
-	return &Repository{baseDir}
+// Create a new Repository. Will return an error
+// if all the requisite directories could not be
+// created.
+func NewRepository(basedir string) (r *Repository, err error) {
+	r = &Repository{basedir}
+
+	// create the base directory
+	if err = os.MkdirAll(basedir, 0755); err != nil {
+		return nil, err
+	}
+
+	// create all the subdirs
+	for _, subdir := range subdirSearchPath {
+		fullPath := filepath.Join(basedir, subdir)
+		if err = os.Mkdir(fullPath, 0755); err != nil {
+			return nil, err
+		}
+	}
+
+	// ok!
+	return
 }
 
 // subdirectories
@@ -38,8 +61,17 @@ const (
 var subdirSearchPath = []string{SubdirLocal, SubdirCloud}
 
 // Return the base directory of the repository.
-func (r *Repository) BaseDir() string {
-	return r.baseDir
+func (r *Repository) Basedir() string {
+	return r.basedir
+}
+
+// Return all known subdirs of this repository.
+func (r *Repository) Subdirs() (subdirs []string) {
+	for _, subdir := range subdirSearchPath {
+		fullPath := filepath.Join(r.basedir, subdir)
+		subdirs = append(subdirs, fullPath)
+	}
+	return
 }
 
 func (r *Repository) NewResourceId() (resourceId, resourcePath string) {
