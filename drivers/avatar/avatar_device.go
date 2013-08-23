@@ -31,18 +31,18 @@ var BadCrcErr = errors.New("frame had bad crc")
 type AvatarDevice struct {
 	serialPort string // serial port like /dev/tty.AvatarEEG03009-SPPDev
 	reader     io.ReadCloser
-	repo       string
+	repo       *Repository
 	name       string
 }
 
 // NewAvatarDevice creates a new AvatarEEG connection. The user
 // can then start streaming data by calling Connect() and reading the
 // output channel.
-func NewAvatarDevice(repo, serialPort string) Device {
+func NewAvatarDevice(basedir, serialPort string) Device {
 	return NewDevice(&AvatarDevice{
 		serialPort: serialPort,
 		name:       "AvatarEEG",
-		repo:       repo,
+		repo:       NewRepository(basedir),
 	})
 
 }

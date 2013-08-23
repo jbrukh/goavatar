@@ -32,7 +32,7 @@ type Device interface {
 
 	// Return the path of the directory where recorder files are
 	// stored.
-	Repo() string
+	Repo() *Repository
 
 	// Obtain the device information
 	Info() *DeviceInfo
@@ -92,7 +92,7 @@ type DeviceImpl interface {
 	Name() string
 
 	// The directory where recordings are stored.
-	Repo() string
+	Repo() *Repository
 }
 
 // ----------------------------------------------------------------- //
@@ -142,7 +142,7 @@ func (d *BaseDevice) Name() string {
 
 // The recording repository directory for
 // this device.
-func (d *BaseDevice) Repo() string {
+func (d *BaseDevice) Repo() *Repository {
 	return d.deviceImpl.Repo()
 }
 
