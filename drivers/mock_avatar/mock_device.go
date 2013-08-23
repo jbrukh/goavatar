@@ -20,21 +20,21 @@ import (
 type MockDevice struct {
 	frames   []DataFrame
 	name     string
-	repo     string
+	repo     *Repository
 	obfFile  string
 	channels int
 }
 
 // Mock AvatarEEG device that plays pre-recorded frames on
 // repeat. The frames are specified as an OBF file.
-func NewMockDevice(repo string, obfFile string, channels int) Device {
+func NewMockDevice(basedir string, obfFile string, channels int) Device {
 	if channels < 1 {
 		log.Printf("Resetting channels to: 1")
 		channels = 1
 	}
 	return NewDevice(&MockDevice{
 		name:     "MockAvatarEEG",
-		repo:     repo,
+		repo:     NewRepository(basedir),
 		obfFile:  obfFile,
 		channels: channels,
 	})
