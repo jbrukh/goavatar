@@ -4,6 +4,7 @@
 package device
 
 import (
+	"fmt"
 	. "github.com/jbrukh/goavatar/util"
 	"os"
 	"path/filepath"
@@ -117,4 +118,16 @@ func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourc
 
 	// id is aquired, generate the path
 	return id, fp
+}
+
+// Look up a resource by its resource id. The search path
+// will be checked.
+func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) {
+	for _, subdir := range r.Subdirs() {
+		fp := filepath.Join(subdir, resourceId)
+		if _, err = os.Stat(fp); err == nil {
+			return fp, nil
+		}
+	}
+	return "", fmt.Errorf("no such resource in search path: %v", resourceId)
 }
