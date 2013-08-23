@@ -38,10 +38,10 @@ type (
 	// is sent to indicate success (if recording has commenced) or
 	// failure (if the device is off, or other errors).
 	RecordMessage struct {
-		Id          string `json:"id"`           // should be non-empty
-		MessageType string `json:"message_type"` // should be "record"
-		Record      bool   `json:"record"`       // start or stop recording
-		Seconds     int    `json:"seconds"`      // number of seconds after which to cease recording
+		Id           string `json:"id"`           // should be non-empty
+		MessageType  string `json:"message_type"` // should be "record"
+		Record       bool   `json:"record"`       // start or stop recording
+		Milliseconds int    `json:"milliseconds"` // number of milliseconds after which to cease recording
 	}
 
 	// UploadMessage is used to trigger upload of a
@@ -99,13 +99,13 @@ type (
 	// RecordResponseMessage is sent in response to a RecordMessage.
 	// The MessageType is set to "record".
 	RecordResponse struct {
-		Id          string `json:"id"`           // echo of your correlation id
-		MessageType string `json:"message_type"` // will be "record"
-		Success     bool   `json:"success"`      // whether or not the control message was successful
-		Err         string `json:"err"`          // error text, if any
-		ResourceId  string `json:"resource_id"`  // id of the resource
-		Seconds     int    `json:"seconds"`      // number of seconds recorder if this was a fixed-time recording
-		SessionId   string `json:"session_id"`   // the connector session that made this recording (see InfoResponse.SessionId)
+		Id           string `json:"id"`           // echo of your correlation id
+		MessageType  string `json:"message_type"` // will be "record"
+		Success      bool   `json:"success"`      // whether or not the control message was successful
+		Err          string `json:"err"`          // error text, if any
+		ResourceId   string `json:"resource_id"`  // id of the resource
+		Milliseconds int    `json:"milliseconds"` // number of milliseconds recorder if this was a fixed-time recording
+		SessionId    string `json:"session_id"`   // the connector session that made this recording (see InfoResponse.SessionId)
 	}
 
 	// UploadResponse is sent in response to an UploadMessage, providing
