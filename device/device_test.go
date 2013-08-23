@@ -6,6 +6,8 @@ package device
 import (
 	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
+	. "github.com/jbrukh/goavatar/repo"
+
 	"testing"
 	"time"
 )
@@ -38,7 +40,7 @@ func (r *MockRecorder) Reset() {
 
 type emptyDevice struct {
 	name     string
-	repo     string
+	repo     *Repository
 	errProne bool // will produce errors in stream (for testing)
 }
 
@@ -46,7 +48,7 @@ func (ed *emptyDevice) Name() string {
 	return ed.name
 }
 
-func (ed *emptyDevice) Repo() string {
+func (ed *emptyDevice) Repo() *Repository {
 	return ed.repo
 }
 
@@ -78,7 +80,7 @@ func (ed *emptyDevice) Stream(c *Control) (err error) {
 func newEmptyDevice() Device {
 	return NewDevice(&emptyDevice{
 		name: "EmptyDevice",
-		repo: "var",
+		repo: NewRepositoryOrPanic("../var/unit-tests/empty-device"),
 	})
 }
 
@@ -86,7 +88,7 @@ func newEmptyDevice() Device {
 func newErrorProneDevice() Device {
 	return NewDevice(&emptyDevice{
 		name:     "ErrorProneDevice",
-		repo:     "var",
+		repo:     NewRepositoryOrPanic("../var/unit-tests/error-prone-device"),
 		errProne: true,
 	})
 }

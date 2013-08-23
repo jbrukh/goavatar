@@ -72,9 +72,9 @@ func (s *OctopusSocket) ListenAndServe() {
 		wsData    = websocket.Handler(s.handleDataConn)
 	)
 
-	absRepo, err := filepath.Abs(s.device.Repo())
+	absRepo, err := filepath.Abs(s.device.Repo().Basedir())
 	if err != nil {
-		absRepo = s.device.Repo()
+		absRepo = s.device.Repo().Basedir()
 	}
 
 	fmt.Printf(`Octopus Connector

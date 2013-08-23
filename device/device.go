@@ -6,6 +6,7 @@ package device
 import (
 	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
+	. "github.com/jbrukh/goavatar/repo"
 	"log"
 	"sync"
 )

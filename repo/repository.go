@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package device
+package repo
 
 import (
 	"fmt"
@@ -107,7 +107,7 @@ func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourc
 
 	// check validity
 	if subdir != SubdirLocal && subdir != SubdirCloud {
-		panic("bad subdir")
+		panic(fmt.Sprintf("bad subdir: %s", subdir))
 	}
 
 	// create a resource id
@@ -138,4 +138,23 @@ func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) 
 		}
 	}
 	return "", fmt.Errorf("no such resource in search path: %v", resourceId)
+}
+
+// Cache a resource in a particular subdirectory
+func (r *Repository) Move(resourceId, subdir string) (err error) {
+	if subdir != SubdirLocal && subdir != SubdirCloud {
+		return fmt.Errorf("bad subdir: %v", subdir)
+	}
+
+	fp, err := r.Lookup(resourceId)
+	if err != nil {
+		return err
+	}
+
+	newFp := filepath.Join(r.basedir, subdir, resourceId)
+	if err := os.Rename(fp, newFp); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -6,8 +6,7 @@ package formats
 import (
 	"bytes"
 	. "github.com/jbrukh/goavatar/datastruct"
-	. "github.com/jbrukh/goavatar/device"
-	. "github.com/jbrukh/goavatar/util"
+	. "github.com/jbrukh/goavatar/repo"
 	"io"
 	"log"
 	"os"
@@ -87,7 +86,8 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 
 func (r *OBFRecorder) commit() (id string, err error) {
 	// get the file name
-	r.newFileName()
+	// TODO: get rid of the subdir parameter
+	r.fileName, _ = r.repo.NewResourceIdWithSubdir(r.params["subdir"])
 	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
 
 	// make sure the directory exists
@@ -156,23 +156,4 @@ func (r *OBFRecorder) RollbackFile() {
 	if err := os.Remove(fileName); err != nil {
 		log.Printf("OBFRecorder: could not remove the file: %s", fileName)
 	}
-}
-
-// return the name of the recording file
-func (r *OBFRecorder) newFileName() {
-	// get the subdirectory
-	subdir := r.params["subdir"]
-	for i := 0; i < 100; i++ {
-		f, _ := Uuid()
-		r.fileName = filepath.Join(r.repo, subdir, f)
-
-		// check for clash just in case
-		_, err := os.Stat(r.fileName)
-		if err == nil {
-			log.Printf("WARNING: new filename clashed with existing: %s", r.fileName)
-			continue
-		}
-		return
-	}
-	panic("could not generate filename")
 }

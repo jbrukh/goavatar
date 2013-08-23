@@ -269,10 +269,13 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 	r.Success = false
 	defer Send(s.conn, r)
 
-	var (
-		resourceId = msg.ResourceId
-		file       = filepath.Join(s.device.Repo(), LocalSubdir, resourceId)
-	)
+	resourceId := msg.ResourceId
+	repo := s.device.Repo()
+	file, err := repo.Lookup(resourceId)
+	if err != nil {
+		r.Err = err.Error()
+		return
+	}
 
 	// direct uploads go through the Octopus site
 	// while S3 uploads go directly to S3, with the
@@ -329,16 +332,7 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		return
 	}
 
-	// the upload has completed successfully, and we now wish to
-	// move the file from Local to Cloud subdirectory
-	newFile := filepath.Join(s.device.Repo(), CloudSubdir, resourceId)
-
-	// make sure the directory exists
-	if err := os.MkdirAll(newFile, 0755); err != nil {
-		r.Err = err.Error()
-	}
-
-	if err := os.Rename(file, newFile); err != nil {
+	if err := s.device.Repo().Move(resourceId, CloudSubdir); err != nil {
 		r.Err = err.Error()
 	}
 
@@ -387,7 +381,8 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	switch msg.Operation {
 	// list the files in the repo (always local)
 	case "list":
-		basedir := filepath.Join(s.device.Repo(), LocalSubdir)
+		// TODO: deprecate this with repo list
+		basedir := filepath.Join(s.device.Repo().Basedir(), LocalSubdir)
 		if infos, err := listFiles(basedir); err != nil {
 			r.Err = err.Error()
 			return
@@ -398,7 +393,8 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 		}
 	// clear a specific file
 	case "clear":
-		basedir := filepath.Join(s.device.Repo(), subdir)
+		// TODO: deprecate this with repo clear
+		basedir := filepath.Join(s.device.Repo().Basedir(), subdir)
 		if err := removeFiles(basedir); err != nil {
 			r.Err = err.Error()
 			return
@@ -408,11 +404,12 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 		}
 	// delete a specific file
 	case "delete":
+		// TODO: deprecate this with repo delete
 		if msg.ResourceId == "" {
 			r.Err = "You must specify a valid resource id"
 			return
 		}
-		basedir := filepath.Join(s.device.Repo(), subdir)
+		basedir := filepath.Join(s.device.Repo().Basedir(), subdir)
 		if err := removeFile(basedir, msg.ResourceId); err != nil {
 			r.Err = err.Error()
 			return
@@ -425,7 +422,8 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Err = "You must specify a valid resource id"
 			return
 		}
-		basedir := filepath.Join(s.device.Repo(), subdir)
+		// TODO: deprecate this with repo get
+		basedir := filepath.Join(s.device.Repo().Basedir(), subdir)
 		if err := sendFile(s.conn, basedir, msg.ResourceId, msg.Id); err != nil {
 			r.Err = err.Error()
 			return
