@@ -4,6 +4,7 @@
 package device
 
 import (
+	. "github.com/jbrukh/goavatar/util"
 	"os"
 	"path/filepath"
 	"testing"
@@ -75,4 +76,9 @@ func TestNewResourceId(t *testing.T) {
 	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirLocal) || filepath.Base(fp) != id {
 		t.Errorf("something went wrong with id generation")
 	}
+
+	// test invalid dir
+	TestPanic(t, func() {
+		r.NewResourceIdWithSubdir("nonsense")
+	})
 }
