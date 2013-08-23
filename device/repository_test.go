@@ -82,3 +82,58 @@ func TestNewResourceId(t *testing.T) {
 		r.NewResourceIdWithSubdir("nonsense")
 	})
 }
+
+// Test file lookup.
+func TestLookup(t *testing.T) {
+	r, err := NewRepository(testBaseDir)
+
+	// something wrong with constructor
+	if err != nil {
+		t.Errorf("could not create the directories")
+	}
+
+	ids := []string{"silly-id", "sillier-id", "silliest-id"}
+	subdirs := r.Subdirs()
+	testPaths := []string{
+		filepath.Join(subdirs[0], ids[0]),
+		filepath.Join(subdirs[1], ids[1]),
+		filepath.Join(subdirs[0], ids[2]),
+		filepath.Join(subdirs[1], ids[2]),
+	}
+
+	// create test resources
+	if err := touchFile(testPaths[0]); err != nil {
+		t.Errorf("could not touch test path")
+	}
+
+	if err := touchFile(testPaths[1]); err != nil {
+		t.Errorf("could not touch test path")
+	}
+
+	if err := touchFile(testPaths[2]); err != nil {
+		t.Errorf("could not touch test path")
+	}
+
+	if err := touchFile(testPaths[3]); err != nil {
+		t.Errorf("could not touch test path")
+	}
+
+	// test the lookup
+	if fp, err := r.Lookup(ids[0]); err != nil || fp != testPaths[0] {
+		t.Errorf("bad lookup")
+	}
+
+	if fp, err := r.Lookup(ids[1]); err != nil || fp != testPaths[1] {
+		t.Errorf("bad lookup")
+	}
+
+	if fp, err := r.Lookup(ids[2]); err != nil || fp != testPaths[2] {
+		t.Errorf("bad lookup")
+	}
+
+}
+
+func touchFile(file string) error {
+	_, err := os.OpenFile(file, os.O_CREATE, 0644)
+	return err
+}
