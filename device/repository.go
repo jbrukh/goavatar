@@ -87,12 +87,20 @@ func (r *Repository) Subdirs() (subdirs []string) {
 	return
 }
 
+// Generate a new default id.
 func (r *Repository) NewResourceId() (resourceId, resourcePath string) {
 	return r.NewResourceIdWithSubdir(SubdirLocal)
 }
 
+// Generate a new id within a specified subdir.
 func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourcePath string) {
 	var fp, id string
+
+	// check validity
+	if subdir != SubdirLocal && subdir != SubdirCloud {
+		panic("bad subdir")
+	}
+
 	// create a resource id
 	for i := 1; i <= maxGenerateRetries; i++ {
 		// try to generate the id

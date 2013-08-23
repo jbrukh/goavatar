@@ -5,6 +5,7 @@ package datastruct
 
 import (
 	//"log"
+	. "github.com/jbrukh/goavatar/util"
 	"testing"
 )
 
@@ -27,7 +28,7 @@ func TestNewBlockBuffer__Normal(t *testing.T) {
 }
 
 func TestNewBlockBuffer__NegativeChannels(t *testing.T) {
-	testPanic(t, func() {
+	TestPanic(t, func() {
 		NewBlockBuffer(-1, 10)
 	})
 }
@@ -45,13 +46,13 @@ func TestBlockBufferAppend__NotComparable(t *testing.T) {
 		b2 = NewBlockBuffer(3, 10)
 		b3 = NewBlockBuffer(2, 5)
 	)
-	testPanic(t, func() {
+	TestPanic(t, func() {
 		b1.Append(b2)
 	})
-	testPanic(t, func() {
+	TestPanic(t, func() {
 		b2.Append(b1)
 	})
-	testPanic(t, func() {
+	TestPanic(t, func() {
 		b3.Append(b2)
 	})
 }
@@ -253,7 +254,7 @@ func TestBlockBufferAppendSample__NotComparable(t *testing.T) {
 	if b.Samples() != 0 {
 		t.Errorf("wrong size")
 	}
-	testPanic(t, func() {
+	TestPanic(t, func() {
 		b.AppendSample([]float64{1, 2, 3}, 11)
 	})
 }
@@ -292,14 +293,4 @@ func mockBlockBuffer() (b *BlockBuffer) {
 		[]int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 	)
 	return
-}
-
-func testPanic(t *testing.T, f func()) {
-	defer func() {
-		if r := recover(); r != nil {
-			// ok
-		}
-	}()
-	f()
-	t.Errorf("should have panicked")
 }

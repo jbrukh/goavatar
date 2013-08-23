@@ -6,6 +6,7 @@ package util
 import (
 	"fmt"
 	"os"
+	"testing"
 	"time"
 )
 
@@ -71,4 +72,15 @@ func Uuid() (uuid string, err error) {
 // between timestamps is dur.
 func InterpolateTs(start int64, s int, δ time.Duration) int64 {
 	return start + int64(s)*int64(δ)
+}
+
+// For testing panics.
+func TestPanic(t *testing.T, f func()) {
+	defer func() {
+		if r := recover(); r != nil {
+			// ok
+		}
+	}()
+	f()
+	t.Errorf("should have panicked")
 }
