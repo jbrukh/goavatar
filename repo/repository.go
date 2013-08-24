@@ -195,21 +195,15 @@ func (r *Repository) move(resourceId, subdir string) (err error) {
 	return nil
 }
 
-// func (r *Repository) clear(subdir string) (err error) {
-// 	root := r.subdirPath(subdir)
-// 	return filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
-// 		if err != nil {
-// 			return err
-// 		}
-// 		if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
-// 			if err := os.RemoveAll(path); err != nil {
-// 				log.Printf("could not remove file: %v", err)
-// 			}
-// 			log.Printf("DELETE\t%s", path)
-// 		}
-// 		return nil
-// 	})
-// }
+// Remove all the files in a subdir.
+func (r *Repository) clear(subdir string) (err error) {
+	return r.forEach(subdir, func(path string, f os.FileInfo) error {
+		if err := os.RemoveAll(path); err != nil {
+			fmt.Fprint(os.Stderr, "failed to remove the file: %v (err: %v)", path, err)
+		}
+		return nil
+	})
+}
 
 // Perform an operation for each resource in a subdir.
 func (r *Repository) forEach(subdir string, op func(path string, f os.FileInfo) error) (err error) {
