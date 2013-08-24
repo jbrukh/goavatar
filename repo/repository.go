@@ -107,7 +107,7 @@ func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourc
 	var fp, id string
 
 	// check validity
-	if subdir != SubdirLocal && subdir != SubdirCloud {
+	if !isValidSubdir(subdir) {
 		panic(fmt.Sprintf("bad subdir: %s", subdir))
 	}
 
