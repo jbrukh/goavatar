@@ -87,7 +87,7 @@ func (r *OBFRecorder) Stop() (id string, err error) {
 func (r *OBFRecorder) commit() (id string, err error) {
 	// get the file name
 	// TODO: get rid of the subdir parameter
-	r.fileName, _ = r.repo.NewResourceIdWithSubdir(r.params["subdir"])
+	_, r.fileName = r.repo.NewResourceIdWithSubdir(r.params["subdir"])
 	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
 
 	// make sure the directory exists
