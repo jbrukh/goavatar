@@ -39,7 +39,7 @@ var LocalParameters = map[string]string{
 type SocketSession struct {
 	conn      *websocket.Conn
 	device    Device
-	sessionId string
+	pairingId string
 	pps       int
 	batchSize int
 	kickoff   chan *SocketSession
@@ -84,7 +84,7 @@ func (s *SocketSession) ProcessInfoMessage(msgBytes []byte, id string) {
 	r.Success = true
 	r.Version = Version()
 	r.DeviceName = s.device.Name()
-	r.SessionId = s.sessionId
+	r.PairingId = s.pairingId
 
 	Send(s.conn, r)
 }
@@ -182,7 +182,7 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.MessageType = "record"
 	r.Id = msg.Id
 	r.Success = false
-	r.SessionId = s.sessionId
+	r.PairingId = s.pairingId
 	shouldRespond := true
 
 	// by default, send the response
@@ -284,7 +284,7 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 			token    = params["token"]
 			endpoint = params["endpoint"]
 		)
-		err = UploadOBFFile(s.device.Name(), s.sessionId, file, endpoint, token)
+		err = UploadOBFFile(s.device.Name(), s.pairingId, file, endpoint, token)
 		if err != nil {
 			r.Err = err.Error()
 			return

@@ -112,7 +112,7 @@ func (s *OctopusSocket) handleControlConn(conn *websocket.Conn) {
 	uuid, _ := Uuid()
 	session := &SocketSession{
 		conn:      conn,
-		sessionId: uuid,
+		pairingId: uuid,
 		device:    s.device, // in the future we can instantiate device based on message
 		pps:       s.pps,
 		batchSize: s.batchSize,

@@ -105,7 +105,7 @@ type (
 		Err          string `json:"err"`          // error text, if any
 		ResourceId   string `json:"resource_id"`  // id of the resource
 		Milliseconds int    `json:"milliseconds"` // number of milliseconds recorder if this was a fixed-time recording
-		SessionId    string `json:"session_id"`   // the connector session that made this recording (see InfoResponse.SessionId)
+		PairingId    string `json:"pairing_id"`   // the connector session that made this recording (see InfoResponse.PairingId)
 	}
 
 	// UploadResponse is sent in response to an UploadMessage, providing
@@ -126,7 +126,7 @@ type (
 		Err         string `json:"err"`          // error text, if any
 		Version     string `json:"version"`      // octopus server version
 		DeviceName  string `json:"device_name"`  // device name
-		SessionId   string `json:"session_id"`   // session id, lives for the life of control socket connection
+		PairingId   string `json:"pairing_id"`   // session id, lives for the life of control socket connection
 	}
 
 	// RepositoryResponse sends back messages about repository operations.
