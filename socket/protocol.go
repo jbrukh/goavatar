@@ -77,7 +77,6 @@ type (
 	RepositoryMessage struct {
 		Id          string `json:"id"`           // should be non-empty
 		MessageType string `json:"message_type"` // should be "repository"
-		Local       bool   `json:"local"`        // whether to operate on local files
 		Operation   string `json:"operation"`    // one of {"list", "clear", "delete", "get"}
 		ResourceId  string `json:"resource_id"`  // delete a specific file, in the case of "delete" or "get"
 	}

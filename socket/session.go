@@ -9,12 +9,9 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/device"
-	. "github.com/jbrukh/goavatar/repo"
 	"log"
 	"os"
-	"path/filepath"
 	"strconv"
-	"strings"
 )
 
 //---------------------------------------------------------//
@@ -433,28 +430,6 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	default:
 		r.Err = fmt.Sprintf("unknown operation: %s", msg.Operation)
 	}
-}
-
-// TODO: deprecate!
-func listFiles(basedir string) ([]*ResourceInfo, error) {
-	infos := make([]*ResourceInfo, 0)
-	err := filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		base := filepath.Base(path)
-		if !f.IsDir() && !strings.HasPrefix(base, ".") {
-			log.Printf("LIST\t%s", path)
-			infos = append(infos, &ResourceInfo{
-				Id:           base,
-				File:         path,
-				SizeBytes:    f.Size(),
-				LastModified: f.ModTime().Unix(),
-			})
-		}
-		return nil
-	})
-	return infos, err
 }
 
 func sendFile(conn *websocket.Conn, path, correlationId string) error {
