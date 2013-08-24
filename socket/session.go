@@ -9,6 +9,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/device"
+	. "github.com/jbrukh/goavatar/repo"
 	"log"
 	"os"
 	"path/filepath"
@@ -368,16 +369,17 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	switch msg.Operation {
 	// list the files in the repo (always local)
 	case "list":
-		// TODO: deprecate this with repo list
-		basedir := filepath.Join(repo.Basedir(), "local")
-		if infos, err := listFiles(basedir); err != nil {
+
+		infos, err := repo.List()
+		if err != nil {
 			r.Err = err.Error()
 			return
-		} else {
-			r.ResourceInfos = infos
-			r.Success = true
-			return
 		}
+
+		r.ResourceInfos = infos
+		r.Success = true
+		return
+
 	// clear the repository
 	case "clear":
 		log.Printf("CLEAR REPO")
@@ -407,6 +409,8 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Err = "You must specify a valid resource id"
 			return
 		}
+
+		log.Printf("GET %v\n", msg.ResourceId)
 
 		// look up the file
 		path, err := repo.Lookup(msg.ResourceId)

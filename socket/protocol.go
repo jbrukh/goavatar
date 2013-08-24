@@ -3,6 +3,10 @@
 //
 package socket
 
+import (
+	. "github.com/jbrukh/goavatar/repo"
+)
+
 //---------------------------------------------------------//
 // Messages
 //---------------------------------------------------------//
@@ -137,14 +141,6 @@ type (
 		Err           string          `json:"err"`            // error text, if any
 		Operation     string          `json:"operation"`      // echoes one of {"list", "clear", "delete", "get"}
 		ResourceInfos []*ResourceInfo `json:"resource_infos"` // list of files and infos
-	}
-
-	// Resource information from the repo.
-	ResourceInfo struct {
-		Id           string `json:"id"` // this is the resourceId
-		File         string `json:"file"`
-		SizeBytes    int64  `json:"size_bytes"`
-		LastModified int64  `json:"last_modified"`
 	}
 
 	// DataMessage returns datapoints from the device across

@@ -32,6 +32,14 @@ var ValidSubdirs = []string{
 // data goes first or by default
 var DefaultSubdir = ValidSubdirs[0]
 
+// Resource information from the repo.
+type ResourceInfo struct {
+	Id           string `json:"id"` // this is the resourceId
+	File         string `json:"file"`
+	SizeBytes    int64  `json:"size_bytes"`
+	LastModified int64  `json:"last_modified"`
+}
+
 // ----------------------------------------------------------------- //
 // Repository
 // ----------------------------------------------------------------- //
@@ -153,12 +161,12 @@ func (r *Repository) Cache(resourceId string) (err error) {
 }
 
 // List will list all the resources in the default subdir.
-func (r *Repository) List() (infos []os.FileInfo, err error) {
+func (r *Repository) List() (infos []*ResourceInfo, err error) {
 	return r.list(DefaultSubdir)
 }
 
 // List will list all the resources in the cache.
-func (r *Repository) ListCache() (infos []os.FileInfo, err error) {
+func (r *Repository) ListCache() (infos []*ResourceInfo, err error) {
 	return r.list("cache")
 }
 
@@ -175,9 +183,14 @@ func (r *Repository) ClearCache() (err error) {
 // ----------------------------------------------------------------- //
 
 // List all the resources in a subdirectory.
-func (r *Repository) list(subdir string) (infos []os.FileInfo, err error) {
+func (r *Repository) list(subdir string) (infos []*ResourceInfo, err error) {
 	err = r.forEach(subdir, func(path string, f os.FileInfo) error {
-		infos = append(infos, f)
+		infos = append(infos, &ResourceInfo{
+			Id:           f.Name(),
+			File:         path,
+			SizeBytes:    f.Size(),
+			LastModified: f.ModTime().Unix(),
+		})
 		return nil
 	})
 	return infos, err
