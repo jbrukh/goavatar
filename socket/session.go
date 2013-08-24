@@ -334,7 +334,9 @@ func (s *SocketSession) ProcessUploadMessage(msgBytes []byte, id string) {
 		return
 	}
 
-	if err := s.device.Repo().Move(resourceId, CloudSubdir); err != nil {
+	// cache the resource id, removing it from the
+	// main repository listing
+	if err := repo.Cache(resourceId); err != nil {
 		r.Err = err.Error()
 	}
 
@@ -441,6 +443,7 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	}
 }
 
+// TODO: deprecate!
 func listFiles(basedir string) ([]*ResourceInfo, error) {
 	infos := make([]*ResourceInfo, 0)
 	err := filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {

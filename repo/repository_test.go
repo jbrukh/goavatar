@@ -33,18 +33,18 @@ func TestNewRepository(t *testing.T) {
 	}
 
 	// check that there are two subdirs
-	if len(subdirSearchPath) != 2 {
-		t.Errorf("should be local and cloud subdirs")
+	if len(ValidSubdirs) != 2 {
+		t.Errorf("should be local and cache subdirs")
 	}
 
 	// check that we can retrieve them
-	subdirs := r.Subdirs()
-	if len(subdirs) != 2 {
+	searchPath := r.SearchPath()
+	if len(searchPath) != 2 {
 		t.Errorf("should be able to get subdirs")
 	}
 
 	// check that they were created
-	for _, subdir := range subdirs {
+	for _, subdir := range searchPath {
 		if _, err := os.Stat(subdir); os.IsNotExist(err) {
 			t.Errorf("did not create subdir")
 		}
@@ -60,14 +60,18 @@ func TestNewResourceId(t *testing.T) {
 	}
 
 	// test a local id
+	var (
+		SubdirLocal = "local"
+		SubdirCache = "cache"
+	)
 	id, fp := r.NewResourceIdWithSubdir(SubdirLocal)
 	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirLocal) || filepath.Base(fp) != id {
 		t.Errorf("something went wrong with id generation")
 	}
 
-	// test cloud id
-	id, fp = r.NewResourceIdWithSubdir(SubdirCloud)
-	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirCloud) || filepath.Base(fp) != id {
+	// test cached id
+	id, fp = r.NewResourceIdWithSubdir(SubdirCache)
+	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirCache) || filepath.Base(fp) != id {
 		t.Errorf("something went wrong with id generation")
 	}
 
@@ -93,12 +97,12 @@ func TestLookup(t *testing.T) {
 	}
 
 	ids := []string{"silly-id", "sillier-id", "silliest-id"}
-	subdirs := r.Subdirs()
+	searchPath := r.SearchPath()
 	testPaths := []string{
-		filepath.Join(subdirs[0], ids[0]),
-		filepath.Join(subdirs[1], ids[1]),
-		filepath.Join(subdirs[0], ids[2]),
-		filepath.Join(subdirs[1], ids[2]),
+		filepath.Join(searchPath[0], ids[0]),
+		filepath.Join(searchPath[1], ids[1]),
+		filepath.Join(searchPath[0], ids[2]),
+		filepath.Join(searchPath[1], ids[2]),
 	}
 
 	// create test resources
@@ -142,12 +146,12 @@ func TestMove(t *testing.T) {
 	}
 
 	ids := []string{"silly-id", "sillier-id", "silliest-id"}
-	subdirs := r.Subdirs()
+	searchPath := r.SearchPath()
 	testPaths := []string{
-		filepath.Join(subdirs[0], ids[0]),
-		filepath.Join(subdirs[1], ids[1]),
-		filepath.Join(subdirs[0], ids[2]),
-		filepath.Join(subdirs[1], ids[2]),
+		filepath.Join(searchPath[0], ids[0]),
+		filepath.Join(searchPath[1], ids[1]),
+		filepath.Join(searchPath[0], ids[2]),
+		filepath.Join(searchPath[1], ids[2]),
 	}
 
 	// create test resources
@@ -167,13 +171,15 @@ func TestMove(t *testing.T) {
 		t.Errorf("could not touch test path")
 	}
 
+	var SubdirCache = "cache"
+
 	// move from local to cloud
-	if err := r.Move(ids[0], SubdirCloud); err != nil || exists(testPaths[0]) {
+	if err := r.move(ids[0], SubdirCache); err != nil || exists(testPaths[0]) {
 		t.Errorf("could not move; err: %v; testPath: %s", err, testPaths[0])
 	}
 
 	// move from cloud to cloud
-	if err := r.Move(ids[1], SubdirCloud); err != nil || !exists(testPaths[1]) {
+	if err := r.move(ids[1], SubdirCache); err != nil || !exists(testPaths[1]) {
 		t.Errorf("could not move to the same dir")
 	}
 }

@@ -8,24 +8,39 @@ import (
 	. "github.com/jbrukh/goavatar/util"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 // ----------------------------------------------------------------- //
 // Constants
 // ----------------------------------------------------------------- //
 
-// subdirectories
-const (
-	SubdirLocal = "local"
-	SubdirCloud = "cloud"
-)
-
 // max number of times to try to
 // generate a resource id on clash
 const maxGenerateRetries = 10
 
-// subdirectory search path
-var subdirSearchPath = []string{SubdirLocal, SubdirCloud}
+// regex for a resourceId
+const resourceRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
+// subdirectories
+var ValidSubdirs = []string{
+	"local",
+	"cache",
+}
+
+// the default subdir, where all
+// data goes first or by default
+var DefaultSubdir = ValidSubdirs[0]
+
+// quick validity test
+func isValidSubdir(subdir string) bool {
+	for _, validSubdir := range ValidSubdirs {
+		if subdir == validSubdir {
+			return true
+		}
+	}
+	return false
+}
 
 // ----------------------------------------------------------------- //
 // Repository
@@ -48,14 +63,17 @@ var subdirSearchPath = []string{SubdirLocal, SubdirCloud}
 
 // An Octopus file repository.
 type Repository struct {
-	basedir string
+	basedir    string
+	searchPath []string
 }
 
 // Create a new Repository. Will return an error
 // if all the requisite directories could not be
 // created.
 func NewRepository(basedir string) (r *Repository, err error) {
-	r = &Repository{basedir}
+	r = &Repository{
+		basedir: basedir,
+	}
 
 	// create the base directory
 	if err = os.MkdirAll(basedir, 0755); err != nil {
@@ -63,11 +81,12 @@ func NewRepository(basedir string) (r *Repository, err error) {
 	}
 
 	// create all the subdirs
-	for _, subdir := range subdirSearchPath {
-		fullPath := filepath.Join(basedir, subdir)
-		if err = os.MkdirAll(fullPath, 0755); err != nil {
+	for _, subdir := range ValidSubdirs {
+		subdirPath := r.subdirPath(subdir)
+		if err = os.MkdirAll(subdirPath, 0755); err != nil {
 			return nil, err
 		}
+		r.searchPath = append(r.searchPath, subdirPath)
 	}
 
 	// ok!
@@ -83,23 +102,33 @@ func NewRepositoryOrPanic(basedir string) *Repository {
 	return r
 }
 
+// Returns the full path of a subdir.
+func (r *Repository) subdirPath(subdir string) string {
+	if !isValidSubdir(subdir) {
+		panic(fmt.Sprintf("bad subdir: %s", subdir))
+	}
+	return filepath.Join(r.basedir, subdir)
+}
+
+// Returns the full path of a resource id, given the subdir.
+func (r *Repository) resourcePath(subdir, resourceId string) string {
+	return filepath.Join(r.subdirPath(subdir), resourceId)
+}
+
 // Return the base directory of the repository.
 func (r *Repository) Basedir() string {
 	return r.basedir
 }
 
-// Return all known subdirs of this repository.
-func (r *Repository) Subdirs() (subdirs []string) {
-	for _, subdir := range subdirSearchPath {
-		fullPath := filepath.Join(r.basedir, subdir)
-		subdirs = append(subdirs, fullPath)
-	}
-	return
+// Return all directories on the search path of
+// of this repository.
+func (r *Repository) SearchPath() (searchPath []string) {
+	return r.searchPath
 }
 
 // Generate a new default id.
 func (r *Repository) NewResourceId() (resourceId, resourcePath string) {
-	return r.NewResourceIdWithSubdir(SubdirLocal)
+	return r.NewResourceIdWithSubdir(DefaultSubdir)
 }
 
 // Generate a new id within a specified subdir.
@@ -115,7 +144,7 @@ func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourc
 	for i := 1; i <= maxGenerateRetries; i++ {
 		// try to generate the id
 		id, _ = Uuid()
-		fp = filepath.Join(r.basedir, subdir, id)
+		fp = r.resourcePath(subdir, id)
 
 		// check for clash
 		_, err := os.Stat(fp)
@@ -132,8 +161,8 @@ func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourc
 // Look up a resource by its resource id. The search path
 // will be checked.
 func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) {
-	for _, subdir := range r.Subdirs() {
-		fp := filepath.Join(subdir, resourceId)
+	for _, subdir := range ValidSubdirs {
+		fp := r.resourcePath(subdir, resourceId)
 		if _, err = os.Stat(fp); err == nil {
 			return fp, nil
 		}
@@ -142,24 +171,45 @@ func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) 
 }
 
 // Cache a resource in a particular subdirectory
-func (r *Repository) Move(resourceId, subdir string) (err error) {
-	if !isValidSubdir(subdir) {
-		return fmt.Errorf("bad subdir: %v", subdir)
-	}
-
-	fp, err := r.Lookup(resourceId)
+func (r *Repository) move(resourceId, subdir string) (err error) {
+	pth, err := r.Lookup(resourceId)
 	if err != nil {
 		return err
 	}
 
-	newFp := filepath.Join(r.basedir, subdir, resourceId)
-	if err := os.Rename(fp, newFp); err != nil {
+	newPath := r.resourcePath(subdir, resourceId)
+	if newPath == pth {
+		return
+	}
+
+	// do the renaming
+	if err := os.Rename(pth, newPath); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func isValidSubdir(subdir string) bool {
-	return subdir == SubdirLocal || subdir == SubdirCloud
+// List all the resources in a subdirectory.
+func (r *Repository) list(subdir string) (infos []os.FileInfo, err error) {
+	root := r.subdirPath(subdir)
+	err = filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		doesMatch, err := regexp.MatchString(resourceRegex, f.Name())
+		if err != nil {
+			return err
+		}
+		if !f.IsDir() && doesMatch {
+			infos = append(infos, f)
+		}
+		return nil
+	})
+	return infos, err
+}
+
+// Move a file into the cache subdir for backup.
+func (r *Repository) Cache(resourceId string) (err error) {
+	return r.move(resourceId, "cache")
 }
