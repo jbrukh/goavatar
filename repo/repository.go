@@ -74,6 +74,7 @@ func NewRepository(basedir string) (r *Repository, err error) {
 	return
 }
 
+// Create a new repository or panic.
 func NewRepositoryOrPanic(basedir string) *Repository {
 	r, err := NewRepository(basedir)
 	if err != nil {
@@ -142,7 +143,7 @@ func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) 
 
 // Cache a resource in a particular subdirectory
 func (r *Repository) Move(resourceId, subdir string) (err error) {
-	if subdir != SubdirLocal && subdir != SubdirCloud {
+	if !isValidSubdir(subdir) {
 		return fmt.Errorf("bad subdir: %v", subdir)
 	}
 
@@ -157,4 +158,8 @@ func (r *Repository) Move(resourceId, subdir string) (err error) {
 	}
 
 	return nil
+}
+
+func isValidSubdir(subdir string) bool {
+	return subdir == SubdirLocal || subdir == SubdirCloud
 }
