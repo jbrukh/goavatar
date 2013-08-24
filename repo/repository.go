@@ -30,7 +30,10 @@ var ValidSubdirs = []string{
 
 // the default subdir, where all
 // data goes first or by default
-var DefaultSubdir = ValidSubdirs[0]
+var (
+	SubdirDefault = ValidSubdirs[0]
+	SubdirCache   = ValidSubdirs[1]
+)
 
 // Resource information from the repo.
 type ResourceInfo struct {
@@ -113,7 +116,7 @@ func (r *Repository) SearchPath() (searchPath []string) {
 
 // Generate a new default id.
 func (r *Repository) NewResourceId() (resourceId, resourcePath string) {
-	return r.NewResourceIdWithSubdir(DefaultSubdir)
+	return r.NewResourceIdWithSubdir(SubdirDefault)
 }
 
 // Generate a new id within a specified subdir.
@@ -148,11 +151,11 @@ func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourc
 func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) {
 	isValid, err := regexp.MatchString(resourceRegex, resourceId)
 	if err != nil {
-		return
+		return "", err
 	}
 
 	if !isValid {
-		return "", fmt.Errof("not a valid resourceId: %v", resourceId)
+		return "", fmt.Errorf("not a valid resourceId: %v", resourceId)
 	}
 
 	for _, subdir := range ValidSubdirs {
@@ -166,25 +169,25 @@ func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) 
 
 // Move a file into the cache subdir for backup.
 func (r *Repository) Cache(resourceId string) (err error) {
-	return r.move(resourceId, "cache")
+	return r.move(resourceId, SubdirCache)
 }
 
 // List will list all the resources in the default subdir.
 func (r *Repository) List() (infos []*ResourceInfo, err error) {
-	return r.list(DefaultSubdir)
+	return r.list(SubdirDefault)
 }
 
 // List will list all the resources in the cache.
 func (r *Repository) ListCache() (infos []*ResourceInfo, err error) {
-	return r.list("cache")
+	return r.list(SubdirCache)
 }
 
 func (r *Repository) Clear() (err error) {
-	return r.clear(DefaultSubdir)
+	return r.clear(SubdirDefault)
 }
 
 func (r *Repository) ClearCache() (err error) {
-	return r.clear("cache")
+	return r.clear(SubdirCache)
 }
 
 // ----------------------------------------------------------------- //

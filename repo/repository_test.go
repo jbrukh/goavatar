@@ -59,13 +59,8 @@ func TestNewResourceId(t *testing.T) {
 		t.Errorf("could not create the directories")
 	}
 
-	// test a local id
-	var (
-		SubdirLocal = "local"
-		SubdirCache = "cache"
-	)
-	id, fp := r.NewResourceIdWithSubdir(SubdirLocal)
-	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirLocal) || filepath.Base(fp) != id {
+	id, fp := r.NewResourceIdWithSubdir(SubdirDefault)
+	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirDefault) || filepath.Base(fp) != id {
 		t.Errorf("something went wrong with id generation")
 	}
 
@@ -77,7 +72,7 @@ func TestNewResourceId(t *testing.T) {
 
 	// test a local id
 	id, fp = r.NewResourceId()
-	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirLocal) || filepath.Base(fp) != id {
+	if id == "" || filepath.Dir(fp) != filepath.Join(r.basedir, SubdirDefault) || filepath.Base(fp) != id {
 		t.Errorf("something went wrong with id generation")
 	}
 
@@ -96,7 +91,15 @@ func TestLookup(t *testing.T) {
 		t.Errorf("could not create the directories")
 	}
 
-	ids := []string{"silly-id", "sillier-id", "silliest-id"}
+	// clear past testing data
+	r.clear(SubdirDefault)
+	r.clear(SubdirCache)
+
+	ids := []string{
+		"30dbbd1d-6426-baaf-9eab-29ad6e6740fc",
+		"37b221be-753b-9bfc-52aa-8c1aade21399",
+		"3ef4019c-b6f8-e44d-25f3-907240f52978",
+	}
 	searchPath := r.SearchPath()
 	testPaths := []string{
 		filepath.Join(searchPath[0], ids[0]),
@@ -128,7 +131,7 @@ func TestLookup(t *testing.T) {
 	}
 
 	if fp, err := r.Lookup(ids[1]); err != nil || fp != testPaths[1] {
-		t.Errorf("bad lookup")
+		t.Errorf("bad lookup: %v fp: %v testPath: %v", err, fp, testPaths[1])
 	}
 
 	if fp, err := r.Lookup(ids[2]); err != nil || fp != testPaths[2] {
@@ -145,7 +148,15 @@ func TestMove(t *testing.T) {
 		t.Errorf("could not create the directories")
 	}
 
-	ids := []string{"silly-id", "sillier-id", "silliest-id"}
+	// clear past testing data
+	r.clear(SubdirDefault)
+	r.clear(SubdirCache)
+
+	ids := []string{
+		"30dbbd1d-6426-baaf-9eab-29ad6e6740fc",
+		"37b221be-753b-9bfc-52aa-8c1aade21399",
+		"3ef4019c-b6f8-e44d-25f3-907240f52978",
+	}
 	searchPath := r.SearchPath()
 	testPaths := []string{
 		filepath.Join(searchPath[0], ids[0]),
@@ -192,23 +203,26 @@ func TestListing(t *testing.T) {
 		t.Errorf("could not create the directories")
 	}
 
+	// clear past testing data
+	r.clear(SubdirDefault)
+	r.clear(SubdirCache)
+
 	ids := []string{
 		"30dbbd1d-6426-baaf-9eab-29ad6e6740fc",
 		"37b221be-753b-9bfc-52aa-8c1aade21399",
 		"3ef4019c-b6f8-e44d-25f3-907240f52978",
 	}
-	subdir := "local"
 	fakeDir := "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
 
 	// create the test files
 	for _, id := range ids {
-		if err := touchFile(r.resourcePath(subdir, id)); err != nil {
+		if err := touchFile(r.resourcePath(SubdirDefault, id)); err != nil {
 			t.Errorf("could not touch test path")
 		}
 	}
 
 	var checkListing = func() {
-		infos, err := r.list(subdir)
+		infos, err := r.list(SubdirDefault)
 		if err != nil {
 			t.Errorf("could not get listing")
 		}
@@ -220,16 +234,35 @@ func TestListing(t *testing.T) {
 	checkListing()
 
 	// now add an invalid id, which will be ignored
-	if err := touchFile(r.resourcePath(subdir, "not-valid-id")); err != nil {
+	if err := touchFile(r.resourcePath(SubdirDefault, "not-valid-id")); err != nil {
 		t.Errorf("could not touch test path")
 	}
 	checkListing()
 
 	// now add a directory in there
-	if err := os.MkdirAll(r.resourcePath(subdir, fakeDir), 0755); err != nil {
+	if err := os.MkdirAll(r.resourcePath(SubdirDefault, fakeDir), 0755); err != nil {
 		t.Errorf("could not create directory: %v", err)
 	}
 	checkListing()
+}
+
+func TestInvalidId(t *testing.T) {
+	resourceId := "invalid-id"
+	r, err := NewRepository(testBaseDir)
+
+	// something wrong with constructor
+	if err != nil {
+		t.Errorf("could not create the directories")
+	}
+
+	// create a file with invalid id
+	if err := touchFile(r.resourcePath(SubdirDefault, resourceId)); err != nil {
+		t.Errorf("could not touch test path")
+	}
+
+	if _, err := r.Lookup(resourceId); err == nil {
+		t.Errorf("should have validated id: %v", resourceId)
+	}
 }
 
 func touchFile(file string) error {
