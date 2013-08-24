@@ -18,20 +18,7 @@ import (
 
 //---------------------------------------------------------//
 // Constants
-//-------------------------------------------------------
-
-var (
-	LocalSubdir = "local"
-	CloudSubdir = "cloud"
-)
-
-var CloudParameters = map[string]string{
-	"subdir": CloudSubdir,
-}
-
-var LocalParameters = map[string]string{
-	"subdir": LocalSubdir,
-}
+//---------------------------------------------------------//
 
 // SocketSession encapsulates all of the
 // business logic of sending and receiving
