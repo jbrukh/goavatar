@@ -216,16 +216,17 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 				ar.MessageType = "record"
 				ar.Id = msg.Id
 				ar.Success = false
-				ar.Milliseconds = msg.Milliseconds
 
-				// TODO: fix this!!!!
-				outFile, err := s.recorder.Wait()
+				info, err := s.recorder.Wait()
 				if err != nil {
 					log.Printf("error during fixed-time recording: %v", err)
 					ar.Err = err.Error()
+				} else {
+					ar.Success = true
 				}
-				ar.Success = true
-				ar.ResourceId = outFile
+
+				ar.ResourceId = info.ResourceId
+				ar.Milliseconds = int(info.DurationMs)
 				Send(s.conn, ar)
 			}()
 		}
@@ -245,10 +246,11 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 			// don't send a response in this case
 			shouldRespond = false
 		} else {
-			outFile, err := s.recorder.Stop()
+			info, err := s.recorder.Stop()
 			if err == nil {
 				r.Success = true
-				r.ResourceId = outFile
+				r.ResourceId = info.ResourceId
+				r.Milliseconds = int(info.DurationMs)
 			}
 		}
 		return

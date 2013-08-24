@@ -27,6 +27,7 @@ type OBFRecorder struct {
 	sampleRate int
 	buf        bytes.Buffer
 	tsFirst    int64
+	tsLast     uint32
 	fc         int               // frame count
 	params     map[string]string // recording parameters
 }
@@ -46,6 +47,7 @@ func (r *OBFRecorder) Init(params map[string]string) error {
 	r.samples = 0
 	r.sampleRate = 0
 	r.tsFirst = 0
+	r.tsLast = 0
 	r.fc = 0
 	r.buf = bytes.Buffer{}
 	r.params = params
@@ -71,7 +73,12 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 			r.channels = b.Channels()
 		}
 	}
-	r.samples += df.Buffer().Samples()
+	buf := df.Buffer()
+	samples := buf.Samples()
+	r.samples += samples
+
+	// get the last timestamp
+	r.tsLast = r.tsTransform(buf.Timestamps()[samples-1])
 
 	// write the frame, or send back an error
 	// we are using synchronization to protect the buffer
@@ -82,6 +89,10 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 
 func (r *OBFRecorder) Stop() (id string, err error) {
 	return r.commit()
+}
+
+func (r *OBFRecorder) Stats() (ms uint32) {
+	return r.tsLast
 }
 
 func (r *OBFRecorder) commit() (id string, err error) {

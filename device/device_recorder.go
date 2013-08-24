@@ -20,6 +20,15 @@ type Recorder interface {
 	Init(params map[string]string) error
 	RecordFrame(DataFrame) error
 	Stop() (id string, err error)
+
+	// return the recording length, since
+	// the last time Init() was called
+	Stats() (ms uint32)
+}
+
+type RecordingInfo struct {
+	ResourceId string
+	DurationMs uint32
 }
 
 // DeviceRecorder -- a thread-safe recorder that
@@ -161,14 +170,14 @@ func nextFrame(df DataFrame, max, count, samples int) (DataFrame, bool) {
 // device is recording indefinitely and this method is called
 // followed by Stop(), then recording will stop, this method will
 // succeed, but the Stop() call will fail with an error.
-func (d *DeviceRecorder) Wait() (id string, err error) {
+func (d *DeviceRecorder) Wait() (info *RecordingInfo, err error) {
 	// you can only wait on recording
 	// devices
 	d.Lock()
 	recording := d.recording
 	d.Unlock()
 	if !recording {
-		return "", fmt.Errorf("not recording")
+		return nil, fmt.Errorf("not recording")
 	}
 
 	// wait for the worker
@@ -183,8 +192,19 @@ func (d *DeviceRecorder) Wait() (id string, err error) {
 	defer d.Unlock()
 
 	// stop
-	return d.r.Stop()
+	id, err := d.r.Stop()
+	if err != nil {
+		return nil, err
+	}
 
+	// get the recording duration
+	// from the last timestamp
+	ms := d.r.Stats()
+
+	return &RecordingInfo{
+		ResourceId: id,
+		DurationMs: ms,
+	}, nil
 }
 
 // Release the worker.
@@ -195,7 +215,7 @@ func (d *DeviceRecorder) Release() {
 // Stop will stop recording and return the details of the
 // recorder file. If the device is not recording, then this
 // operation will fail.
-func (d *DeviceRecorder) Stop() (id string, err error) {
+func (d *DeviceRecorder) Stop() (info *RecordingInfo, err error) {
 	// this will cause the worker to exit on the next iteration
 	d.Release()
 	return d.Wait()
