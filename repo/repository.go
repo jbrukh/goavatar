@@ -146,6 +146,15 @@ func (r *Repository) NewResourceIdWithSubdir(subdir string) (resourceId, resourc
 // Look up a resource by its resource id. The search path
 // will be checked.
 func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) {
+	isValid, err := regexp.MatchString(resourceRegex, resourceId)
+	if err != nil {
+		return
+	}
+
+	if !isValid {
+		return "", fmt.Errof("not a valid resourceId: %v", resourceId)
+	}
+
 	for _, subdir := range ValidSubdirs {
 		fp := r.resourcePath(subdir, resourceId)
 		if _, err = os.Stat(fp); err == nil {
