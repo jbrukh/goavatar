@@ -32,16 +32,6 @@ var ValidSubdirs = []string{
 // data goes first or by default
 var DefaultSubdir = ValidSubdirs[0]
 
-// quick validity test
-func isValidSubdir(subdir string) bool {
-	for _, validSubdir := range ValidSubdirs {
-		if subdir == validSubdir {
-			return true
-		}
-	}
-	return false
-}
-
 // ----------------------------------------------------------------- //
 // Repository
 // ----------------------------------------------------------------- //
@@ -102,19 +92,6 @@ func NewRepositoryOrPanic(basedir string) *Repository {
 	return r
 }
 
-// Returns the full path of a subdir.
-func (r *Repository) subdirPath(subdir string) string {
-	if !isValidSubdir(subdir) {
-		panic(fmt.Sprintf("bad subdir: %s", subdir))
-	}
-	return filepath.Join(r.basedir, subdir)
-}
-
-// Returns the full path of a resource id, given the subdir.
-func (r *Repository) resourcePath(subdir, resourceId string) string {
-	return filepath.Join(r.subdirPath(subdir), resourceId)
-}
-
 // Return the base directory of the repository.
 func (r *Repository) Basedir() string {
 	return r.basedir
@@ -170,6 +147,34 @@ func (r *Repository) Lookup(resourceId string) (resourcePath string, err error) 
 	return "", fmt.Errorf("no such resource in search path: %v", resourceId)
 }
 
+// Move a file into the cache subdir for backup.
+func (r *Repository) Cache(resourceId string) (err error) {
+	return r.move(resourceId, "cache")
+}
+
+// List will list all the resources in the default subdir.
+func (r *Repository) List() (infos []os.FileInfo, err error) {
+	return r.list(DefaultSubdir)
+}
+
+// List will list all the resources in the cache.
+func (r *Repository) ListCache() (infos []os.FileInfo, err error) {
+	return r.list("cache")
+}
+
+// ----------------------------------------------------------------- //
+// Private Repo Operations
+// ----------------------------------------------------------------- //
+
+// List all the resources in a subdirectory.
+func (r *Repository) list(subdir string) (infos []os.FileInfo, err error) {
+	err = r.forEach(subdir, func(path string, f os.FileInfo) error {
+		infos = append(infos, f)
+		return nil
+	})
+	return infos, err
+}
+
 // Cache a resource in a particular subdirectory
 func (r *Repository) move(resourceId, subdir string) (err error) {
 	pth, err := r.Lookup(resourceId)
@@ -190,26 +195,65 @@ func (r *Repository) move(resourceId, subdir string) (err error) {
 	return nil
 }
 
-// List all the resources in a subdirectory.
-func (r *Repository) list(subdir string) (infos []os.FileInfo, err error) {
+// func (r *Repository) clear(subdir string) (err error) {
+// 	root := r.subdirPath(subdir)
+// 	return filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
+// 		if err != nil {
+// 			return err
+// 		}
+// 		if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
+// 			if err := os.RemoveAll(path); err != nil {
+// 				log.Printf("could not remove file: %v", err)
+// 			}
+// 			log.Printf("DELETE\t%s", path)
+// 		}
+// 		return nil
+// 	})
+// }
+
+// Perform an operation for each resource in a subdir.
+func (r *Repository) forEach(subdir string, op func(path string, f os.FileInfo) error) (err error) {
 	root := r.subdirPath(subdir)
 	err = filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		doesMatch, err := regexp.MatchString(resourceRegex, f.Name())
-		if err != nil {
-			return err
-		}
-		if !f.IsDir() && doesMatch {
-			infos = append(infos, f)
+		if !f.IsDir() {
+			doesMatch, err := regexp.MatchString(resourceRegex, f.Name())
+			if err == nil && doesMatch {
+				if ferr := op(path, f); ferr != nil {
+					return ferr
+				}
+			}
 		}
 		return nil
 	})
-	return infos, err
+	return err
 }
 
-// Move a file into the cache subdir for backup.
-func (r *Repository) Cache(resourceId string) (err error) {
-	return r.move(resourceId, "cache")
+// ----------------------------------------------------------------- //
+// Private Methods
+// ----------------------------------------------------------------- //
+
+// quick validity test
+func isValidSubdir(subdir string) bool {
+	for _, validSubdir := range ValidSubdirs {
+		if subdir == validSubdir {
+			return true
+		}
+	}
+	return false
+}
+
+// Returns the full path of a subdir.
+func (r *Repository) subdirPath(subdir string) string {
+	if !isValidSubdir(subdir) {
+		panic(fmt.Sprintf("bad subdir: %s", subdir))
+	}
+	return filepath.Join(r.basedir, subdir)
+}
+
+// Returns the full path of a resource id, given the subdir.
+func (r *Repository) resourcePath(subdir, resourceId string) string {
+	return filepath.Join(r.subdirPath(subdir), resourceId)
 }
