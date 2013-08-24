@@ -184,6 +184,54 @@ func TestMove(t *testing.T) {
 	}
 }
 
+func TestListing(t *testing.T) {
+	r, err := NewRepository(testBaseDir)
+
+	// something wrong with constructor
+	if err != nil {
+		t.Errorf("could not create the directories")
+	}
+
+	ids := []string{
+		"30dbbd1d-6426-baaf-9eab-29ad6e6740fc",
+		"37b221be-753b-9bfc-52aa-8c1aade21399",
+		"3ef4019c-b6f8-e44d-25f3-907240f52978",
+	}
+	subdir := "local"
+	fakeDir := "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+
+	// create the test files
+	for _, id := range ids {
+		if err := touchFile(r.resourcePath(subdir, id)); err != nil {
+			t.Errorf("could not touch test path")
+		}
+	}
+
+	var checkListing = func() {
+		infos, err := r.list(subdir)
+		if err != nil {
+			t.Errorf("could not get listing")
+		}
+
+		if len(infos) != len(ids) {
+			t.Errorf("wrong number of files in listing: %v", len(infos))
+		}
+	}
+	checkListing()
+
+	// now add an invalid id, which will be ignored
+	if err := touchFile(r.resourcePath(subdir, "not-valid-id")); err != nil {
+		t.Errorf("could not touch test path")
+	}
+	checkListing()
+
+	// now add a directory in there
+	if err := os.MkdirAll(r.resourcePath(subdir, fakeDir), 0755); err != nil {
+		t.Errorf("could not create directory: %v", err)
+	}
+	checkListing()
+}
+
 func touchFile(file string) error {
 	_, err := os.OpenFile(file, os.O_CREATE, 0644)
 	return err
