@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-var unitTestParams = map[string]string{"subdir": "local"}
-
 func TestRecord(t *testing.T) {
 	d := newEmptyDevice()
 	if err := d.Engage(); err != nil || !d.Engaged() {
@@ -21,7 +19,7 @@ func TestRecord(t *testing.T) {
 
 	r := NewDeviceRecorder(d, NewOBFRecorder(d.Repo()))
 
-	err := r.RecordAsync(unitTestParams)
+	err := r.RecordAsync()
 	if err != nil {
 		t.Fatalf("failed to record")
 	}
@@ -49,7 +47,7 @@ func TestRecord__MaxSamples(t *testing.T) {
 
 	r := NewDeviceRecorder(d, NewOBFRecorder(d.Repo()))
 	r.SetMax(2)
-	err := r.RecordAsync(unitTestParams)
+	err := r.RecordAsync()
 	if err != nil {
 		t.Fatalf("failed to record")
 	}
@@ -83,7 +81,7 @@ func TestRecord__WaitFail(t *testing.T) {
 		t.Errorf("should have failed")
 	}
 
-	err := r.RecordAsync(unitTestParams)
+	err := r.RecordAsync()
 	if err != nil {
 		t.Fatalf("failed to record")
 	}

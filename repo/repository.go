@@ -162,6 +162,14 @@ func (r *Repository) ListCache() (infos []os.FileInfo, err error) {
 	return r.list("cache")
 }
 
+func (r *Repository) Clear() (err error) {
+	return r.clear(DefaultSubdir)
+}
+
+func (r *Repository) ClearCache() (err error) {
+	return r.clear("cache")
+}
+
 // ----------------------------------------------------------------- //
 // Private Repo Operations
 // ----------------------------------------------------------------- //
@@ -199,7 +207,7 @@ func (r *Repository) move(resourceId, subdir string) (err error) {
 func (r *Repository) clear(subdir string) (err error) {
 	return r.forEach(subdir, func(path string, f os.FileInfo) error {
 		if err := os.RemoveAll(path); err != nil {
-			fmt.Fprint(os.Stderr, "failed to remove the file: %v (err: %v)", path, err)
+			fmt.Fprintf(os.Stderr, "failed to remove the file: %v (err: %v)", path, err)
 		}
 		return nil
 	})

@@ -42,7 +42,7 @@ func NewOBFRecorder(repo *Repository) *OBFRecorder {
 	}
 }
 
-func (r *OBFRecorder) Init(params map[string]string) error {
+func (r *OBFRecorder) Init() error {
 	r.channels = 0
 	r.samples = 0
 	r.sampleRate = 0
@@ -50,7 +50,6 @@ func (r *OBFRecorder) Init(params map[string]string) error {
 	r.tsLast = 0
 	r.fc = 0
 	r.buf = bytes.Buffer{}
-	r.params = params
 	return nil
 }
 
@@ -98,7 +97,7 @@ func (r *OBFRecorder) Stats() (ms uint32) {
 func (r *OBFRecorder) commit() (id string, err error) {
 	// get the file name
 	// TODO: get rid of the subdir parameter
-	_, r.fileName = r.repo.NewResourceIdWithSubdir(r.params["subdir"])
+	_, r.fileName = r.repo.NewResourceId()
 	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
 
 	// make sure the directory exists

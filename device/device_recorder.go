@@ -17,7 +17,7 @@ const RecorderName = "recorder"
 // given order: Init, RecordFrame (multiple times),
 // and finally stop.
 type Recorder interface {
-	Init(params map[string]string) error
+	Init() error
 	RecordFrame(DataFrame) error
 	Stop() (id string, err error)
 
@@ -84,7 +84,7 @@ func (d *DeviceRecorder) RecordingTimed() bool {
 // cannot be subscribed to. If the subscription is closed (for
 // instance, if the device is turned off) then the
 // asynchronous worker will exit.
-func (d *DeviceRecorder) RecordAsync(params map[string]string) (err error) {
+func (d *DeviceRecorder) RecordAsync() (err error) {
 	d.Lock()
 	defer d.Unlock()
 
@@ -100,7 +100,7 @@ func (d *DeviceRecorder) RecordAsync(params map[string]string) (err error) {
 	}
 
 	// initialize the underlying recorder
-	err = d.r.Init(params)
+	err = d.r.Init()
 	if err != nil {
 		return
 	}

@@ -170,11 +170,11 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 	r.Id = msg.Id
 	r.Success = false
 	r.PairingId = s.pairingId
-	shouldRespond := true
+	suppress := false
 
 	// by default, send the response
 	defer func() {
-		if shouldRespond {
+		if !suppress {
 			Send(s.conn, r)
 		}
 	}()
@@ -220,7 +220,7 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 
 		// kick off the recording, always going to
 		// the local directory
-		err = s.recorder.RecordAsync(LocalParameters)
+		err = s.recorder.RecordAsync()
 		if err != nil {
 			r.Err = err.Error()
 			return
@@ -231,7 +231,7 @@ func (s *SocketSession) ProcessRecordMessage(msgBytes []byte, id string) {
 		if s.recorder.RecordingTimed() {
 			s.recorder.Release()
 			// don't send a response in this case
-			shouldRespond = false
+			suppress = true
 		} else {
 			info, err := s.recorder.Stop()
 			if err == nil {
@@ -353,8 +353,7 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 	r.Success = false
 	r.Operation = msg.Operation
 
-	// TODO: this is a temporary hack
-	// to suppress the sending of JSON
+	// uppress the sending of JSON, particularly
 	// responses for "get" operations
 	suppress := false
 	defer func() {
@@ -363,17 +362,14 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 		}
 	}()
 
-	// determine subdir
-	var subdir = CloudSubdir
-	if msg.Local {
-		subdir = LocalSubdir
-	}
+	// the repository we're operating on
+	repo := s.device.Repo()
 
 	switch msg.Operation {
 	// list the files in the repo (always local)
 	case "list":
 		// TODO: deprecate this with repo list
-		basedir := filepath.Join(s.device.Repo().Basedir(), LocalSubdir)
+		basedir := filepath.Join(repo.Basedir(), "local")
 		if infos, err := listFiles(basedir); err != nil {
 			r.Err = err.Error()
 			return
@@ -382,40 +378,45 @@ func (s *SocketSession) ProcessRepositoryMessage(msgBytes []byte, id string) {
 			r.Success = true
 			return
 		}
-	// clear a specific file
+	// clear the repository
 	case "clear":
-		// TODO: deprecate this with repo clear
-		basedir := filepath.Join(s.device.Repo().Basedir(), subdir)
-		if err := removeFiles(basedir); err != nil {
+		log.Printf("CLEAR REPO")
+		if err := repo.Clear(); err != nil {
 			r.Err = err.Error()
 			return
-		} else {
-			r.Success = true
-			return
 		}
+		r.Success = true
+		return
 	// delete a specific file
 	case "delete":
-		// TODO: deprecate this with repo delete
 		if msg.ResourceId == "" {
-			r.Err = "You must specify a valid resource id"
+			r.Err = "You must specify a resourceId!"
 			return
 		}
-		basedir := filepath.Join(s.device.Repo().Basedir(), subdir)
-		if err := removeFile(basedir, msg.ResourceId); err != nil {
+		log.Printf("CACHE %v\n", msg.ResourceId)
+
+		// cache it!
+		if err := repo.Cache(msg.ResourceId); err != nil {
 			r.Err = err.Error()
 			return
-		} else {
-			r.Success = true
-			return
 		}
+		r.Success = true
+		return
 	case "get":
 		if msg.ResourceId == "" {
 			r.Err = "You must specify a valid resource id"
 			return
 		}
-		// TODO: deprecate this with repo get
-		basedir := filepath.Join(s.device.Repo().Basedir(), subdir)
-		if err := sendFile(s.conn, basedir, msg.ResourceId, msg.Id); err != nil {
+
+		// look up the file
+		path, err := repo.Lookup(msg.ResourceId)
+		if err != nil {
+			r.Err = err.Error()
+			return
+		}
+
+		// send it
+		if err := sendFile(s.conn, path, msg.Id); err != nil {
 			r.Err = err.Error()
 			return
 		} else {
@@ -452,33 +453,11 @@ func listFiles(basedir string) ([]*ResourceInfo, error) {
 	return infos, err
 }
 
-func removeFiles(basedir string) error {
-	return filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !f.IsDir() && !strings.HasPrefix(filepath.Base(path), ".") {
-			if err := os.RemoveAll(path); err != nil {
-				log.Printf("could not remove file: %v", err)
-			}
-			log.Printf("DELETE\t%s", path)
-		}
-		return nil
-	})
-}
-
-func removeFile(basedir, resourceId string) error {
-	target := filepath.Join(basedir, resourceId)
-	log.Printf("DELETE\t%s", target)
-	return os.Remove(target)
-}
-
-func sendFile(conn *websocket.Conn, basedir, resourceId, correlationId string) error {
-	target := filepath.Join(basedir, resourceId)
+func sendFile(conn *websocket.Conn, path, correlationId string) error {
 	id, err := strconv.ParseInt(correlationId, 10, 32)
 	if err != nil {
 		return err
 	}
-	log.Printf("SEND\t%s", target)
-	return SendFile(conn, target, int32(id))
+	log.Printf("SEND\t%s", path)
+	return SendFile(conn, path, int32(id))
 }
