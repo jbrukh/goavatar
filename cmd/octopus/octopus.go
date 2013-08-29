@@ -18,7 +18,7 @@ func init() {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		for _ = range c {
-			log.Printf("Terminating the Octopus Server (SIGTERM)...\n")
+			log.Printf("Terminating the Octopus Server (SIGINT)...\n")
 			os.Exit(0)
 		}
 	}()
