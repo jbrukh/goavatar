@@ -61,7 +61,7 @@ func main() {
 		fmt.Println(preludeFmt)
 	}
 
-	codec, err := NewOBFReader(file)
+	codec, err := NewObfReader(file)
 	if err != nil {
 		fmt.Printf("could not read the header")
 		return
@@ -118,7 +118,7 @@ func main() {
 	}
 }
 
-func printParallel(codec OBFReader) {
+func printParallel(codec ObfReader) {
 	var (
 		header  = codec.Header()
 		ch      = int(header.Channels)

@@ -163,13 +163,13 @@ type (
 		header OBFHeader
 	}
 
-	OBFReader interface {
+	ObfReader interface {
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
 		Sequential() ([][]float64, []int64, error)
 	}
 
-	OBFWriter interface {
+	ObfWriter interface {
 		SeekHeader() error
 		SeekValues() error
 		SeekParallel() error
@@ -183,7 +183,7 @@ type (
 
 // Create a new OBFReader and read the header. If the header
 // cannot be read an error is returned.
-func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
+func NewObfReader(file io.ReadWriteSeeker) (r ObfReader, err error) {
 	oc := &obfCodec{file: file}
 	if err = oc.ReadHeader(); err != nil {
 		return
