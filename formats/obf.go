@@ -155,6 +155,14 @@ type (
 		payloadSize int64
 	}
 
+	// obfReaderCodec will perform reading operations
+	// without making use of Seek(), so it can be
+	// used on in-memory io.Readers
+	obfReaderCodec struct {
+		r      io.Reader
+		header OBFHeader
+	}
+
 	OBFReader interface {
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
@@ -173,15 +181,10 @@ type (
 	}
 )
 
-// Create a new obfCodec.
-func newObfCodec(file io.ReadWriteSeeker) (oc *obfCodec) {
-	return &obfCodec{file: file}
-}
-
 // Create a new OBFReader and read the header. If the header
 // cannot be read an error is returned.
 func NewOBFReader(file io.ReadWriteSeeker) (r OBFReader, err error) {
-	oc := newObfCodec(file)
+	oc := &obfCodec{file: file}
 	if err = oc.ReadHeader(); err != nil {
 		return
 	}

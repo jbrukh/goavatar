@@ -109,7 +109,7 @@ func testWithCodec(t *testing.T, tf func(t *testing.T, oc *obfCodec)) {
 		t.Errorf("could not create mock file: %v", err)
 	}
 	defer f.Close()
-	oc := newObfCodec(f)
+	oc := &obfCodec{file: f}
 	tf(t, oc)
 }
 
@@ -222,7 +222,7 @@ func Test__MarshallUnmarshall(t *testing.T) {
 		t.Fatalf("could not open test file: %v", fn)
 	}
 	defer file.Close()
-	oc := newObfCodec(file)
+	oc := &obfCodec{file: file}
 
 	pb, err := oc.Parallel()
 	if err != nil {

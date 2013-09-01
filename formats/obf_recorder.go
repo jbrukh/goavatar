@@ -118,7 +118,7 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	}()
 
 	// get the codec
-	r.codec = newObfCodec(r.file)
+	r.codec = &obfCodec{file: r.file}
 
 	// write the header
 	header := &OBFHeader{
