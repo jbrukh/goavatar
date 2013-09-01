@@ -151,34 +151,6 @@ func Test__SeekHeader(t *testing.T) {
 	})
 }
 
-func Test__SeekValues(t *testing.T) {
-	var err error
-	testWithCodec(t, func(t *testing.T, oc *obfCodec) {
-		// seek back to the values
-		if err = oc.SeekValues(); err != nil {
-			t.Errorf("could not seek to the values")
-		}
-
-		// check that the values are expected
-		v, ts, err := oc.ReadParallelBlock()
-		if err != nil {
-			t.Errorf("could not read parallel block")
-		}
-
-		// assert timestamp
-		if ts != 0 {
-			t.Errorf("unexpected timestamp: %d", ts)
-		}
-
-		// assert values
-		for c, value := range v {
-			if value != float64(c) {
-				t.Fatal()
-			}
-		}
-	})
-}
-
 func Test__SeekSequential(t *testing.T) {
 	var err error
 	testWithCodec(t, func(t *testing.T, oc *obfCodec) {

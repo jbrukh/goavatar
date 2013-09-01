@@ -13,10 +13,9 @@ import (
 )
 
 var (
-	humanTime *bool = flag.Bool("humanTime", false, "format timestamps")
-	csv       *bool = flag.Bool("csv", false, "output strict CSV")
-	plot      *bool = flag.Bool("plot", false, "ouput the series on a gplot graph")
-	seq       *bool = flag.Bool("seq", false, "read sequential data, if available")
+	csv  *bool = flag.Bool("csv", false, "output strict CSV")
+	plot *bool = flag.Bool("plot", false, "ouput the series on a gplot graph")
+	seq  *bool = flag.Bool("seq", false, "read sequential data, if available")
 )
 
 const preludeFmt = `# Octopus Binary Format.
@@ -130,21 +129,17 @@ func printParallel(codec OBFReader) {
 		fmt.Printf(",channel%d", i+1)
 	}
 	fmt.Println()
+
+	bb, err := codec.Parallel()
+	if err != nil {
+		fmt.Println("ERR: could not get parallel format")
+		os.Exit(1)
+	}
+
 	for j := 0; j < samples; j++ {
 		// read each block
-		values, ts, err := codec.ReadParallelBlock()
-		if err != nil {
-			fmt.Printf("could not read block: %v\n", err)
-			return
-		}
-
-		// print the values and timestamp
-		if *humanTime {
-			// human := NanosToTime(ts).Format(time.RFC3339Nano)
-			panic("unsupported right now")
-		} else {
-			fmt.Printf("%v", ts)
-		}
+		values, ts := bb.Sample(0)
+		fmt.Printf("%v", ts)
 		for i := 0; i < ch; i++ {
 			fmt.Printf(",%.20f", values[i])
 		}

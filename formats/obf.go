@@ -156,9 +156,6 @@ type (
 	}
 
 	OBFReader interface {
-		// TODO: deprecate
-		ReadParallelBlock() ([]float64, int64, error)
-
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
 		Sequential() ([][]float64, []int64, error)
@@ -410,18 +407,6 @@ func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
 		ts[s] = toTs64(ts32)
 		return
 	})
-	return
-}
-
-// TODO:  deprecate
-func (oc *obfCodec) ReadParallelBlock() (values []float64, ts int64, err error) {
-	values = oc.block()
-	if err = oc.read(values); err != nil {
-		return
-	}
-	var ts32 uint32
-	err = oc.read(&ts32)
-	ts = toTs64(ts32)
 	return
 }
 
