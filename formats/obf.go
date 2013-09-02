@@ -133,15 +133,15 @@ const (
 // data point sizes.
 //
 const (
-	OBFHeaderSize    = 31
+	ObfHeaderSize    = 31
 	OBFTimestampSize = 4
 	OBFValueSize     = 8
 )
 
 // Fixed locations
 const (
-	OBFHeaderAddr = 0
-	OBFValuesAddr = OBFHeaderSize
+	ObfHeaderAddr = 0
+	OBFValuesAddr = ObfHeaderSize
 )
 
 var ByteOrder = binary.BigEndian
@@ -154,7 +154,7 @@ type (
 	// The OBF Header, which keeps track
 	// of versioning information as well
 	// as the size of the data.
-	OBFHeader struct {
+	ObfHeader struct {
 		DataType      byte
 		FormatVersion byte
 		StorageMode   byte
@@ -167,7 +167,7 @@ type (
 	}
 
 	ObfReader interface {
-		Header() *OBFHeader
+		Header() *ObfHeader
 		Parallel() (*BlockBuffer, error)
 		Sequential() ([][]float64, []int64, error)
 	}
@@ -179,7 +179,7 @@ type (
 		SeekSequential() error
 		SeekSample(n int) error
 
-		WriteHeader(*OBFHeader) error
+		WriteHeader(*ObfHeader) error
 		WriteParallel(*BlockBuffer, func(int64) uint32) error
 	}
 
@@ -192,7 +192,7 @@ type (
 	// format on various levels of abstraction.
 	obfCodec struct {
 		file        io.ReadWriteSeeker
-		header      OBFHeader
+		header      ObfHeader
 		payloadSize int64
 	}
 )
@@ -333,7 +333,7 @@ func (oc *obfCodec) forSamples(f func(s int) error) error {
 
 // Go to the starting position of the header.
 func (oc *obfCodec) SeekHeader() (err error) {
-	_, err = oc.file.Seek(OBFHeaderAddr, os.SEEK_SET)
+	_, err = oc.file.Seek(ObfHeaderAddr, os.SEEK_SET)
 	return
 }
 
@@ -358,7 +358,7 @@ func (oc *obfCodec) SeekSequential() (err error) {
 	if oc.mode() == StorageModeParallel {
 		return fmt.Errorf("no sequential values available in this mode")
 	}
-	_, err = oc.file.Seek(OBFHeaderSize+oc.payloadSize, os.SEEK_SET)
+	_, err = oc.file.Seek(ObfHeaderSize+oc.payloadSize, os.SEEK_SET)
 	return
 }
 
@@ -374,7 +374,7 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 // Reading Operations -- all these operations happen in-place
 // ----------------------------------------------------------------- //
 
-// Read the OBFHeader of this file.
+// Read the ObfHeader of this file.
 func (oc *obfCodec) ReadHeader() (err error) {
 	if err = oc.read(&oc.header); err != nil {
 		return
@@ -436,7 +436,7 @@ func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
 
 // Return the last header that had been read. Notice
 // header is read upon instantiation.
-func (oc *obfCodec) Header() *OBFHeader {
+func (oc *obfCodec) Header() *ObfHeader {
 	return &oc.header
 }
 
@@ -473,7 +473,7 @@ func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
 // ----------------------------------------------------------------- //
 
 // Write a new header to this file.
-func (oc *obfCodec) WriteHeader(h *OBFHeader) (err error) {
+func (oc *obfCodec) WriteHeader(h *ObfHeader) (err error) {
 	return oc.write(h)
 }
 

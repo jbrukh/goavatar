@@ -37,7 +37,7 @@ func newTestFile(fn string) (file *os.File, err error) {
 
 func writeMockData(w io.Writer) (err error) {
 	// make the header
-	h := &OBFHeader{
+	h := &ObfHeader{
 		DataType:      DataTypeRaw,
 		FormatVersion: FormatVersion2,
 		StorageMode:   StorageModeCombined,
@@ -89,7 +89,7 @@ func writeMockData(w io.Writer) (err error) {
 	return
 }
 
-func assertMockHeader(t *testing.T, h *OBFHeader) {
+func assertMockHeader(t *testing.T, h *ObfHeader) {
 	if h.DataType != DataTypeRaw || h.FormatVersion != FormatVersion2 || h.StorageMode != StorageModeCombined {
 		t.Errorf("bad metadata for header: %v, %v, %v; expected: %v, %v, %v",
 			h.DataType, h.FormatVersion, h.StorageMode, DataTypeRaw, FormatVersion2, StorageModeCombined)

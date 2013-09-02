@@ -121,7 +121,7 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	r.codec = &obfCodec{file: r.file}
 
 	// write the header
-	header := &OBFHeader{
+	header := &ObfHeader{
 		DataType:      DataTypeRaw,
 		FormatVersion: FormatVersion2,
 		StorageMode:   StorageModeCombined,
