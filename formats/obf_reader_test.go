@@ -87,4 +87,17 @@ func TestObfReader__Sequential(t *testing.T) {
 		h.SampleRate != 512 || h.Endianness != 0 || h.IndexUnit != 0 {
 		t.Errorf("unexpected header")
 	}
+
+	v, inxs, err := re.Sequential()
+	if err != nil {
+		t.Errorf("could not deserialize sequential")
+	}
+
+	if len(v) != 1 || len(inxs) != 10706 {
+		t.Errorf("unexpected dimensions")
+	}
+
+	if inxs[0] != 0 || inxs[1] != 1000000 {
+		t.Errorf("unexpected index values")
+	}
 }
