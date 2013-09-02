@@ -4,7 +4,6 @@
 package repo
 
 import (
-	. "github.com/jbrukh/goavatar/util"
 	"os"
 	"path/filepath"
 	"testing"
@@ -77,7 +76,7 @@ func TestNewResourceId(t *testing.T) {
 	}
 
 	// test invalid dir
-	TestPanic(t, func() {
+	AssertPanic(t, func() {
 		r.NewResourceIdWithSubdir("nonsense")
 	})
 }
@@ -273,4 +272,15 @@ func touchFile(file string) error {
 func exists(file string) bool {
 	_, err := os.Stat(file)
 	return err == nil
+}
+
+// For testing panics.
+func AssertPanic(t *testing.T, f func()) {
+	defer func() {
+		if r := recover(); r != nil {
+			// ok
+		}
+	}()
+	f()
+	t.Errorf("should have panicked")
 }
