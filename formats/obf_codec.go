@@ -59,7 +59,7 @@ func (oc *obfCodec) read(i interface{}) error {
 // Write a piece of binary data to the underlying stream,
 // in place.
 func (oc *obfCodec) write(i interface{}) error {
-	return writeTo(oc.file, i)
+	return binary.Write(oc.file, ByteOrder, i)
 }
 
 // Return the storage mode as an integer.

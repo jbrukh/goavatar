@@ -292,13 +292,13 @@ func WriteParallel(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (e
 	}
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
-	return writeTo(w, buf.Bytes())
+	return binary.Write(w, ByteOrder, buf.Bytes())
 }
 
 func WriteSequential(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	arr, ts64 := b.Arrays()
 	for _, channel := range arr {
-		if err = writeTo(w, channel); err != nil {
+		if err = binary.Write(w, ByteOrder, channel); err != nil {
 			return
 		}
 	}
@@ -306,7 +306,7 @@ func WriteSequential(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) 
 	for i, tv := range ts64 {
 		ts32[i] = indexFunc(tv)
 	}
-	return writeTo(w, ts32)
+	return binary.Write(w, ByteOrder, ts32)
 }
 
 // ----------------------------------------------------------------- //
@@ -331,15 +331,11 @@ func toTs32Diff(ts int64, diff int64) uint32 {
 	return toTs32(ts - diff)
 }
 
-func writeTo(w io.Writer, i interface{}) error {
-	return binary.Write(w, ByteOrder, i)
-}
-
 func writeBlock(w io.Writer, v []float64, ts uint32) (err error) {
-	if err = writeTo(w, v); err != nil {
+	if err = binary.Write(w, ByteOrder, v); err != nil {
 		return
 	}
-	return writeTo(w, ts)
+	return binary.Write(w, ByteOrder, ts)
 }
 
 // Read a block in place.
