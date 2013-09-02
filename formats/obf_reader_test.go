@@ -18,8 +18,14 @@ func obfData(file string) (io.Reader, error) {
 }
 
 func TestNewObfReader(t *testing.T) {
-	_, err := obfData(testFile1)
+	r, err := obfData(testFile1)
 	if err != nil {
 		t.Errorf("could not get mock data: %v", err)
 	}
+
+	re, err := NewObfReader(r)
+	if err != nil {
+		t.Errorf("could not init reader: %v", err)
+	}
+
 }
