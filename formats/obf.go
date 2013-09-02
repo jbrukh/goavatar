@@ -212,8 +212,8 @@ func (h *ObfHeader) S() int {
 
 // getPayloadSize calculates the size of the payload based on the
 // number of channels and index values.
-func getPayloadSize(channels, samples int64) int64 {
-	return samples * (channels*ObfValueSize + ObfIndexValueSize)
+func getPayloadSize(channels, samples int) int64 {
+	return int64(samples) * (int64(channels)*ObfValueSize + ObfIndexValueSize)
 }
 
 func toTs64(ts uint32) int64 {

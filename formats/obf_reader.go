@@ -14,11 +14,11 @@ type (
 	// obfCodec will read and write the OBF
 	// format on various levels of abstraction.
 	obfReader struct {
-		r    io.Reader
-		h    *ObfHeader
-		ps   int64        // payload size
-		b    *BlockBuffer // data read from parallel payload
-		read bool         // whether the stream is exhausted
+		r      io.Reader
+		header *ObfHeader
+		ps     int64        // payload size
+		b      *BlockBuffer // data read from parallel payload
+		read   bool         // whether the stream is exhausted
 	}
 )
 
@@ -26,11 +26,10 @@ type (
 // the OBF stream sequentially.
 func NewObfReader(r io.Reader) (ObfReader, error) {
 	or := &obfReader{r: r}
-	if err := binary.Read(or.r, ByteOrder, &or.h); err != nil {
+	if err := binary.Read(or.r, ByteOrder, &or.header); err != nil {
 		return nil, err
 	}
-	or.ps = getPayloadSize(int64(or.h.Channels),
-		int64(or.h.Samples))
+	or.ps = getPayloadSize(or.header.Ch(), or.header.S())
 	return or, nil
 }
 
@@ -38,7 +37,7 @@ func NewObfReader(r io.Reader) (ObfReader, error) {
 // is always available upon construction. This function
 // does not have any effect on internal state.
 func (or *obfReader) Header() *ObfHeader {
-	return or.h
+	return or.header
 }
 
 // Parallel returns the data by reading the parallel
@@ -57,7 +56,7 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 	// create the
 	var (
 		//	v     = make([]float64, or.h.Ch())
-		b = NewBlockBuffer(or.h.Ch(), or.h.S())
+		b = NewBlockBuffer(or.header.Ch(), or.header.S())
 	//	inx32 uint32
 	)
 
