@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"io"
 	//"log"
+	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
 )
 
@@ -243,6 +244,59 @@ func readBlock(r io.Reader, v []float64, ts *uint32) (err error) {
 	}
 	return binary.Read(r, ByteOrder, ts)
 }
+
+func ReadParallel(r io.Reader, header *ObfHeader) (*BlockBuffer, error) {
+	if header.StorageMode == StorageModeSequential {
+		return nil, fmt.Errorf("no parallel payload, use sequential")
+	}
+	var (
+		channels, samples = header.Dim()
+		b                 = NewBlockBuffer(channels, samples)
+		v                 = make([]float64, channels)
+		inx32             uint32
+	)
+	for s := 0; s < samples; s++ {
+		if err := readBlock(r, v, &inx32); err != nil {
+			return nil, err
+		}
+		b.AppendSample(v, toTs64(inx32))
+	}
+	return b, nil
+}
+
+func ReadSequential(r io.Reader, header *ObfHeader) (v [][]float64, inxs []int64, err error) {
+	if header.StorageMode == StorageModeParallel {
+		return nil, nil, fmt.Errorf("no sequential payload, use parallel")
+	}
+
+	channels, samples := header.Dim()
+	v = make([][]float64, channels)
+
+	// read in all the channels sequentially
+	for c := 0; c < channels; c++ {
+		v[c] = make([]float64, samples)
+		if err = binary.Read(r, ByteOrder, v[c]); err != nil {
+			return nil, nil, err
+		}
+	}
+
+	// allocate the timestamps
+	inxs = make([]int64, samples)
+
+	// read and convert all the timestamps
+	for s := 0; s < samples; s++ {
+		var inx32 uint32
+		if err = binary.Read(r, ByteOrder, &inx32); err != nil {
+			return nil, nil, err
+		}
+		inxs[s] = toTs64(inx32)
+	}
+	return
+}
+
+// func ReadSequential(r io.Reader, header *ObfHeader) (*BlockBuffer, error) {
+//
+// }
 
 func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	// write parallel samples to a buffer

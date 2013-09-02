@@ -50,31 +50,13 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 	if or.read {
 		return nil, fmt.Errorf("stream exhausted (get a new reader)")
 	}
-	if or.header.StorageMode == StorageModeSequential {
-		return nil, fmt.Errorf("no parallel payload, use sequential")
-	}
 	or.read = true
-	var (
-		channels, samples = or.header.Dim()
-		b                 = NewBlockBuffer(channels, samples)
-		v                 = make([]float64, channels)
-		inx32             uint32
-	)
-	for s := 0; s < samples; s++ {
-		if err := readBlock(or.r, v, &inx32); err != nil {
-			return nil, err
-		}
-		b.AppendSample(v, toTs64(inx32))
-	}
-	return b, nil
+	return ReadParallel(or.r, &or.header)
 }
 
 func (or *obfReader) Sequential() (v [][]float64, inxs []int64, err error) {
 	if or.read {
 		return nil, nil, fmt.Errorf("stream exhausted (get a new reader)")
-	}
-	if or.header.StorageMode == StorageModeParallel {
-		return nil, nil, fmt.Errorf("no sequential payload, use parallel")
 	}
 	or.read = true
 
@@ -86,28 +68,5 @@ func (or *obfReader) Sequential() (v [][]float64, inxs []int64, err error) {
 			return nil, nil, err
 		}
 	}
-
-	channels, samples := or.header.Dim()
-	v = make([][]float64, channels)
-
-	// read in all the channels sequentially
-	for c := 0; c < channels; c++ {
-		v[c] = make([]float64, samples)
-		if err = binary.Read(or.r, ByteOrder, v[c]); err != nil {
-			return nil, nil, err
-		}
-	}
-
-	// allocate the timestamps
-	inxs = make([]int64, samples)
-
-	// read and convert all the timestamps
-	for s := 0; s < samples; s++ {
-		var inx32 uint32
-		if err = binary.Read(or.r, ByteOrder, &inx32); err != nil {
-			return nil, nil, err
-		}
-		inxs[s] = toTs64(inx32)
-	}
-	return
+	return ReadSequential(or.r, &or.header)
 }
