@@ -62,11 +62,6 @@ func (oc *obfCodec) write(i interface{}) error {
 	return binary.Write(oc.file, ByteOrder, i)
 }
 
-// Return the storage mode as an integer.
-func (oc *obfCodec) mode() byte {
-	return oc.header.StorageMode
-}
-
 func (oc *obfCodec) timestamps() []int64 {
 	_, samples := oc.header.Dim()
 	return make([]int64, samples)
@@ -110,7 +105,7 @@ func (oc *obfCodec) SeekValues() (err error) {
 
 // Go to the starting position of the parallel values.
 func (oc *obfCodec) SeekParallel() (err error) {
-	if oc.mode() == StorageModeSequential {
+	if oc.header.StorageMode == StorageModeSequential {
 		return fmt.Errorf("no parallel values available in this mode")
 	}
 	_, err = oc.file.Seek(OBFValuesAddr, os.SEEK_SET)
@@ -120,7 +115,7 @@ func (oc *obfCodec) SeekParallel() (err error) {
 // Go to the starting position of the sequential values.
 // TODO this will fail silently without having called ReadHeader().
 func (oc *obfCodec) SeekSequential() (err error) {
-	if oc.mode() == StorageModeParallel {
+	if oc.header.StorageMode == StorageModeParallel {
 		return fmt.Errorf("no sequential values available in this mode")
 	}
 	_, err = oc.file.Seek(ObfHeaderSize+oc.payloadSize, os.SEEK_SET)
@@ -129,7 +124,7 @@ func (oc *obfCodec) SeekSequential() (err error) {
 
 // Seek the n-th sample.
 func (oc *obfCodec) SeekSample(n int) (err error) {
-	if oc.mode() == StorageModeSequential {
+	if oc.header.StorageMode == StorageModeSequential {
 		return fmt.Errorf("no parallel values available in this mode")
 	}
 	panic("implement")
