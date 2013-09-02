@@ -147,50 +147,11 @@ func (oc *obfCodec) ReadHeader() (err error) {
 // Read the entire set of parallel values from
 // the file starting at the current position.
 func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
-	var (
-		channels, samples = oc.header.Dim()
-		v                 = make([]float64, channels)
-		ts32              uint32
-	)
-
-	b = NewBlockBuffer(channels, samples)
-	err = oc.forSamples(func(s int) (err error) {
-		if err = readBlock(oc.file, v, &ts32); err != nil {
-			return
-		}
-		b.AppendSample(v, toTs64(ts32))
-		return
-	})
-	return
+	return ReadParallel(oc.file, &oc.header)
 }
 
 func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
-	// allocate channel slices
-	channels, samples := oc.header.Dim()
-	v = make([][]float64, channels)
-
-	// read in all the channels sequentially
-	err = oc.forChannels(func(c int) (err error) {
-		v[c] = make([]float64, samples)
-		return oc.read(v[c])
-	})
-	if err != nil {
-		return
-	}
-
-	// allocate the timestamps
-	ts = oc.timestamps()
-
-	// read and convert all the timestamps
-	err = oc.forSamples(func(s int) (err error) {
-		var ts32 uint32
-		if err = oc.read(&ts32); err != nil {
-			return
-		}
-		ts[s] = toTs64(ts32)
-		return
-	})
-	return
+	return ReadSequential(oc.file, &oc.header)
 }
 
 // ----------------------------------------------------------------- //
