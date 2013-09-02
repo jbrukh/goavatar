@@ -4,7 +4,6 @@
 package formats
 
 import (
-	"encoding/binary"
 	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
 	"io"
@@ -15,7 +14,7 @@ type (
 	// format on various levels of abstraction.
 	obfReader struct {
 		r      io.Reader
-		header ObfHeader
+		header *ObfHeader
 		ps     int64        // payload size
 		b      *BlockBuffer // data read from parallel payload
 		read   bool         // whether the stream is exhausted
@@ -25,11 +24,15 @@ type (
 // NewObfReader creates a vanilla OBF deserializer that reads
 // the OBF stream sequentially.
 func NewObfReader(r io.Reader) (ObfReader, error) {
-	or := &obfReader{r: r}
-	if err := binary.Read(or.r, ByteOrder, &or.header); err != nil {
+	header, err := ReadHeader(r)
+	if err != nil {
 		return nil, err
 	}
-	or.ps = getPayloadSize(or.header.Dim())
+	or := &obfReader{
+		r:      r,
+		header: header,
+	}
+	or.ps = getPayloadSize(header.Dim())
 	return or, nil
 }
 
@@ -37,7 +40,7 @@ func NewObfReader(r io.Reader) (ObfReader, error) {
 // is always available upon construction. This function
 // does not have any effect on internal state.
 func (or *obfReader) Header() *ObfHeader {
-	return &or.header
+	return or.header
 }
 
 // Parallel returns the data by reading the parallel
@@ -51,7 +54,7 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 		return nil, fmt.Errorf("stream exhausted (get a new reader)")
 	}
 	or.read = true
-	return ReadParallel(or.r, &or.header)
+	return ReadParallel(or.r, or.header)
 }
 
 func (or *obfReader) Sequential() (v [][]float64, inxs []int64, err error) {
@@ -68,5 +71,5 @@ func (or *obfReader) Sequential() (v [][]float64, inxs []int64, err error) {
 			return nil, nil, err
 		}
 	}
-	return ReadSequential(or.r, &or.header)
+	return ReadSequential(or.r, or.header)
 }

@@ -62,11 +62,6 @@ func (oc *obfCodec) write(i interface{}) error {
 	return writeTo(oc.file, i)
 }
 
-// Write a block in place.
-func (oc *obfCodec) writeBlock(v []float64, ts uint32) (err error) {
-	return writeBlockTo(oc.file, v, ts)
-}
-
 // Return the storage mode as an integer.
 func (oc *obfCodec) mode() byte {
 	return oc.header.StorageMode

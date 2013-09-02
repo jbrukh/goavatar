@@ -6,10 +6,9 @@ package formats
 import (
 	"bytes"
 	"encoding/binary"
-	"io"
-	//"log"
 	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
+	"io"
 )
 
 // ----------------------------------------------------------------- //
@@ -205,44 +204,16 @@ func (h *ObfHeader) Dim() (channels, samples int) {
 }
 
 // ----------------------------------------------------------------- //
-// Helper Methods
+// Generic Reading Methods -- all these read the current position
 // ----------------------------------------------------------------- //
 
-// getPayloadSize calculates the size of the payload based on the
-// number of channels and index values.
-func getPayloadSize(channels, samples int) int64 {
-	return int64(samples) * (int64(channels)*ObfValueSize + ObfIndexValueSize)
-}
-
-func toTs64(ts uint32) int64 {
-	return int64(ts) * 1000000
-}
-
-func toTs32(ts int64) uint32 {
-	return uint32(ts / 1000000)
-}
-
-func toTs32Diff(ts int64, diff int64) uint32 {
-	return toTs32(ts - diff)
-}
-
-func writeTo(w io.Writer, i interface{}) error {
-	return binary.Write(w, ByteOrder, i)
-}
-
-func writeBlockTo(w io.Writer, v []float64, ts uint32) (err error) {
-	if err = writeTo(w, v); err != nil {
-		return
+// Read the ObfHeader of this file.
+func ReadHeader(r io.Reader) (header *ObfHeader, err error) {
+	header = new(ObfHeader)
+	if err := binary.Read(r, ByteOrder, header); err != nil {
+		return nil, err
 	}
-	return writeTo(w, ts)
-}
-
-// Read a block in place.
-func readBlock(r io.Reader, v []float64, ts *uint32) (err error) {
-	if err = binary.Read(r, ByteOrder, &v); err != nil {
-		return
-	}
-	return binary.Read(r, ByteOrder, ts)
+	return
 }
 
 func ReadParallel(r io.Reader, header *ObfHeader) (*BlockBuffer, error) {
@@ -294,9 +265,9 @@ func ReadSequential(r io.Reader, header *ObfHeader) (v [][]float64, inxs []int64
 	return
 }
 
-// func ReadSequential(r io.Reader, header *ObfHeader) (*BlockBuffer, error) {
-//
-// }
+// ----------------------------------------------------------------- //
+// Generic Writing Methods -- all these write the current position
+// ----------------------------------------------------------------- //
 
 func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	// write parallel samples to a buffer
@@ -305,7 +276,7 @@ func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) 
 
 	for s := 0; s < samples; s++ {
 		v, ts := b.Sample(s)
-		if err = writeBlockTo(buf, v, indexFunc(ts)); err != nil {
+		if err = writeBlock(buf, v, indexFunc(ts)); err != nil {
 			return
 		}
 	}
@@ -326,4 +297,45 @@ func WriteSequentialTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32
 		ts32[i] = indexFunc(tv)
 	}
 	return writeTo(w, ts32)
+}
+
+// ----------------------------------------------------------------- //
+// Private Helper Methods
+// ----------------------------------------------------------------- //
+
+// getPayloadSize calculates the size of the payload based on the
+// number of channels and index values.
+func getPayloadSize(channels, samples int) int64 {
+	return int64(samples) * (int64(channels)*ObfValueSize + ObfIndexValueSize)
+}
+
+func toTs64(ts uint32) int64 {
+	return int64(ts) * 1000000
+}
+
+func toTs32(ts int64) uint32 {
+	return uint32(ts / 1000000)
+}
+
+func toTs32Diff(ts int64, diff int64) uint32 {
+	return toTs32(ts - diff)
+}
+
+func writeTo(w io.Writer, i interface{}) error {
+	return binary.Write(w, ByteOrder, i)
+}
+
+func writeBlock(w io.Writer, v []float64, ts uint32) (err error) {
+	if err = writeTo(w, v); err != nil {
+		return
+	}
+	return writeTo(w, ts)
+}
+
+// Read a block in place.
+func readBlock(r io.Reader, v []float64, ts *uint32) (err error) {
+	if err = binary.Read(r, ByteOrder, &v); err != nil {
+		return
+	}
+	return binary.Read(r, ByteOrder, ts)
 }
