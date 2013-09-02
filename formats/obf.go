@@ -166,26 +166,44 @@ type (
 		Reserved      [19]byte // reserved for extentions
 	}
 
+	// ObfReader can read OBF files. Depending on
+	// the implementation it may or may not be able
+	// to seek to parts of the file.
 	ObfReader interface {
 		Header() *ObfHeader
 		Parallel() (*BlockBuffer, error)
 		Sequential() ([][]float64, []int64, error)
 	}
 
+	// ObfWriter can write OBF files. Depending on
+	// the implementation it may or may not be able
+	// to seek to parts of the file.
 	ObfWriter interface {
+		WriteHeader(*ObfHeader) error
+		WriteParallel(*BlockBuffer, func(int64) uint32) error
+	}
+
+	// ObfSeeker is able to seek to sections of OBF.
+	// If implementor is also an ObfReader or ObfWriter
+	// it may also be able to read or write those
+	// sections.
+	ObfSeeker interface {
 		SeekHeader() error
 		SeekValues() error
 		SeekParallel() error
 		SeekSequential() error
 		SeekSample(n int) error
-
-		WriteHeader(*ObfHeader) error
-		WriteParallel(*BlockBuffer, func(int64) uint32) error
 	}
 
+	// ObfCodec is able to perform all reading, writing,
+	// and seeking operations on an OBF file. This is
+	// typically performed on hard files on the file system
+	// since Go doesn't have an out-of-the-box in-memory
+	// io.ReadWriteSeeker.
 	ObfCodec interface {
 		ObfReader
 		ObfWriter
+		ObfSeeker
 	}
 
 	// obfCodec will read and write the OBF
