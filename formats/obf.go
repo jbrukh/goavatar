@@ -194,15 +194,15 @@ type (
 	}
 )
 
-// NewObfReader creates a vanilla OBF deserializer that reads
-// the OBF stream sequentially.
-func NewObfReader(r io.Reader) (or ObfReader, err error) {
-	return
-}
-
 // ----------------------------------------------------------------- //
 // Helper Methods
 // ----------------------------------------------------------------- //
+
+// getPayloadSize calculates the size of the payload based on the
+// number of channels and index values.
+func getPayloadSize(channels, samples int64) int64 {
+	return samples * (channels*OBFValueSize + OBFTimestampSize)
+}
 
 func toTs64(ts uint32) int64 {
 	return int64(ts) * 1000000

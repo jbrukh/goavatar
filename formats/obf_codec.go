@@ -46,11 +46,6 @@ func NewObfCodec(file io.ReadWriteSeeker) (oc ObfCodec, err error) {
 // Private Methods
 // ----------------------------------------------------------------- //
 
-func (oc *obfCodec) pyldSize(channels, samples int64) {
-	oc.payloadSize = samples * (channels*
-		OBFValueSize + OBFTimestampSize)
-}
-
 // Validate the last header that has been read.
 func (oc *obfCodec) validate() (err error) {
 	return // TODO TODO TODO
@@ -187,7 +182,7 @@ func (oc *obfCodec) ReadHeader() (err error) {
 	if err = oc.read(&oc.header); err != nil {
 		return
 	}
-	oc.pyldSize(int64(oc.channels()), int64(oc.samples()))
+	oc.payloadSize = getPayloadSize(int64(oc.channels()), int64(oc.samples()))
 	return oc.validate()
 }
 
