@@ -227,14 +227,14 @@ func writeBlockTo(w io.Writer, v []float64, ts uint32) (err error) {
 	return writeTo(w, ts)
 }
 
-func WriteParallelTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
+func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	// write parallel samples to a buffer
 	buf := new(bytes.Buffer)
 	samples := b.Samples()
 
 	for s := 0; s < samples; s++ {
 		v, ts := b.Sample(s)
-		if err = writeBlockTo(buf, v, tsTransform(ts)); err != nil {
+		if err = writeBlockTo(buf, v, indexFunc(ts)); err != nil {
 			return
 		}
 	}
@@ -243,11 +243,11 @@ func WriteParallelTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint32
 	return writeTo(w, buf.Bytes())
 }
 
-func (oc *obfCodec) WriteSequential(b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
-	return WriteSequentialTo(oc.file, b, tsTransform)
+func (oc *obfCodec) WriteSequential(b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
+	return WriteSequentialTo(oc.file, b, indexFunc)
 }
 
-func WriteSequentialTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
+func WriteSequentialTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	arr, ts64 := b.Arrays()
 	for _, channel := range arr {
 		if err = writeTo(w, channel); err != nil {
@@ -256,7 +256,7 @@ func WriteSequentialTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint
 	}
 	ts32 := make([]uint32, len(ts64))
 	for i, tv := range ts64 {
-		ts32[i] = tsTransform(tv)
+		ts32[i] = indexFunc(tv)
 	}
 	return writeTo(w, ts32)
 }
