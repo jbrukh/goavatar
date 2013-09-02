@@ -207,7 +207,9 @@ func (h *ObfHeader) Dim() (channels, samples int) {
 // Generic Reading Methods -- all these read the current position
 // ----------------------------------------------------------------- //
 
-// Read the ObfHeader of this file.
+// ReadHeader will read in the OBF header from the underlying
+// reader. This function assumes that the pointer of the reader
+// is pointing to the start of the header.
 func ReadHeader(r io.Reader) (header *ObfHeader, err error) {
 	header = new(ObfHeader)
 	if err := binary.Read(r, ByteOrder, header); err != nil {
@@ -216,6 +218,10 @@ func ReadHeader(r io.Reader) (header *ObfHeader, err error) {
 	return
 }
 
+// ReadParallel will read in the parallel data payload. This
+// function assumes that the pointer of the reader is pointing
+// to the start of the data. If the OBF file does not support
+// parallel data, then an error is returned.
 func ReadParallel(r io.Reader, header *ObfHeader) (*BlockBuffer, error) {
 	if header.StorageMode == StorageModeSequential {
 		return nil, fmt.Errorf("no parallel payload, use sequential")
@@ -235,6 +241,10 @@ func ReadParallel(r io.Reader, header *ObfHeader) (*BlockBuffer, error) {
 	return b, nil
 }
 
+// ReadDSequential will read in the sequential data payload. This
+// function assumes that the pointer of the reader is pointing
+// to the start of the data. If the file does not support
+// sequential data, then an error is returned.
 func ReadSequential(r io.Reader, header *ObfHeader) (v [][]float64, inxs []int64, err error) {
 	if header.StorageMode == StorageModeParallel {
 		return nil, nil, fmt.Errorf("no sequential payload, use parallel")
@@ -251,10 +261,10 @@ func ReadSequential(r io.Reader, header *ObfHeader) (v [][]float64, inxs []int64
 		}
 	}
 
-	// allocate the timestamps
+	// allocate the indices
 	inxs = make([]int64, samples)
 
-	// read and convert all the timestamps
+	// read and convert all the indices
 	for s := 0; s < samples; s++ {
 		var inx32 uint32
 		if err = binary.Read(r, ByteOrder, &inx32); err != nil {
@@ -269,7 +279,7 @@ func ReadSequential(r io.Reader, header *ObfHeader) (v [][]float64, inxs []int64
 // Generic Writing Methods -- all these write the current position
 // ----------------------------------------------------------------- //
 
-func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
+func WriteParallel(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	// write parallel samples to a buffer
 	buf := new(bytes.Buffer)
 	samples := b.Samples()
@@ -285,7 +295,7 @@ func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) 
 	return writeTo(w, buf.Bytes())
 }
 
-func WriteSequentialTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
+func WriteSequential(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	arr, ts64 := b.Arrays()
 	for _, channel := range arr {
 		if err = writeTo(w, channel); err != nil {

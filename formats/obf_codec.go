@@ -249,9 +249,9 @@ func (oc *obfCodec) WriteHeader(h *ObfHeader) (err error) {
 // Writes a data frame in parallel mode, assuming the writer
 // is at the correct location for the frame.
 func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
-	return WriteParallelTo(oc.file, b, tsTransform)
+	return WriteParallel(oc.file, b, tsTransform)
 }
 
 func (oc *obfCodec) WriteSequential(b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
-	return WriteSequentialTo(oc.file, b, indexFunc)
+	return WriteSequential(oc.file, b, indexFunc)
 }

@@ -83,7 +83,7 @@ func (r *ObfRecorder) RecordFrame(df DataFrame) error {
 	// we are using synchronization to protect the buffer
 	r.Lock()
 	defer r.Unlock()
-	return WriteParallelTo(&r.buf, df.Buffer(), r.tsTransform)
+	return WriteParallel(&r.buf, df.Buffer(), r.tsTransform)
 }
 
 func (r *ObfRecorder) Stop() (id string, err error) {
