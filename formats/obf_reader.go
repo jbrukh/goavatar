@@ -5,6 +5,7 @@ package formats
 
 import (
 	"encoding/binary"
+	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
 	"io"
 )
@@ -13,9 +14,11 @@ type (
 	// obfCodec will read and write the OBF
 	// format on various levels of abstraction.
 	obfReader struct {
-		r  io.Reader
-		h  ObfHeader
-		ps int64 // payload size
+		r    io.Reader
+		h    *ObfHeader
+		ps   int64        // payload size
+		b    *BlockBuffer // data read from parallel payload
+		read bool         // whether the stream is exhausted
 	}
 )
 
@@ -23,25 +26,55 @@ type (
 // the OBF stream sequentially.
 func NewObfReader(r io.Reader) (ObfReader, error) {
 	or := &obfReader{r: r}
-
-	// first things first, read the header
 	if err := binary.Read(or.r, ByteOrder, &or.h); err != nil {
 		return nil, err
 	}
-
-	// set the payload size
-	or.ps = getPayloadSize(int64(or.h.Channels), int64(or.h.Samples))
+	or.ps = getPayloadSize(int64(or.h.Channels),
+		int64(or.h.Samples))
 	return or, nil
 }
 
+// Header returns the header of this OBF stream, which
+// is always available upon construction. This function
+// does not have any effect on internal state.
 func (or *obfReader) Header() *ObfHeader {
-	return nil // TODO
+	return or.h
 }
 
+// Parallel returns the data by reading the parallel
+// payload. If the stream was exhausted
+// by reading the sequential format first, then this
+// method will return an error. This method may only
+// be called once.
 func (or *obfReader) Parallel() (*BlockBuffer, error) {
-	return nil, nil // TODO
+	// only read the stream once
+	if or.read {
+		return nil, fmt.Errorf("stream exhausted (get a new reader)")
+	} else {
+		or.read = true
+	}
+
+	// create the
+	var (
+		//	v     = make([]float64, or.h.Ch())
+		b = NewBlockBuffer(or.h.Ch(), or.h.S())
+	//	inx32 uint32
+	)
+
+	// err = oc.forSamples(func(s int) (err error) {
+	// 	if err = oc.readBlock(v, &ts32); err != nil {
+	// 		return
+	// 	}
+	// 	b.AppendSample(v, toTs64(ts32))
+	// 	return
+	// })
+	return b, nil
 }
 
 func (or *obfReader) Sequential() ([][]float64, []int64, error) {
-	return nil, nil, nil // TODO
+	if or.read {
+		return nil, nil, fmt.Errorf("stream exhausted (get a new reader)")
+	} else {
+		panic("implement me")
+	}
 }

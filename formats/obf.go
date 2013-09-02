@@ -195,6 +195,18 @@ type (
 )
 
 // ----------------------------------------------------------------- //
+// OBF Header
+// ----------------------------------------------------------------- //
+
+func (h *ObfHeader) Ch() int {
+	return int(h.Channels)
+}
+
+func (h *ObfHeader) S() int {
+	return int(h.Samples)
+}
+
+// ----------------------------------------------------------------- //
 // Helper Methods
 // ----------------------------------------------------------------- //
 
@@ -241,10 +253,6 @@ func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) 
 
 	//log.Printf("writing parallel blocks: %v", buf.Bytes())
 	return writeTo(w, buf.Bytes())
-}
-
-func (oc *obfCodec) WriteSequential(b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
-	return WriteSequentialTo(oc.file, b, indexFunc)
 }
 
 func WriteSequentialTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {

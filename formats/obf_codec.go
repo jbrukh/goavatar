@@ -90,18 +90,6 @@ func (oc *obfCodec) mode() byte {
 	return oc.header.StorageMode
 }
 
-// Return a new buffer big enough for this
-// OBF file.
-func (oc *obfCodec) buffer() *BlockBuffer {
-	return NewBlockBuffer(oc.channels(), oc.samples())
-}
-
-// Return a slice big enough to hold one block
-// of channel values.
-func (oc *obfCodec) block() []float64 {
-	return make([]float64, oc.channels())
-}
-
 func (oc *obfCodec) channel() []float64 {
 	return make([]float64, oc.samples())
 }
@@ -190,10 +178,10 @@ func (oc *obfCodec) ReadHeader() (err error) {
 // the file starting at the current position.
 func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 	var (
-		v    = oc.block()
+		v    = make([]float64, oc.channels())
 		ts32 uint32
 	)
-	b = oc.buffer()
+	b = NewBlockBuffer(oc.channels(), oc.samples())
 	err = oc.forSamples(func(s int) (err error) {
 		if err = oc.readBlock(v, &ts32); err != nil {
 			return
@@ -284,4 +272,8 @@ func (oc *obfCodec) WriteHeader(h *ObfHeader) (err error) {
 // is at the correct location for the frame.
 func (oc *obfCodec) WriteParallel(b *BlockBuffer, tsTransform func(int64) uint32) (err error) {
 	return WriteParallelTo(oc.file, b, tsTransform)
+}
+
+func (oc *obfCodec) WriteSequential(b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
+	return WriteSequentialTo(oc.file, b, indexFunc)
 }
