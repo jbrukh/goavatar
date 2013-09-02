@@ -131,9 +131,9 @@ const (
 // data point sizes.
 //
 const (
-	ObfHeaderSize    = 31
-	OBFTimestampSize = 4
-	OBFValueSize     = 8
+	ObfHeaderSize     = 31
+	ObfIndexValueSize = 4
+	ObfValueSize      = 8
 )
 
 // Fixed locations
@@ -201,7 +201,7 @@ type (
 // getPayloadSize calculates the size of the payload based on the
 // number of channels and index values.
 func getPayloadSize(channels, samples int64) int64 {
-	return samples * (channels*OBFValueSize + OBFTimestampSize)
+	return samples * (channels*ObfValueSize + ObfIndexValueSize)
 }
 
 func toTs64(ts uint32) int64 {
