@@ -17,7 +17,7 @@ func TestRecord(t *testing.T) {
 	}
 	defer d.Disengage()
 
-	r := NewDeviceRecorder(d, NewOBFRecorder(d.Repo()))
+	r := NewDeviceRecorder(d, NewObfRecorder(d.Repo()))
 
 	err := r.RecordAsync()
 	if err != nil {
@@ -45,7 +45,7 @@ func TestRecord__MaxSamples(t *testing.T) {
 	}
 	defer d.Disengage()
 
-	r := NewDeviceRecorder(d, NewOBFRecorder(d.Repo()))
+	r := NewDeviceRecorder(d, NewObfRecorder(d.Repo()))
 	r.SetMax(2)
 	err := r.RecordAsync()
 	if err != nil {
@@ -69,7 +69,7 @@ func TestRecord__WaitFail(t *testing.T) {
 		t.Errorf("could not engage")
 	}
 	defer d.Disengage()
-	r := NewDeviceRecorder(d, NewOBFRecorder(d.Repo()))
+	r := NewDeviceRecorder(d, NewObfRecorder(d.Repo()))
 
 	// at this point wait should fail because
 	// we are not recording: Stop() and Wait()

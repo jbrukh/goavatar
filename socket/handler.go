@@ -117,7 +117,7 @@ func (s *OctopusSocket) handleControlConn(conn *websocket.Conn) {
 		pps:       s.pps,
 		batchSize: s.batchSize,
 		kickoff:   s.kickoff,
-		recorder:  NewDeviceRecorder(s.device, NewOBFRecorder(s.device.Repo())),
+		recorder:  NewDeviceRecorder(s.device, NewObfRecorder(s.device.Repo())),
 	}
 	log.Printf("got session: %+v", session)
 	// keep processing as long as we are connected

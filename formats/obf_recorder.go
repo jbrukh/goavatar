@@ -14,7 +14,7 @@ import (
 	"sync"
 )
 
-type OBFRecorder struct {
+type ObfRecorder struct {
 	sync.Mutex
 	repo     *Repository // repository where file is being recorded to
 	fileName string      // name of the file/resource id
@@ -32,17 +32,17 @@ type OBFRecorder struct {
 	params     map[string]string // recording parameters
 }
 
-func (r *OBFRecorder) tsTransform(ts int64) uint32 {
+func (r *ObfRecorder) tsTransform(ts int64) uint32 {
 	return toTs32Diff(ts, r.tsFirst)
 }
 
-func NewOBFRecorder(repo *Repository) *OBFRecorder {
-	return &OBFRecorder{
+func NewObfRecorder(repo *Repository) *ObfRecorder {
+	return &ObfRecorder{
 		repo: repo,
 	}
 }
 
-func (r *OBFRecorder) Init() error {
+func (r *ObfRecorder) Init() error {
 	r.channels = 0
 	r.samples = 0
 	r.sampleRate = 0
@@ -54,7 +54,7 @@ func (r *OBFRecorder) Init() error {
 }
 
 // Process each incoming frame, if there is an error
-func (r *OBFRecorder) RecordFrame(df DataFrame) error {
+func (r *ObfRecorder) RecordFrame(df DataFrame) error {
 	if df == nil {
 		return nil
 	}
@@ -86,19 +86,19 @@ func (r *OBFRecorder) RecordFrame(df DataFrame) error {
 	return WriteParallelTo(&r.buf, df.Buffer(), r.tsTransform)
 }
 
-func (r *OBFRecorder) Stop() (id string, err error) {
+func (r *ObfRecorder) Stop() (id string, err error) {
 	return r.commit()
 }
 
-func (r *OBFRecorder) Stats() (ms uint32) {
+func (r *ObfRecorder) Stats() (ms uint32) {
 	return r.tsLast
 }
 
-func (r *OBFRecorder) commit() (id string, err error) {
+func (r *ObfRecorder) commit() (id string, err error) {
 	// get the file name
 	// TODO: get rid of the subdir parameter
 	_, r.fileName = r.repo.NewResourceId()
-	log.Printf("OBFRecorder: opening file for writing: %v", r.fileName)
+	log.Printf("ObfRecorder: opening file for writing: %v", r.fileName)
 
 	// make sure the directory exists
 	dir := filepath.Dir(r.fileName)
@@ -112,7 +112,7 @@ func (r *OBFRecorder) commit() (id string, err error) {
 		return
 	}
 	defer func() {
-		log.Printf("OBFRecorder: closing the file: %v", r.fileName)
+		log.Printf("ObfRecorder: closing the file: %v", r.fileName)
 		// TODO: if err, rollback
 		r.file.Close()
 	}()
@@ -159,11 +159,11 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	return
 }
 
-func (r *OBFRecorder) RollbackFile() {
+func (r *ObfRecorder) RollbackFile() {
 	fileName := r.file.Name()
-	log.Printf("OBFRecorder: rolling back %s due to error", fileName)
+	log.Printf("ObfRecorder: rolling back %s due to error", fileName)
 	r.file.Close()
 	if err := os.Remove(fileName); err != nil {
-		log.Printf("OBFRecorder: could not remove the file: %s", fileName)
+		log.Printf("ObfRecorder: could not remove the file: %s", fileName)
 	}
 }

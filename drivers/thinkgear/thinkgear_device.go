@@ -41,7 +41,7 @@ func (d *ThinkGearDevice) Disengage() (err error) {
 }
 
 func (d *ThinkGearDevice) ProvideRecorder() Recorder {
-	return NewOBFRecorder(d.repo)
+	return NewObfRecorder(d.repo)
 }
 
 func (d *ThinkGearDevice) Name() string {

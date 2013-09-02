@@ -44,7 +44,7 @@ func main() {
 
 	if *rec > 0 {
 		log.Printf("going to record...")
-		r := NewDeviceRecorder(device, NewOBFRecorder(device.Repo()))
+		r := NewDeviceRecorder(device, NewObfRecorder(device.Repo()))
 		r.SetMax(*rec)
 		if err = r.RecordAsync(); err != nil {
 			log.Printf("Error: %v", err)

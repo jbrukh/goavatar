@@ -68,7 +68,7 @@ func (ad *AvatarDevice) Stream(c *Control) (err error) {
 
 // Provide a recorder.
 func (ad *AvatarDevice) ProvideRecorder() Recorder {
-	return NewOBFRecorder(ad.repo)
+	return NewObfRecorder(ad.repo)
 }
 
 // The name of the device: AvatarEEG.

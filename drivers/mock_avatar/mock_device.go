@@ -76,7 +76,7 @@ func (d *MockDevice) Stream(c *Control) (err error) {
 }
 
 func (d *MockDevice) ProvideRecorder() Recorder {
-	return NewOBFRecorder(d.repo)
+	return NewObfRecorder(d.repo)
 }
 
 func (d *MockDevice) Name() string {
