@@ -53,7 +53,6 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 		or.read = true
 	}
 
-	// create the
 	var (
 		channels, samples = or.header.Dim()
 		b                 = NewBlockBuffer(channels, samples)
@@ -67,6 +66,7 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 		}
 		b.AppendSample(v, toTs64(inx32))
 	}
+
 	return b, nil
 }
 
