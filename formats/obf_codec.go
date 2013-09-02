@@ -164,10 +164,12 @@ func (oc *obfCodec) ReadHeader() (err error) {
 // the file starting at the current position.
 func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 	var (
-		v    = make([]float64, oc.header.Ch())
-		ts32 uint32
+		channels = oc.header.Ch()
+		samples  = oc.header.S()
+		v        = make([]float64, channels)
+		ts32     uint32
 	)
-	b = NewBlockBuffer(oc.header.Ch(), oc.header.S())
+	b = NewBlockBuffer(channels, samples)
 	err = oc.forSamples(func(s int) (err error) {
 		if err = oc.readBlock(v, &ts32); err != nil {
 			return
