@@ -60,6 +60,15 @@ import (
 //                                        in ms starting at 0)
 //
 // ----------------------------------------------------------------- //
+// Octopus Binary Format (OBF) Version 2.1
+// (Adding independent variable unit)
+//
+// Header will now be 32 bytes, with 19 bytes reserved. The 12th byte
+// of the header will be the unit of the index variable. This version
+// is backwards compatible with 2.0, taking the unit of the index
+// variable to be milliseconds by default.
+//
+// ----------------------------------------------------------------- //
 // Notes on P-mode vs S-mode:
 //
 // Define v(c,s) to mean the value of channel c (0 < c <= C) at
@@ -96,6 +105,15 @@ const (
 const (
 	BigEndian    = 0x00
 	LittleEndian = 0x01
+)
+
+// IndexUnit
+const (
+	Milliseconds = 0x00
+	Nanoseconds  = 0x01
+	Seconds      = 0x02
+	Hertz        = 0x03
+	Enumeration  = 0x04 // just monotonically increasing integers
 )
 
 // StorageModes
@@ -144,7 +162,8 @@ type (
 		Samples       uint32
 		SampleRate    uint16
 		Endianness    byte
-		Reserved      [20]byte // reserved for extentions
+		IndexUnit     byte
+		Reserved      [19]byte // reserved for extentions
 	}
 
 	ObfReader interface {
