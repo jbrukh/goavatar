@@ -159,7 +159,7 @@ func Test__SeekSequential(t *testing.T) {
 			t.Fatalf("could not seek to the values")
 		}
 
-		channels, ts, err := oc.ReadSequential()
+		channels, ts, err := ReadSequential(oc.file, &oc.header)
 		if err != nil {
 			t.Fatalf("could not read sequential")
 		}

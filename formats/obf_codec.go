@@ -144,16 +144,6 @@ func (oc *obfCodec) ReadHeader() (err error) {
 	return oc.validate()
 }
 
-// Read the entire set of parallel values from
-// the file starting at the current position.
-func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
-	return ReadParallel(oc.file, &oc.header)
-}
-
-func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
-	return ReadSequential(oc.file, &oc.header)
-}
-
 // ----------------------------------------------------------------- //
 // Reading Operations -- these operations seek and do validation,
 // so are more user-facing and safer
@@ -176,7 +166,7 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 	if err = oc.SeekParallel(); err != nil {
 		return
 	}
-	return oc.ReadParallel()
+	return ReadParallel(oc.file, &oc.header)
 }
 
 // Read the entire set of sequential values from the file.
@@ -190,7 +180,7 @@ func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
 	if err = oc.SeekSequential(); err != nil {
 		return
 	}
-	return oc.ReadSequential()
+	return ReadSequential(oc.file, &oc.header)
 }
 
 // ----------------------------------------------------------------- //
