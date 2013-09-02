@@ -147,22 +147,6 @@ type (
 		Reserved      [20]byte // reserved for extentions
 	}
 
-	// obfCodec will read and write the OBF
-	// format on various levels of abstraction.
-	obfCodec struct {
-		file        io.ReadWriteSeeker
-		header      OBFHeader
-		payloadSize int64
-	}
-
-	// obfReaderCodec will perform reading operations
-	// without making use of Seek(), so it can be
-	// used on in-memory io.Readers
-	obfReaderCodec struct {
-		r      io.Reader
-		header OBFHeader
-	}
-
 	ObfReader interface {
 		Header() *OBFHeader
 		Parallel() (*BlockBuffer, error)
@@ -177,13 +161,26 @@ type (
 		SeekSample(n int) error
 
 		WriteHeader(*OBFHeader) error
-		WriteParallel(*BlockBuffer, int64) error
+		WriteParallel(*BlockBuffer, func(int64) uint32) error
+	}
+
+	ObfCodec interface {
+		ObfReader
+		ObfWriter
+	}
+
+	// obfCodec will read and write the OBF
+	// format on various levels of abstraction.
+	obfCodec struct {
+		file        io.ReadWriteSeeker
+		header      OBFHeader
+		payloadSize int64
 	}
 )
 
 // Create a new OBFReader and read the header. If the header
 // cannot be read an error is returned.
-func NewObfReader(file io.ReadWriteSeeker) (r ObfReader, err error) {
+func NewObfCodec(file io.ReadWriteSeeker) (r ObfCodec, err error) {
 	oc := &obfCodec{file: file}
 	if err = oc.ReadHeader(); err != nil {
 		return
@@ -499,4 +496,12 @@ func WriteSequentialTo(w io.Writer, b *BlockBuffer, tsTransform func(int64) uint
 		ts32[i] = tsTransform(tv)
 	}
 	return writeTo(w, ts32)
+}
+
+// ----------------------------------------------------------------- //
+// Deserialization
+// ----------------------------------------------------------------- //
+
+func DeserializeObf(r io.Reader) (b *BlockBuffer, err error) {
+	return
 }
