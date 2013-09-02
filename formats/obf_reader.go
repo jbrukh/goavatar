@@ -66,10 +66,33 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 	return b, nil
 }
 
-func (or *obfReader) Sequential() ([][]float64, []int64, error) {
+func (or *obfReader) Sequential() (v [][]float64, inxs []int64, err error) {
 	if or.read {
 		return nil, nil, fmt.Errorf("stream exhausted (get a new reader)")
-	} else {
-		panic("implement me")
 	}
+	or.read = true
+
+	channels, samples := or.header.Dim()
+	v = make([][]float64, channels)
+
+	// read in all the channels sequentially
+	for c := 0; c < channels; c++ {
+		v[c] = make([]float64, samples)
+		if err = binary.Read(or.r, ByteOrder, v[c]); err != nil {
+			return nil, nil, err
+		}
+	}
+
+	// allocate the timestamps
+	inxs = make([]int64, samples)
+
+	// read and convert all the timestamps
+	for s := 0; s < samples; s++ {
+		var inx32 uint32
+		if err = binary.Read(or.r, ByteOrder, &inx32); err != nil {
+			return nil, nil, err
+		}
+		inxs[s] = toTs64(inx32)
+	}
+	return
 }
