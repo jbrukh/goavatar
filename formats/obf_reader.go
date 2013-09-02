@@ -50,6 +50,9 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 	if or.read {
 		return nil, fmt.Errorf("stream exhausted (get a new reader)")
 	}
+	if or.header.StorageMode == StorageModeSequential {
+		return nil, fmt.Errorf("no parallel payload, use sequential")
+	}
 	or.read = true
 	var (
 		channels, samples = or.header.Dim()
@@ -70,7 +73,19 @@ func (or *obfReader) Sequential() (v [][]float64, inxs []int64, err error) {
 	if or.read {
 		return nil, nil, fmt.Errorf("stream exhausted (get a new reader)")
 	}
+	if or.header.StorageMode == StorageModeParallel {
+		return nil, nil, fmt.Errorf("no sequential payload, use parallel")
+	}
 	or.read = true
+
+	// if the storage mode is combined, we must skip to the
+	// start of the sequential payload
+	if or.header.StorageMode == StorageModeCombined {
+		// throw away the parallel
+		if _, err = io.ReadFull(or.r, make([]byte, or.ps)); err != nil {
+			return nil, nil, err
+		}
+	}
 
 	channels, samples := or.header.Dim()
 	v = make([][]float64, channels)
