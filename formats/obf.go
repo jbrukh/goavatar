@@ -198,12 +198,8 @@ type (
 // OBF Header
 // ----------------------------------------------------------------- //
 
-func (h *ObfHeader) Ch() int {
-	return int(h.Channels)
-}
-
-func (h *ObfHeader) S() int {
-	return int(h.Samples)
+func (h *ObfHeader) Dim() (channels, samples int) {
+	return int(h.Channels), int(h.Samples)
 }
 
 // ----------------------------------------------------------------- //
@@ -237,6 +233,14 @@ func writeBlockTo(w io.Writer, v []float64, ts uint32) (err error) {
 		return
 	}
 	return writeTo(w, ts)
+}
+
+// Read a block in place.
+func readBlock(r io.Reader, v []float64, ts *uint32) (err error) {
+	if err = binary.Read(r, ByteOrder, &v); err != nil {
+		return
+	}
+	return binary.Read(r, ByteOrder, ts)
 }
 
 func WriteParallelTo(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {

@@ -62,14 +62,6 @@ func (oc *obfCodec) write(i interface{}) error {
 	return writeTo(oc.file, i)
 }
 
-// Read a block in place.
-func (oc *obfCodec) readBlock(v []float64, ts *uint32) (err error) {
-	if err = oc.read(v); err != nil {
-		return
-	}
-	return oc.read(ts)
-}
-
 // Write a block in place.
 func (oc *obfCodec) writeBlock(v []float64, ts uint32) (err error) {
 	return writeBlockTo(oc.file, v, ts)
@@ -81,11 +73,12 @@ func (oc *obfCodec) mode() byte {
 }
 
 func (oc *obfCodec) timestamps() []int64 {
-	return make([]int64, oc.header.S())
+	_, samples := oc.header.Dim()
+	return make([]int64, samples)
 }
 
 func (oc *obfCodec) forChannels(f func(c int) error) error {
-	channels := oc.header.Ch()
+	channels, _ := oc.header.Dim()
 	for c := 0; c < channels; c++ {
 		if err := f(c); err != nil {
 			return err
@@ -95,7 +88,7 @@ func (oc *obfCodec) forChannels(f func(c int) error) error {
 }
 
 func (oc *obfCodec) forSamples(f func(s int) error) error {
-	samples := oc.header.S()
+	_, samples := oc.header.Dim()
 	for s := 0; s < samples; s++ {
 		if err := f(s); err != nil {
 			return err
@@ -156,7 +149,8 @@ func (oc *obfCodec) ReadHeader() (err error) {
 	if err = oc.read(&oc.header); err != nil {
 		return
 	}
-	oc.payloadSize = getPayloadSize(oc.header.Ch(), oc.header.S())
+	//	channels, samples := oc.header.Dim()
+	oc.payloadSize = getPayloadSize(oc.header.Dim())
 	return oc.validate()
 }
 
@@ -164,14 +158,14 @@ func (oc *obfCodec) ReadHeader() (err error) {
 // the file starting at the current position.
 func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 	var (
-		channels = oc.header.Ch()
-		samples  = oc.header.S()
-		v        = make([]float64, channels)
-		ts32     uint32
+		channels, samples = oc.header.Dim()
+		v                 = make([]float64, channels)
+		ts32              uint32
 	)
+
 	b = NewBlockBuffer(channels, samples)
 	err = oc.forSamples(func(s int) (err error) {
-		if err = oc.readBlock(v, &ts32); err != nil {
+		if err = readBlock(oc.file, v, &ts32); err != nil {
 			return
 		}
 		b.AppendSample(v, toTs64(ts32))
@@ -182,8 +176,8 @@ func (oc *obfCodec) ReadParallel() (b *BlockBuffer, err error) {
 
 func (oc *obfCodec) ReadSequential() (v [][]float64, ts []int64, err error) {
 	// allocate channel slices
-	v = make([][]float64, oc.header.Ch())
-	samples := oc.header.S()
+	channels, samples := oc.header.Dim()
+	v = make([][]float64, channels)
 
 	// read in all the channels sequentially
 	err = oc.forChannels(func(c int) (err error) {

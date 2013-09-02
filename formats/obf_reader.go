@@ -29,7 +29,7 @@ func NewObfReader(r io.Reader) (ObfReader, error) {
 	if err := binary.Read(or.r, ByteOrder, &or.header); err != nil {
 		return nil, err
 	}
-	or.ps = getPayloadSize(or.header.Ch(), or.header.S())
+	or.ps = getPayloadSize(or.header.Dim())
 	return or, nil
 }
 
@@ -55,18 +55,18 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 
 	// create the
 	var (
-		//	v     = make([]float64, or.h.Ch())
-		b = NewBlockBuffer(or.header.Ch(), or.header.S())
-	//	inx32 uint32
+		channels, samples = or.header.Dim()
+		b                 = NewBlockBuffer(channels, samples)
+		v                 = make([]float64, channels)
+		inx32             uint32
 	)
 
-	// err = oc.forSamples(func(s int) (err error) {
-	// 	if err = oc.readBlock(v, &ts32); err != nil {
-	// 		return
-	// 	}
-	// 	b.AppendSample(v, toTs64(ts32))
-	// 	return
-	// })
+	for s := 0; s < samples; s++ {
+		if err := readBlock(or.r, v, &inx32); err != nil {
+			return nil, err
+		}
+		b.AppendSample(v, toTs64(inx32))
+	}
 	return b, nil
 }
 
