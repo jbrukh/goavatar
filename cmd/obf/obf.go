@@ -32,6 +32,7 @@ const headerFmt = `# HEADER ----------------------------------
 # Samples:        %d
 # SampleRate:     %d
 # Endianness:     %d
+# IndexUnit:      %d
 # Reserved:       %x
 # ------------------------------------------
 `
@@ -61,9 +62,9 @@ func main() {
 		fmt.Println(preludeFmt)
 	}
 
-	codec, err := NewObfCodec(file)
+	codec, err := NewObfReader(file)
 	if err != nil {
-		fmt.Printf("could not read the header")
+		fmt.Printf("could not read the header: %v", err)
 		return
 	}
 	header := codec.Header()
@@ -71,7 +72,7 @@ func main() {
 	if !*csv {
 		// format the header
 		fmt.Printf(headerFmt, header.DataType, header.FormatVersion,
-			header.StorageMode, header.Channels, header.Samples, header.SampleRate, header.Endianness, header.Reserved)
+			header.StorageMode, header.Channels, header.Samples, header.SampleRate, header.Endianness, header.IndexUnit, header.Reserved)
 	}
 
 	if *seq {
@@ -109,11 +110,8 @@ func main() {
 		ch := len(channels)
 		if ch == 1 {
 			p.PlotX(channels[0], "Ch1")
-		} else if ch == 2 {
+		} else if ch >= 2 {
 			p.Dual(channels[0], channels[1], "Ch1", "Ch2")
-		} else {
-			fmt.Printf("sorry, max 2 channels is currently supported")
-			return
 		}
 	}
 }

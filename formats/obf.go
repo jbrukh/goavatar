@@ -95,8 +95,9 @@ const (
 
 // FormatVersions
 const (
-	FormatVersion1 = 0x01 // in this format, we have a 10 byte header
-	FormatVersion2 = 0x02 // in this format, we add a field for Endianness and 20 bytes of padding
+	FormatVersion1   = 0x01 // in this format, we have a 10 byte header
+	FormatVersion2   = 0x02 // in this format, we add a field for Endianness and 20 bytes of padding
+	FormatVersion2_1 = 0x03 // in this format, we add an IndexUnit field
 )
 
 // Endianness
@@ -107,11 +108,11 @@ const (
 
 // IndexUnit
 const (
-	Milliseconds = 0x00
-	Nanoseconds  = 0x01
-	Seconds      = 0x02
-	Hertz        = 0x03
-	Enumeration  = 0x04 // just monotonically increasing integers
+	UnitMilliseconds = 0x00
+	UnitNanoseconds  = 0x01
+	UnitSeconds      = 0x02
+	UnitHertz        = 0x03
+	UnitEnumeration  = 0x04 // just monotonically increasing integers
 )
 
 // StorageModes

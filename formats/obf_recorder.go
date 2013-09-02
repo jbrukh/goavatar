@@ -123,7 +123,7 @@ func (r *OBFRecorder) commit() (id string, err error) {
 	// write the header
 	header := &ObfHeader{
 		DataType:      DataTypeRaw,
-		FormatVersion: FormatVersion2,
+		FormatVersion: FormatVersion2_1,
 		StorageMode:   StorageModeCombined,
 		Channels:      uint8(r.channels),
 		Samples:       uint32(r.samples),

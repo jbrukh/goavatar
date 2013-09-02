@@ -15,7 +15,7 @@ type (
 	// format on various levels of abstraction.
 	obfReader struct {
 		r      io.Reader
-		header *ObfHeader
+		header ObfHeader
 		ps     int64        // payload size
 		b      *BlockBuffer // data read from parallel payload
 		read   bool         // whether the stream is exhausted
@@ -37,7 +37,7 @@ func NewObfReader(r io.Reader) (ObfReader, error) {
 // is always available upon construction. This function
 // does not have any effect on internal state.
 func (or *obfReader) Header() *ObfHeader {
-	return or.header
+	return &or.header
 }
 
 // Parallel returns the data by reading the parallel
@@ -49,24 +49,20 @@ func (or *obfReader) Parallel() (*BlockBuffer, error) {
 	// only read the stream once
 	if or.read {
 		return nil, fmt.Errorf("stream exhausted (get a new reader)")
-	} else {
-		or.read = true
 	}
-
+	or.read = true
 	var (
 		channels, samples = or.header.Dim()
 		b                 = NewBlockBuffer(channels, samples)
 		v                 = make([]float64, channels)
 		inx32             uint32
 	)
-
 	for s := 0; s < samples; s++ {
 		if err := readBlock(or.r, v, &inx32); err != nil {
 			return nil, err
 		}
 		b.AppendSample(v, toTs64(inx32))
 	}
-
 	return b, nil
 }
 
