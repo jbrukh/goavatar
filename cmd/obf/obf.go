@@ -138,7 +138,7 @@ func printParallel(codec ObfReader) {
 
 	for j := 0; j < samples; j++ {
 		// read each block
-		values, ts := bb.Sample(0)
+		values, ts := bb.Sample(j)
 		fmt.Printf("%v", ts)
 		for i := 0; i < ch; i++ {
 			fmt.Printf(",%.20f", values[i])
