@@ -12,7 +12,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar"
 	. "github.com/jbrukh/goavatar/device"
-	. "github.com/jbrukh/goavatar/formats"
+	. "github.com/jbrukh/goavatar/obf/recorder"
 	. "github.com/jbrukh/goavatar/util"
 	"io"
 	"io/ioutil"

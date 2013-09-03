@@ -5,7 +5,7 @@ package etc
 
 import (
 	. "github.com/jbrukh/goavatar/datastruct"
-	. "github.com/jbrukh/goavatar/formats"
+	. "github.com/jbrukh/goavatar/obf"
 	"log"
 	"os"
 )

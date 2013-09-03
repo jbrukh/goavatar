@@ -5,7 +5,7 @@ package device
 
 import (
 	//"log"
-	. "github.com/jbrukh/goavatar/formats"
+	. "github.com/jbrukh/goavatar/obf/recorder"
 	"testing"
 	"time"
 )

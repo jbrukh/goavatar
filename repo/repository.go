@@ -5,6 +5,7 @@ package repo
 
 import (
 	"fmt"
+	. "github.com/jbrukh/goavatar/obf"
 	. "github.com/jbrukh/goavatar/util"
 	"os"
 	"path/filepath"
@@ -198,11 +199,14 @@ func (r *Repository) ClearCache() (err error) {
 // List all the resources in a subdirectory.
 func (r *Repository) list(subdir string) (infos []*ResourceInfo, err error) {
 	err = r.forEach(subdir, func(path string, f os.FileInfo) error {
+		// best-effort duration here
+		duration, _ := ApproxDurationMs(path)
 		infos = append(infos, &ResourceInfo{
 			Id:           f.Name(),
 			File:         path,
 			SizeBytes:    f.Size(),
 			LastModified: f.ModTime().Unix(),
+			Duration:     int64(duration),
 		})
 		return nil
 	})

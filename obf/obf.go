@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package formats
+package obf
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"fmt"
 	. "github.com/jbrukh/goavatar/datastruct"
 	"io"
+	"os"
 )
 
 // ----------------------------------------------------------------- //
@@ -237,7 +238,7 @@ func ReadParallel(r io.Reader, header *ObfHeader) (*BlockBuffer, error) {
 		if err := readBlock(r, v, &inx32); err != nil {
 			return nil, err
 		}
-		b.AppendSample(v, toTs64(inx32))
+		b.AppendSample(v, ToTs64(inx32))
 	}
 	return b, nil
 }
@@ -271,7 +272,7 @@ func ReadSequential(r io.Reader, header *ObfHeader) (v [][]float64, inxs []int64
 		if err = binary.Read(r, ByteOrder, &inx32); err != nil {
 			return nil, nil, err
 		}
-		inxs[s] = toTs64(inx32)
+		inxs[s] = ToTs64(inx32)
 	}
 	return
 }
@@ -311,6 +312,23 @@ func WriteSequential(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) 
 }
 
 // ----------------------------------------------------------------- //
+// Duration Methods
+// ----------------------------------------------------------------- //
+
+func ApproxDurationMs(obfFile string) (d int, err error) {
+	r, err := os.Open(obfFile)
+	if err != nil {
+		return
+	}
+	h, err := ReadHeader(r)
+	if err != nil {
+		return
+	}
+	d = 1000 * int(h.Samples) / int(h.SampleRate)
+	return
+}
+
+// ----------------------------------------------------------------- //
 // Private Helper Methods
 // ----------------------------------------------------------------- //
 
@@ -320,16 +338,16 @@ func getPayloadSize(channels, samples int) int64 {
 	return int64(samples) * (int64(channels)*ObfValueSize + ObfIndexValueSize)
 }
 
-func toTs64(ts uint32) int64 {
+func ToTs64(ts uint32) int64 {
 	return int64(ts) * 1000000
 }
 
-func toTs32(ts int64) uint32 {
+func ToTs32(ts int64) uint32 {
 	return uint32(ts / 1000000)
 }
 
-func toTs32Diff(ts int64, diff int64) uint32 {
-	return toTs32(ts - diff)
+func ToTs32Diff(ts int64, diff int64) uint32 {
+	return ToTs32(ts - diff)
 }
 
 func writeBlock(w io.Writer, v []float64, ts uint32) (err error) {

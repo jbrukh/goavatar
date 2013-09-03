@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package formats
+package obf
 
 import (
 	"encoding/binary"

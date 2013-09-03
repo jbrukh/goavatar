@@ -1,11 +1,12 @@
 //
 // Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 //
-package formats
+package recorder
 
 import (
 	"bytes"
 	. "github.com/jbrukh/goavatar/datastruct"
+	. "github.com/jbrukh/goavatar/obf"
 	. "github.com/jbrukh/goavatar/repo"
 	"io"
 	"log"
@@ -33,7 +34,7 @@ type ObfRecorder struct {
 }
 
 func (r *ObfRecorder) tsTransform(ts int64) uint32 {
-	return toTs32Diff(ts, r.tsFirst)
+	return ToTs32Diff(ts, r.tsFirst)
 }
 
 func NewObfRecorder(repo *Repository) *ObfRecorder {
@@ -151,7 +152,7 @@ func (r *ObfRecorder) commit() (id string, err error) {
 		return "", err
 	}
 
-	if err = r.codec.WriteSequential(b, toTs32); err != nil {
+	if err = r.codec.WriteSequential(b, ToTs32); err != nil {
 		return "", err
 	}
 
