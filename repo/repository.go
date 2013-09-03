@@ -41,6 +41,7 @@ type ResourceInfo struct {
 	File         string `json:"file"`
 	SizeBytes    int64  `json:"size_bytes"`
 	LastModified int64  `json:"last_modified"`
+	Duration     int64  `json:"duration"`
 }
 
 // ----------------------------------------------------------------- //
