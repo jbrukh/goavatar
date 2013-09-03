@@ -146,61 +146,6 @@ func Test__SeekHeader(t *testing.T) {
 	})
 }
 
-func Test__SeekSequential(t *testing.T) {
-	testWithCodec(t, func(t *testing.T, oc *obfCodec) {
-		h, err := ReadHeader(oc.file)
-		if err != nil {
-			t.Errorf("could not read the mock header")
-		}
-
-		// seek back to the values
-		if err = oc.SeekSequential(); err != nil {
-			t.Fatalf("could not seek to the values")
-		}
-
-		channels, ts, err := ReadSequential(oc.file, h)
-		if err != nil {
-			t.Fatalf("could not read sequential")
-		}
-
-		for _, channel := range channels {
-			for i, v := range channel {
-				if v != float64(i) {
-					t.Fatalf("wrong channel value")
-				}
-			}
-		}
-
-		for i, ts64 := range ts {
-			if ts64 != int64(i) {
-				t.Fatalf("wrong timestamp value")
-			}
-		}
-	})
-}
-
-func Test__Seeking(t *testing.T) {
-	testWithCodec(t, func(t *testing.T, oc *obfCodec) {
-		assertNoErrors(t,
-			func() error {
-				return oc.SeekHeader()
-			},
-			func() error {
-				return oc.SeekValues()
-			},
-			func() error {
-				return oc.SeekSequential()
-			},
-			func() error {
-				return oc.SeekParallel()
-			},
-			func() error {
-				return oc.SeekHeader()
-			},
-		)
-	})
-}
-
 func assertNoErrors(t *testing.T, fs ...func() error) {
 	for i, f := range fs {
 		if err := f(); err != nil {
