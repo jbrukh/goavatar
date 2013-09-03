@@ -32,7 +32,7 @@ type (
 	}
 )
 
-// Create a new OBFReader and read the header. If the header
+// Create a new OBFCodec and read the header. If the header
 // cannot be read an error is returned.
 func NewObfCodec(file io.ReadWriteSeeker) (oc ObfCodec, err error) {
 	c := &obfCodec{file: file}
@@ -40,6 +40,14 @@ func NewObfCodec(file io.ReadWriteSeeker) (oc ObfCodec, err error) {
 		return
 	}
 	return c, nil
+}
+
+// Create a new OBF codec that is meant for generating OBF files
+// whose length is not yet known. Use this codec with seek and
+// write operations only. WARNING: Read operations will fail until
+// a header is written. (TODO)
+func NewLiveObfCodec(file io.ReadWriteSeeker) (oc ObfCodec) {
+	return &obfCodec{file: file}
 }
 
 // ----------------------------------------------------------------- //

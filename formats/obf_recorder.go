@@ -19,7 +19,7 @@ type ObfRecorder struct {
 	repo     *Repository // repository where file is being recorded to
 	fileName string      // name of the file/resource id
 	file     *os.File    // the file we're writing
-	codec    *obfCodec   // codec for the OBF format
+	codec    ObfCodec    // codec for the OBF format
 
 	// diagnostics
 	channels   int
@@ -118,7 +118,7 @@ func (r *ObfRecorder) commit() (id string, err error) {
 	}()
 
 	// get the codec
-	r.codec = &obfCodec{file: r.file}
+	r.codec = NewLiveObfCodec(r.file)
 
 	// write the header
 	header := &ObfHeader{

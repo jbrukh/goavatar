@@ -180,6 +180,7 @@ type (
 	ObfWriter interface {
 		WriteHeader(*ObfHeader) error
 		WriteParallel(*BlockBuffer, func(int64) uint32) error
+		WriteSequential(*BlockBuffer, func(int64) uint32) (err error)
 	}
 
 	// ObfSeeker is able to seek to sections of OBF.
