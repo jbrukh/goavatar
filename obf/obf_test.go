@@ -114,15 +114,12 @@ func testWithCodec(t *testing.T, tf func(t *testing.T, oc *obfCodec)) {
 }
 
 func Test__ReadHeader(t *testing.T) {
-	var err error
 	testWithCodec(t, func(t *testing.T, oc *obfCodec) {
 		// read the header in place
-		if err = oc.ReadHeader(); err != nil {
+		h, err := ReadHeader(oc.file)
+		if err != nil {
 			t.Errorf("could not read header in place: %v", err)
 		}
-
-		// check the header
-		h := oc.Header()
 		assertMockHeader(t, h)
 	})
 }
@@ -140,26 +137,28 @@ func Test__SeekHeader(t *testing.T) {
 			t.Errorf("could not seek to the values")
 		}
 
+		h, err := ReadHeader(oc.file)
 		// read the header
-		if err = oc.ReadHeader(); err != nil {
+		if err != nil {
 			t.Errorf("could not read header in place: %v", err)
 		}
-
-		// check the header
-		h := oc.Header()
 		assertMockHeader(t, h)
 	})
 }
 
 func Test__SeekSequential(t *testing.T) {
-	var err error
 	testWithCodec(t, func(t *testing.T, oc *obfCodec) {
+		h, err := ReadHeader(oc.file)
+		if err != nil {
+			t.Errorf("could not read the mock header")
+		}
+
 		// seek back to the values
 		if err = oc.SeekSequential(); err != nil {
 			t.Fatalf("could not seek to the values")
 		}
 
-		channels, ts, err := ReadSequential(oc.file, &oc.header)
+		channels, ts, err := ReadSequential(oc.file, h)
 		if err != nil {
 			t.Fatalf("could not read sequential")
 		}

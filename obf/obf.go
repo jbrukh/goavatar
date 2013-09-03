@@ -281,6 +281,10 @@ func ReadSequential(r io.Reader, header *ObfHeader) (v [][]float64, inxs []int64
 // Generic Writing Methods -- all these write the current position
 // ----------------------------------------------------------------- //
 
+func WriteHeader(w io.Writer, header *ObfHeader) (err error) {
+	return binary.Write(w, ByteOrder, header)
+}
+
 func WriteParallel(w io.Writer, b *BlockBuffer, indexFunc func(int64) uint32) (err error) {
 	// write parallel samples to a buffer
 	buf := new(bytes.Buffer)

@@ -26,20 +26,24 @@ type (
 	// obfCodec will read and write the OBF
 	// format on various levels of abstraction.
 	obfCodec struct {
-		file        io.ReadWriteSeeker
-		header      ObfHeader
-		payloadSize int64
+		file   io.ReadWriteSeeker
+		header *ObfHeader
+		ps     int64 // payload size
 	}
 )
 
 // Create a new OBFCodec and read the header. If the header
 // cannot be read an error is returned.
 func NewObfCodec(file io.ReadWriteSeeker) (oc ObfCodec, err error) {
-	c := &obfCodec{file: file}
-	if err = c.ReadHeader(); err != nil {
+	// TODO: codec shouldn't expect header here
+	header, err := ReadHeader(file)
+	if err != nil {
 		return
 	}
-	return c, nil
+	return &obfCodec{
+		file:   file,
+		header: header,
+	}, nil
 }
 
 // Create a new OBF codec that is meant for generating OBF files
@@ -62,12 +66,6 @@ func (oc *obfCodec) validate() (err error) {
 // Read a piece of binary data from the underlying stream.
 func (oc *obfCodec) read(i interface{}) error {
 	return binary.Read(oc.file, ByteOrder, i)
-}
-
-// Write a piece of binary data to the underlying stream,
-// in place.
-func (oc *obfCodec) write(i interface{}) error {
-	return binary.Write(oc.file, ByteOrder, i)
 }
 
 func (oc *obfCodec) timestamps() []int64 {
@@ -126,7 +124,7 @@ func (oc *obfCodec) SeekSequential() (err error) {
 	if oc.header.StorageMode == StorageModeParallel {
 		return fmt.Errorf("no sequential values available in this mode")
 	}
-	_, err = oc.file.Seek(ObfHeaderSize+oc.payloadSize, os.SEEK_SET)
+	_, err = oc.file.Seek(ObfHeaderSize+oc.ps, os.SEEK_SET)
 	return
 }
 
@@ -139,20 +137,6 @@ func (oc *obfCodec) SeekSample(n int) (err error) {
 }
 
 // ----------------------------------------------------------------- //
-// Reading Operations -- all these operations happen in-place
-// ----------------------------------------------------------------- //
-
-// Read the ObfHeader of this file.
-func (oc *obfCodec) ReadHeader() (err error) {
-	if err = oc.read(&oc.header); err != nil {
-		return
-	}
-	//	channels, samples := oc.header.Dim()
-	oc.payloadSize = getPayloadSize(oc.header.Dim())
-	return oc.validate()
-}
-
-// ----------------------------------------------------------------- //
 // Reading Operations -- these operations seek and do validation,
 // so are more user-facing and safer
 // ----------------------------------------------------------------- //
@@ -160,7 +144,7 @@ func (oc *obfCodec) ReadHeader() (err error) {
 // Return the last header that had been read. Notice
 // header is read upon instantiation.
 func (oc *obfCodec) Header() *ObfHeader {
-	return &oc.header
+	return oc.header
 }
 
 // Read the entire set of parallel values from the file.
@@ -168,13 +152,15 @@ func (oc *obfCodec) Parallel() (b *BlockBuffer, err error) {
 	if err = oc.SeekHeader(); err != nil {
 		return
 	}
-	if err = oc.ReadHeader(); err != nil {
+	if oc.header, err = ReadHeader(oc.file); err != nil {
 		return
+	} else {
+		oc.ps = getPayloadSize(oc.header.Dim())
 	}
 	if err = oc.SeekParallel(); err != nil {
 		return
 	}
-	return ReadParallel(oc.file, &oc.header)
+	return ReadParallel(oc.file, oc.header)
 }
 
 // Read the entire set of sequential values from the file.
@@ -182,13 +168,15 @@ func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
 	if err = oc.SeekHeader(); err != nil {
 		return
 	}
-	if err = oc.ReadHeader(); err != nil {
+	if oc.header, err = ReadHeader(oc.file); err != nil {
 		return
+	} else {
+		oc.ps = getPayloadSize(oc.header.Dim())
 	}
 	if err = oc.SeekSequential(); err != nil {
 		return
 	}
-	return ReadSequential(oc.file, &oc.header)
+	return ReadSequential(oc.file, oc.header)
 }
 
 // ----------------------------------------------------------------- //
@@ -197,7 +185,7 @@ func (oc *obfCodec) Sequential() (v [][]float64, ts []int64, err error) {
 
 // Write a new header to this file.
 func (oc *obfCodec) WriteHeader(h *ObfHeader) (err error) {
-	return oc.write(h)
+	return WriteHeader(oc.file, h)
 }
 
 // Writes a data frame in parallel mode, assuming the writer
