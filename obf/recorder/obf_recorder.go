@@ -20,7 +20,7 @@ type ObfRecorder struct {
 	repo     *Repository // repository where file is being recorded to
 	fileName string      // name of the file/resource id
 	file     *os.File    // the file we're writing
-	codec    ObfCodec    // codec for the OBF format
+	codec    *ObfCodec   // codec for the OBF format
 
 	// diagnostics
 	channels   int
@@ -124,11 +124,12 @@ func (r *ObfRecorder) commit() (id string, err error) {
 	// write the header
 	header := &ObfHeader{
 		DataType:      DataTypeRaw,
-		FormatVersion: FormatVersion2_1,
+		FormatVersion: ObfDefaultFormatVersion,
 		StorageMode:   StorageModeCombined,
 		Channels:      uint8(r.channels),
 		Samples:       uint32(r.samples),
 		SampleRate:    uint16(r.sampleRate),
+		Endianness:    ObfDefaultByteOrder,
 	}
 	if err = r.codec.WriteHeader(header); err != nil {
 		return "", err

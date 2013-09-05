@@ -101,11 +101,17 @@ const (
 	FormatVersion2_1 = 0x03 // in this format, we add an IndexUnit field
 )
 
+// Default format version
+const ObfDefaultFormatVersion = FormatVersion2_1
+
 // Endianness
 const (
 	BigEndian    = 0x00
 	LittleEndian = 0x01
 )
+
+// Default byte order
+const ObfDefaultByteOrder = BigEndian
 
 // IndexUnit
 const (
@@ -179,9 +185,8 @@ type (
 	// the implementation it may or may not be able
 	// to seek to parts of the file.
 	ObfWriter interface {
-		WriteHeader(*ObfHeader) error
-		WriteParallel(*BlockBuffer, func(int64) uint32) error
-		WriteSequential(*BlockBuffer, func(int64) uint32) (err error)
+		Write(*BlockBuffer) error
+		Close() error
 	}
 
 	// ObfSeeker is able to seek to sections of OBF.
