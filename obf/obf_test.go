@@ -5,6 +5,7 @@ package obf
 
 import (
 	"io"
+	"os"
 	"testing"
 )
 
@@ -117,5 +118,40 @@ func TestObf__ReadSequential(t *testing.T) {
 
 	if inxs[0] != 0 || inxs[1] != 1000000 {
 		t.Errorf("unexpected index values: %v", inxs)
+	}
+}
+
+func TestObf__WriteHeader(t *testing.T) {
+	h := &ObfHeader{
+		DataType:      1,
+		FormatVersion: 3,
+		StorageMode:   3,
+		Channels:      20,
+		Samples:       100,
+		SampleRate:    100,
+		Endianness:    0,
+		IndexUnit:     0,
+	}
+	fp, err := os.OpenFile("../var/header_test", os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		t.Errorf("could not open file: %v\n", err)
+	}
+
+	if err = WriteHeader(fp, h); err != nil {
+		t.Errorf("could not write header")
+	}
+
+	if _, err = fp.Seek(0, os.SEEK_SET); err != nil {
+		t.Errorf("could not rewind")
+	}
+
+	hdr, err := ReadHeader(fp)
+	if err != nil {
+		t.Errorf("could not read back header")
+	}
+
+	if hdr.DataType != 1 || hdr.FormatVersion != 3 || hdr.StorageMode != 3 || hdr.Channels != 20 || hdr.Samples != 100 ||
+		hdr.SampleRate != 100 || hdr.Endianness != 0 || hdr.IndexUnit != 0 {
+		t.Errorf("header does not match")
 	}
 }
