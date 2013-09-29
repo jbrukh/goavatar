@@ -99,8 +99,16 @@ func parseByteStream(r io.ReadCloser, c *Control) (err error) {
 			return err
 		}
 	}
+
+	// take into account trigger channel info
+	// if it is available
+	channels := frame.Channels()
+	if frame.HasTriggerChannel() {
+		channels += 2
+	}
+
 	info := &DeviceInfo{
-		Channels:   frame.Channels(),
+		Channels:   channels,
 		SampleRate: frame.SampleRate(),
 	}
 	c.SendInfo(info)
