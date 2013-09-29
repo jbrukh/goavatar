@@ -145,23 +145,38 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 
 	// allocate the slices for the data
 	var (
-		samples    = header.Samples()
-		channels   = header.Channels()
-		hasTrigger = header.HasTriggerChannel()
-		δ          = time.Second / time.Duration(header.SampleRate())
+		samples     = header.Samples()
+		channels    = header.Channels()
+		hasTrigger  = header.HasTriggerChannel()
+		δ           = time.Second / time.Duration(header.SampleRate())
+		auxChannels = 0
 	)
 
-	data := NewBlockBuffer(channels, samples)
+	// if the user has trigger enabled, we will provide two
+	// extra channels in the start of the sequence
+	if hasTrigger {
+		auxChannels += 2
+	}
+	data := NewBlockBuffer(auxChannels+channels, samples)
 
 	// write the samples in blocks
 	for j := 0; j < samples; j++ {
+		totalChannels := auxChannels + channels
+		p := make([]float64, 0, totalChannels)
+
 		if hasTrigger {
-			// skip the trigger channel
+			// append the two trigger values
+			x, y := consumeTriggerData(payload)
+			p = append(p, x)
+			p = append(p, y)
+
+			// move forward in the payload
 			payload = payload[AvatarPointSize:]
 		}
-		p := make([]float64, channels)
-		for c := range p {
-			p[c] = consumeDataPoint(payload, float64(header.VoltRange()))
+
+		for c := 0; c < channels; c++ {
+			dp := consumeDataPoint(payload, float64(header.VoltRange()))
+			p = append(p, dp)
 			payload = payload[AvatarPointSize:]
 		}
 
@@ -178,6 +193,11 @@ func (r *avatarParser) ParseFrame() (dataFrame *AvatarDataFrame, err error) {
 	}
 	//log.Printf("got time: %v %v", dataFrame.Generated().UnixNano(), dataFrame.Received().UnixNano())
 	return
+}
+
+func consumeTriggerData(payload []byte) (opticalInput float64, keypadSwitch float64) {
+	b := payload[2]
+	return float64(b & 0x01), float64(b & 0x02)
 }
 
 func consumeDataPoint(payload []byte, voltRange float64) float64 {
