@@ -6,8 +6,13 @@ package socket
 import (
 	"bytes"
 	"code.google.com/p/go.net/websocket"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/binary"
 	"encoding/json"
+	"encoding/pem"
 	"flag"
 	"fmt"
 	. "github.com/jbrukh/goavatar"
@@ -17,9 +22,12 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/big"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // --------------------------------------------------------- //
@@ -65,6 +73,74 @@ func NewOctopusSocket(device Device) *OctopusSocket {
 	}
 }
 
+func GenerateTLS() {
+	priv, err := rsa.GenerateKey(rand.Reader, 1024)
+	if err != nil {
+		log.Fatalf("failed to generate private key: %s", err)
+		return
+	}
+
+	var notBefore time.Time
+
+	notBefore = time.Now()
+	notAfter := notBefore.Add(365 * 24 * time.Hour)
+
+	// end of ASN.1 time
+	endOfTime := time.Date(2049, 12, 31, 23, 59, 59, 0, time.UTC)
+	if notAfter.After(endOfTime) {
+		notAfter = endOfTime
+	}
+
+	template := x509.Certificate{
+		SerialNumber: new(big.Int).SetInt64(0),
+		Subject: pkix.Name{
+			Organization: []string{"Octopus Metrics"},
+		},
+		NotBefore: notBefore,
+		NotAfter:  notAfter,
+
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+	}
+
+	hosts := []string{"localhost"}
+	for _, h := range hosts {
+		if ip := net.ParseIP(h); ip != nil {
+			template.IPAddresses = append(template.IPAddresses, ip)
+		} else {
+			template.DNSNames = append(template.DNSNames, h)
+		}
+	}
+
+	template.IsCA = true
+	template.KeyUsage |= x509.KeyUsageCertSign
+
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
+	if err != nil {
+		log.Fatalf("Failed to create certificate: %s", err)
+		return
+	}
+
+	certOut, err := os.Create("cert.pem")
+	if err != nil {
+		log.Fatalf("failed to open cert.pem for writing: %s", err)
+		return
+	}
+	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+	certOut.Close()
+	log.Print("written cert.pem\n")
+
+	keyOut, err := os.OpenFile("key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		log.Print("failed to open key.pem for writing:", err)
+		return
+	}
+	pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)})
+	keyOut.Close()
+	log.Print("written key.pem\n")
+}
+
 func (s *OctopusSocket) ListenAndServe() {
 	var (
 		port      = fmt.Sprintf(":%d", *listenPort)
@@ -84,8 +160,8 @@ Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 
 	fmt.Printf("Version:  %s\n", Version())
 	fmt.Printf("Device:   %v\n", s.device.Name())
-	fmt.Printf("Control:  http://localhost:%d%s\n", *listenPort, *controlEndpoint)
-	fmt.Printf("Data:     http://localhost:%d%s\n", *listenPort, *dataEndpoint)
+	fmt.Printf("Control:  wss://localhost:%d%s\n", *listenPort, *controlEndpoint)
+	fmt.Printf("Data:     wss://localhost:%d%s\n", *listenPort, *dataEndpoint)
 	fmt.Printf("Repo:     %v\n\n", absRepo)
 
 	// ensure the repository exists
@@ -96,7 +172,10 @@ Copyright (c) 2013 Jake Brukhman/Octopus. All rights reserved.
 	http.Handle(*controlEndpoint, wsControl)
 	http.Handle(*dataEndpoint, wsData)
 
-	if err := http.ListenAndServe(port, nil); err != nil {
+	// generate the cert and key
+	GenerateTLS()
+
+	if err := http.ListenAndServeTLS(port, "cert.pem", "key.pem", nil); err != nil {
 		log.Fatalf("could not start OctopusSocket: %v", err)
 	}
 }
