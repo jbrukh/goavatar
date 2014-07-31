@@ -1,5 +1,5 @@
-Octopus Connector
-=================
+Goavatar
+=========
 
 Local component that interfaces with external devices and the Octopus website.
 
