@@ -272,4 +272,6 @@ For example:
 License
 =======
 
-Copyright (c) 2013. Jake Brukhman/Octopus. All rights reserved. This is proprietary software. Do not distribute.
+Copyright (c) 2013. Jake Brukhman/Octopus. 
+
+I am hereby releasing this software under the MIT License.
